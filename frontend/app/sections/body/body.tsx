@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Image, FlatList, Button, Pressable } from 'react-native'
+import { View, Text, StyleSheet, Image, FlatList, Pressable } from 'react-native'
 import React, { useEffect } from 'react'
 import Theme from '../../../colors/ColorScheme.ts'
 import Card from '../../components/Card/card.tsx'

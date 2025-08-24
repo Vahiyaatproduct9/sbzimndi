@@ -11,14 +11,16 @@ import extendToken from './api/extendToken.js'
 const app = express()
 const port = 8080
 app.use(json())
-app.use(cors())
+app.use(cors({
+    allowedHeaders: ['*']
+}))
 
 const upload = multer({ storage: multer.memoryStorage() });
 app.post('/profile', async (req, res) => {
-    const { access_token } = req.body
+    const { access_token } = await req.body
     if (access_token) {
         const response = await getProfile({ access_token })
-        res.send(response)
+        res.status(200).json(response)
     }
 })
 
@@ -101,16 +103,16 @@ app.post('/addpost', upload.single('photo'), async (req, res) => {
 app.post('/extendToken', async (req, res) => {
     const { refresh_token } = req.body
     const { data, error } = await extendToken(refresh_token)
-    console.log('extendToken 🙏🏻 --> ', error)
-    if (data.session && !error) {
-        return res.status(200).json({
+    console.log('extendToken from backend🙏🏻 --> ', data)
+    if (data.session) {
+        return res.json({
             status: 200,
             access_token: data.session.access_token,
             refresh_token: data.session.refresh_token
         })
     }
     else return res.json({
-        status: error.status || 400,
+        status: error ? error.status : 400,
         ...error
     })
 })

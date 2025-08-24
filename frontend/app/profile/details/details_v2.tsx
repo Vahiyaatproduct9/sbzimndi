@@ -23,12 +23,15 @@ import Theme from '../../../colors/ColorScheme.ts'
 import Animation, { withDelay, withSpring } from 'react-native-reanimated'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import checkUser from '../../../api/checkUser.ts'
-import { getName } from '../../functions/getLocalInfo.ts'
+import { getAccessToken, getName } from '../../functions/getLocalInfo.ts'
 // import { getSpirit } from '../../functions/toggleSpiritAnimal.ts'
 import { imageProperty, spiritProperty, svgProperty, textProperty, transform, settingsProperty, animatedStyle } from '../../animation/animation.ts'
 import { getSpirit } from '../../functions/toggleSpiritAnimal.ts'
+import { useIsFocused } from '@react-navigation/native'
+import getProfile from '../../../api/getProfile.ts'
+
 const Details = ({ navigation, route }: any) => {
-    const { change, setchange }: { change: boolean, setchange: React.Dispatch<SetStateAction<boolean>> } = route.params;
+    const isFocused = useIsFocused()
     const height = useWindowDimensions().height
     const width = useWindowDimensions().width
     const [spiritAnimal, setSpiritAnimal] = useState<string>('')
@@ -39,12 +42,15 @@ const Details = ({ navigation, route }: any) => {
             const refresh_token = await AsyncStorage.getItem('refresh_token')
             if (access_token && access_token.length > 0 && refresh_token && refresh_token.length > 0) {
                 const { access_token: at, refresh_token: rt } = await checkUser({ access_token, refresh_token })
-                if (at === null || rt === null) {
+                console.log('final ->', await at, await rt)
+                if (await at === null || await rt === null) {
+                    route.params.setLogged(false)
                     await AsyncStorage.removeItem('access_token')
                     await AsyncStorage.removeItem('refresh_token')
                 } else {
-                    await AsyncStorage.setItem('access_token', at)
-                    await AsyncStorage.setItem('refresh_token', rt)
+                    route.params.setLogged(true)
+                    await AsyncStorage.setItem('access_token', await at)
+                    await AsyncStorage.setItem('refresh_token', await rt)
                 }
             }
         }
@@ -61,7 +67,6 @@ const Details = ({ navigation, route }: any) => {
         settingsProperty.opacity.value = withDelay(500, withSpring(1))
     }, [])
     const spirit = () => {
-        console.log('spirit animal from details -->', spiritAnimal)
         if (spiritAnimal === 'sparrow.png') return sparrow
         else if (spiritAnimal === 'orca.png') return orca
         else if (spiritAnimal === 'cheetah.png') return cheetah
@@ -77,12 +82,19 @@ const Details = ({ navigation, route }: any) => {
     useEffect(() => {
         const d = async () => {
             await getSpirit().then(animal => {
-                console.log(animal)
                 setSpiritAnimal(animal)
             })
         }
         d()
-    }, [change])
+    }, [isFocused])
+    useEffect(() => {
+        const getProf = async () => {
+            const access_token = await getAccessToken()
+            const profileData = await getProfile(access_token)
+            console.log(profileData)
+        }
+        getProf()
+    })
     return (
         <View style={css.container}>
             <View style={css.head}>

@@ -1,9 +1,9 @@
 import { Appearance } from "react-native"
-const theme = Appearance.getColorScheme()
-export const dark = theme === 'dark' ? true : false
+const heme = Appearance.getColorScheme()
+export const dark = heme === 'dark' ? true : false
 // theme = 'light'
 function check() {
-    if (theme === 'dark') {
+    if (heme === 'dark') {
         return {
             backgroundColor: '#1E1E1B',   // deep matte charcoal, not pure black
             text: '#D3D0CB',              // warm grayish-beige, easy on eyes
@@ -18,5 +18,5 @@ function check() {
         extra: '#DDBEA9'              // gentle clay-pink for accents
     }
 }
-const Theme = check()
-export default Theme
+const theme = check()
+export default theme

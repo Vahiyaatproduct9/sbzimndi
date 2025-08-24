@@ -24,3 +24,21 @@ export async function getBio() {
 export async function setBio(bio: string) {
     await AsyncStorage.setItem('bio', bio)
 }
+
+export async function getAccessToken() {
+    const access_token = await AsyncStorage.getItem('access_token')
+    if (access_token) return access_token
+    else return ''
+}
+export async function setAccessToken(access_token: string) {
+    await AsyncStorage.setItem('access_token', access_token)
+}
+
+export async function getRefreshToken() {
+    const refresh_token = await AsyncStorage.getItem('refresh_token')
+    if (refresh_token) return refresh_token
+    else return ''
+}
+export async function setRefreshToken(refresh_token: string) {
+    await AsyncStorage.setItem('refresh_token', refresh_token)
+}

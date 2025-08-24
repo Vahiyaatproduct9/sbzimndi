@@ -52,7 +52,10 @@ const Profile = ({ setActiveTab }: prop) => {
 
                     </>)
                     : (logged === true ? (
-                        <Stack.Screen name='Profile' component={ProfileScreen} options={{ headerShown: false }} />
+                        <Stack.Screen name='Profile'
+                            component={ProfileScreen}
+                            initialParams={{ setLogged }}
+                            options={{ headerShown: false }} />
                     ) : (
                         <Stack.Screen name='Loader' component={LoadingScreen} options={{ headerShown: false }} />))}
             </Stack.Navigator>

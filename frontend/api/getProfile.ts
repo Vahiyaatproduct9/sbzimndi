@@ -1,7 +1,16 @@
 import backendUrl from './path.ts'
-export default async function () {
-    const data = await fetch(`${backendUrl}/profile`)
-    const d = await data.text()
-    return d
+export default async function (access_token: string) {
+    const data = await fetch(`${backendUrl}/profile`,
+        {
+            method: 'POST',
+            headers: {
+                "Content-type": "application/json"
+            },
+            body: JSON.stringify({ access_token })
+        }
+    )
+    const d = await data.json()
+    console.log("Profile Data: -->", await d)
+    return await d
 }
 

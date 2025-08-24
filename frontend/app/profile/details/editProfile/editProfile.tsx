@@ -12,7 +12,7 @@ import { launchImageLibrary } from 'react-native-image-picker'
 import { getBio, getName, setName as sn, setBio as sb } from '../../../functions/getLocalInfo.ts'
 
 const EditProfile = ({ navigation, route }: any) => {
-    const { change, setchange }: { change: boolean, setchange: React.Dispatch<SetStateAction<boolean>> } = route.params;
+    // const { change, setchange }: { change: boolean, setchange: React.Dispatch<SetStateAction<boolean>> } = route.params;
     const [spiritAnimal, setSpiritAnimal] = useState<string>('')
     const [pressed, setPressed] = useState<boolean>(false)
     const [toggle, setToggle] = useState<boolean>(false)
@@ -41,10 +41,7 @@ const EditProfile = ({ navigation, route }: any) => {
                 const f = async () => await sn(name)
                 f().then(() => {
                     const f = async () => await sb(bio)
-                        .then(() => {
-                            setchange(prev => !prev)
-                            navigation.goBack()
-                        })
+                        .then(() => navigation.goBack())
                     f()
                 })
             })
@@ -86,7 +83,6 @@ const EditProfile = ({ navigation, route }: any) => {
                     >
                         {renderItem(spiritAnimals)}
                     </Picker>
-                    <Text>{spiritAnimal}</Text>
                 </View>
                 <View style={[css.TextBox, css.switch]}>
                     <Text style={[css.text, css.label]}>User Type:</Text>

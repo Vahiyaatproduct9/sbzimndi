@@ -18,13 +18,9 @@ export default async function ({ access_token, refresh_token }: prop) {
             body: JSON.stringify(data)
         })
         console.log('Getting new access_token!')
-        console.log(res)
         const response = await res.json()
-        console.log(response)
-        if (res.status !== 200) return {
-            access_token: null, refresh_token: null
-        }
-        else return {
+        console.log('response', response)
+        return {
             access_token: response.access_token,
             refresh_token: response.refresh_token
         }
