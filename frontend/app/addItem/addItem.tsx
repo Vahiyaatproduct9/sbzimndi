@@ -1,5 +1,6 @@
 import DateTimePicker from '@react-native-community/datetimepicker'
 import React, { useEffect, useState } from 'react'
+import { Image as compressor } from 'react-native-compressor'
 import {
     Keyboard, Platform, Pressable, Text, TextInput,
     TouchableWithoutFeedback, View, Image, KeyboardAvoidingView, ScrollView,
@@ -56,7 +57,20 @@ export default ({ setActiveTab }: prop) => {
             { mediaType: 'photo', selectionLimit: 1 },
             (res) => {
                 if (!res.didCancel && !res.errorCode) {
-                    setPhoto(typeof res.assets !== 'undefined' && res.assets[0].uri)
+                    const compressedImg = async () => {
+                        await compressor.compress(typeof res.assets !== 'undefined' && res.assets[0].uri || '', {
+                            compressionMethod: 'manual',
+                            maxWidth: 900,
+                            maxHeight: 900,
+                            quality: 0.7
+                        })
+                            .then((uri) => {
+                                console.log('uri => ', uri)
+                                typeof uri === 'string' ?
+                                    setPhoto(uri) : setMess('Invalid Photo')
+                            })
+                    }
+                    compressedImg()
                 }
             }
         )

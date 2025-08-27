@@ -5,6 +5,7 @@ const data = async () => {
     const d = data
     console.log(d)
 }
+import fuse from 'fuse.js'
 
 const deleteUser = async () => {
     // const res = await sbs.auth.admin.listUsers()
@@ -33,4 +34,22 @@ const find_nearest_items = async () => {
     })
     console.log(res)
 }
-find_nearest_items()
+const search = async ({ latitude, longitude, query }) => {
+    const { data, error } = await sb.rpc('find_nearest_items', {
+        p_latitude: latitude,
+        p_longitude: longitude,
+        p_limit_count: 100
+    })
+    if (data && !error) {
+        const searchPlatform = new fuse(data, {
+            includeScore: true,
+            keys: ['name', 'price', 'expiry_date']
+        })
+        const result = searchPlatform.search(query)
+        console.log(result)
+    } else {
+        console.log(error)
+    }
+}
+
+search({ latitude: 0, longitude: 0, query: 'Indian' })

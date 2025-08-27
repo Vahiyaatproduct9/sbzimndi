@@ -11,6 +11,7 @@ export default async ({ access_token }) => {
         .eq("id", data.user.id)  // users.id
         .single();
     if (!error && !userError) {
-        return { ...data.user, items: userData }
+        return { ...data.user, items: userData, status: 200 }
     }
+    else return { error, status: error.status }
 }

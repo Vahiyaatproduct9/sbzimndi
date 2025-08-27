@@ -9,6 +9,7 @@ import checkUser from './api/checkUser.js'
 import signin from './api/signin.js'
 import extendToken from './api/extendToken.js'
 import { read_items } from './api/readitems.js'
+import search from './api/search.js'
 const app = express()
 const port = 8080
 app.use(json())
@@ -21,7 +22,7 @@ app.post('/profile', async (req, res) => {
     const { access_token } = await req.body
     if (access_token) {
         const response = await getProfile({ access_token })
-        res.status(200).json(response)
+        res.status(response.status).json(response)
     }
 })
 
@@ -99,6 +100,13 @@ app.post('/extendToken', async (req, res) => {
         status: error ? error.status : 400,
         ...error
     })
+})
+
+
+app.post('/search', async (req, res) => {
+    const { latitude, longitude, query } = req.body;
+    const result = await search({ latitude, longitude, query })
+    return res.json(result)
 })
 
 

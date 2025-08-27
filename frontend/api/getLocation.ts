@@ -49,3 +49,20 @@ export async function getAndSetLocation(setLocation: (loc: [number, number, numb
         { enableHighAccuracy: true, timeout: 10000, maximumAge: 10000 }
     );
 }
+
+export async function getandsetCoarseLocation(setLocation: (loc: [number, number, number]) => void, setMessage?: React.Dispatch<SetStateAction<string>>) {
+    Geolocation.getCurrentPosition(
+        (position) => {
+            const loc: [number, number, number] = [
+                position.coords.latitude,
+                position.coords.longitude,
+                position.coords.accuracy
+            ];
+            setLocation(loc);
+        },
+        (error) => {
+            setMessage && setMessage(error.message);
+        },
+        { enableHighAccuracy: false }
+    );
+}

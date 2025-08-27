@@ -6,6 +6,7 @@ import AntDesign from 'react-native-vector-icons/AntDesign'
 import Animated, { withSpring, useSharedValue, withDelay } from 'react-native-reanimated'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import Message from '../../components/message/message.tsx'
+
 import getNearestItems from '../../../api/getNearestItems.ts'
 import { requestLocationPermission, getAndSetLocation } from '../../../api/getLocation.ts'
 
@@ -16,6 +17,7 @@ const Body = () => {
     }
     const [message, setMessage] = useState<string>('')
     const [items, setItems] = useState<any | null>(null)
+    const [fetched, setFetched] = useState<boolean | null>(null)
     const [location, setLocation] = useState<number[] | null>()
     useEffect(() => {
         containerProperty.opacity.value = withDelay(0, withSpring(1))
@@ -29,6 +31,11 @@ const Body = () => {
             }
         }
         setLoc()
+    }, [])
+    useEffect(() => {
+        setFetched(false)
+    }, [])
+    useEffect(() => {
         const componentDidMount = async () => {
             const gotLocationPermission = await requestLocationPermission()
             if (gotLocationPermission) {
@@ -41,23 +48,22 @@ const Body = () => {
                     longitude: location ? location[1] : 0,
                     accuracy: location ? location[2] : 0
                 })
-                if (await res.status === 200) {
-                    setItems(res)
-                }
-                else {
-                    setMessage('PLease Check your Internet Connection before trying again.')
-                }
+                if (await res.status === 200) setItems(res)
+                else setMessage('PLease Check your Internet Connection before trying again.')
             }
-            fetchItems()
+            fetched === false && fetchItems()
         }
         componentDidMount()
         console.log(items)
-    }, [])
+    }, [fetched])
+    useEffect(() => {
+        items === null ? setFetched(false) : setFetched(true)
+    })
     return (
         <Animated.View style={[css.container, containerProperty]}>
             <Message time={3} content={message} state={setMessage} />
-            <Text style={css.head}>Most in Demand</Text>
-            {items ? <View style={css.slider}>
+            <Text style={css.head}>Nearby Picks</Text>
+            {items !== null ? (<View style={css.slider}>
                 <FlatList
                     data={items.data}
                     renderItem={({ item }) =>
@@ -90,8 +96,8 @@ const Body = () => {
                         paddingHorizontal: 0,
                     }}
                 />
-            </View> :
-                <Text>Please Connect to the Internet!</Text>}
+            </View>) :
+                (<Text>Please Connect to the Internet!</Text>)}
         </Animated.View>
     )
 }
