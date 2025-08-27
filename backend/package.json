@@ -1,0 +1,26 @@
+{
+  "name": "sbzimndi",
+  "version": "1.0.0",
+  "description": "This is SbziMndi, A marketplace app for soon-to-be-expired items at low prices.",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon index.js",
+    "start": "node index.js"
+  },
+  "keywords": [
+    "cool"
+  ],
+  "author": "Kishor",
+  "license": "MIT",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.54.0",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.1",
+    "express": "^5.1.0",
+    "multer": "^2.0.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
+}
