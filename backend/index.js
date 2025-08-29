@@ -104,9 +104,10 @@ app.post('/extendToken', async (req, res) => {
 
 
 app.post('/search', async (req, res) => {
+    console.log('Search function running...')
     const { latitude, longitude, query } = req.body;
     const result = await search({ latitude, longitude, query })
-    return res.json(result)
+    res.json(result)
 })
 
 

@@ -16,6 +16,7 @@ export default async ({ latitude, longitude, query }: prop) => {
             query
         })
     })
-    console.log(res)
-    return res
+    const data = res.json()
+    console.log(data)
+    return data
 }

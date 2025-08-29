@@ -1,6 +1,7 @@
 import sb from '../libs/createClient.js'
 import fuse from 'fuse.js'
 export default async ({ latitude, longitude, query }) => {
+    console.log({ latitude, longitude, query })
     const { data, error } = await sb.rpc('find_nearest_items', {
         p_latitude: latitude,
         p_longitude: longitude,
@@ -12,15 +13,21 @@ export default async ({ latitude, longitude, query }) => {
             keys: [{
                 name: 'name',
                 weight: 4
-            }, 'price', {
+            },
+            {
+                name: 'price',
+                weight: 1
+            }
+                , {
                 name: 'expiry_date',
                 weight: 2
             }]
         })
         const result = searchPlatform.search(query)
         console.log(result)
-        return { ...result, status: 200 }
+        return { result: result, status: 200 }
     } else {
-        return { ...error, status: error.status || error.code }
+        console.log('err ->', error)
+        return { result: error, status: error.status || error.code }
     }
 }

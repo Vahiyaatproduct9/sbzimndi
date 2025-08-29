@@ -1,4 +1,4 @@
-import { View, Text, SafeAreaView, TextInput, Pressable, useWindowDimensions } from 'react-native'
+import { View, Text, SafeAreaView, TextInput, Pressable, useWindowDimensions, Image, ScrollView } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import css from './css.ts'
 import Feather from 'react-native-vector-icons/Feather'
@@ -6,6 +6,9 @@ import Animated, { withSpring, useSharedValue } from 'react-native-reanimated'
 import search from '../../api/search.ts'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { getandsetCoarseLocation } from '../../api/getLocation.ts'
+import data from './data.ts'
+import MtoKm from '../functions/meterstokm.ts'
+const photo = require('../../assets/images/switzerland.jpg')
 const Search = () => {
     const [searchContent, setSearchContent] = useState<string>('')
     const [searchHistory, setSearchHistory] = useState<number>(0)
@@ -27,23 +30,26 @@ const Search = () => {
 
         // Getting location from local Storage
         const setLoc = async () => {
-            const location = await AsyncStorage.getItem('location')
-            if (typeof location === 'string' && location.length > 0) {
-                const parsedLoc = JSON.parse(location)
-                if (parsedLoc[0] !== 0 || parsedLoc[1] !== 0 || parsedLoc[2] !== 0) setLocation(location)
-                else getandsetCoarseLocation(setLocation)
+            const localloc = await AsyncStorage.getItem('location')
+            console.log(localloc)
+            if (typeof localloc === 'string' && localloc.length > 0) {
+                const parsedLoc = JSON.parse(localloc)
+                setLocation(parsedLoc)
             }
             else {
                 getandsetCoarseLocation(setLocation)
             }
         }
+        setLoc()
         // This is the time elapsed to NOT continue searching
         const interval = setInterval(() => {
             setSearchHistory(prev => prev + 1)
-            console.log(searchHistory)
         }, 1000)
         return () => { clearInterval(interval) }
     }, [])
+    useEffect(() => {
+        console.log(searchHistory)
+    }, [searchHistory])
     useEffect(() => {
         if (searchContent.length > 0) {
             searchButton.width.value = withSpring(40)
@@ -53,22 +59,29 @@ const Search = () => {
             searchButton.opacity.value = withSpring(0)
         }
 
-        // the real search function
-        if (searchContent.length > 2 && searchHistory > 1) {
-            const res = async () => await search({
-                latitude: location[0],
-                longitude: location[1],
-                query: searchContent
-            }).then(result => {
-                setSearchResult(result)
-                console.log(result)
-            })
-            res()
-        }
-
     }, [searchContent])
     useEffect(() => {
         setSearchHistory(0)
+        setSearchResult(null)
+        console.log('location ->', location)
+    }, [searchContent])
+    useEffect(() => {
+        // the real search function
+        const timer = setTimeout(() => {
+            if (searchContent.length > 2) {
+                const res = async () => await search({
+                    latitude: location[0],
+                    longitude: location[1],
+                    query: searchContent
+                }).then(result => {
+                    setSearchResult(result)
+                    console.log("searchResult -> ", result)
+                })
+                res()
+            }
+            console.log(searchResult)
+        }, 800)
+        return () => { clearTimeout(timer) }
     }, [searchContent])
     return (
         <SafeAreaView>
@@ -83,6 +96,23 @@ const Search = () => {
                         </Pressable>
                     </Animated.View>
                 </Animated.View>
+                <ScrollView style={css.body}>
+                    {(searchResult && Array.isArray(searchResult.result)) ? searchResult.result.map(item => {
+                        return (<View style={css.block}>
+                            <Image source={{ uri: item.item.image_url }} style={css.blockImage} />
+                            <View style={css.blockInfo}>
+                                <View style={css.blockInfoHead}>
+                                    <Text style={css.blockText}>{item.item.name}</Text>
+                                </View>
+                                <View style={css.blockInfoInfo}>
+                                    <Text style={css.blockText}>${item.item.price}</Text>
+                                    <Text style={css.blockText}>{item.item.expiry_date}</Text>
+                                    <Text style={css.blockText}>{MtoKm(item.item.distance_meters)}</Text>
+                                </View>
+                            </View>
+                        </View>)
+                    }) : null}
+                </ScrollView>
             </View>
         </SafeAreaView>
     )
