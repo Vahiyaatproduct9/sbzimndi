@@ -79,12 +79,12 @@ app.post('/addpost', upload.single('photo'), async (req, res) => {
     const info = JSON.parse(req.body.info)
     const photo = req.file
     if (!photo) return res.status(400).json({ error: "No file uploaded" });
-    const { imgData, imgError } = await addPost({ photo, info })
-    console.log('addpost -->', imgData, imgError)
-    if (!imgError && imgData.fullPath) {
-        res.sendStatus(200)
+    const { itemError, imgError } = await addPost({ photo, info })
+    console.log('addpost Error -->', itemError, imgError)
+    if (!imgError && !itemError) {
+        res.json({ status: 200 })
     }
-    else res.sendStatus(imgError.status || 400)
+    else res.json({ status: imgError.status || 400 })
 })
 app.post('/extendToken', async (req, res) => {
     const { refresh_token } = req.body

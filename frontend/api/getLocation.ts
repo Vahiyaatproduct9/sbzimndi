@@ -30,7 +30,7 @@ export async function getAndSetLocation(setLocation: (loc: [number, number, numb
     const hasPermission = await requestLocationPermission();
 
     if (!hasPermission) {
-        console.log('Location permission denied');
+        setMessage('Location permission denied');
         return;
     }
 
@@ -41,10 +41,12 @@ export async function getAndSetLocation(setLocation: (loc: [number, number, numb
                 position.coords.longitude,
                 position.coords.accuracy
             ];
-            setLocation(loc);
+            console.log(loc)
+            return setLocation(loc);
         },
         (error) => {
-            setMessage(error.message);
+            console.log(error)
+            return setMessage(error.message);
         },
         { enableHighAccuracy: true, timeout: 10000, maximumAge: 10000 }
     );
@@ -58,10 +60,10 @@ export async function getandsetCoarseLocation(setLocation: (loc: [number, number
                 position.coords.longitude,
                 position.coords.accuracy
             ];
-            setLocation(loc);
+            return setLocation(loc);
         },
         (error) => {
-            setMessage && setMessage(error.message);
+            return setMessage && setMessage(error.message);
         },
         { enableHighAccuracy: false }
     );

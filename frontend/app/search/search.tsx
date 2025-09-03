@@ -95,6 +95,7 @@ const Search = () => {
                             </View>
                         </Pressable>
                     </Animated.View>
+                    {/* Hello Everyone I hope everyones doing fine!! */}
                 </Animated.View>
                 <ScrollView style={css.body}>
                     {(searchResult && Array.isArray(searchResult.result)) ? searchResult.result.map(item => {

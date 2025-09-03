@@ -7,8 +7,8 @@ export default async function addPost({ photo, info }) {
     try {
         const access_token = await info.access_token
         const { data, error } = await sb.auth.getUser(access_token)
-        const fileName = `${data.user.id}/${Date.now()}-${photo.originalName || '.png'}`
-        const { data: imgData, error: imgError } = await sbs
+        const fileName = `${data.user.id}/${Date.now()}${photo.originalName || '.png'}`
+        const { error: imgError } = await sbs
             .storage
             .from('uploads')
             .upload(fileName, photo.buffer, {
@@ -27,10 +27,10 @@ export default async function addPost({ photo, info }) {
                 accuracy: info.location[2],
                 image_url: `${process.env.supabaseUrl}/storage/v1/object/public/uploads/${fileName}`,
                 user_id: data.user.id,
-                location: `POINT(${info.location[0]},${info.location[1]})`
+                location: `POINT(${info.location[0]} ${info.location[1]})`
             }).select()
-
-        return { imgData, imgError }
+        console.log(itemData, itemError)
+        return { error, itemError, imgError }
     }
     catch (e) {
         console.log('❌ -->', e)

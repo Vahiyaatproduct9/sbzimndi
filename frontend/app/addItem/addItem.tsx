@@ -1,18 +1,16 @@
 import DateTimePicker from '@react-native-community/datetimepicker'
 import React, { useEffect, useState } from 'react'
-import { Image as compressor } from 'react-native-compressor'
 import {
     Keyboard, Platform, Pressable, Text, TextInput,
     TouchableWithoutFeedback, View, Image, KeyboardAvoidingView, ScrollView,
-    PermissionsAndroid
 } from 'react-native'
+import handleAddItem from '../functions/handleAddItem.ts'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import Geolocation from 'react-native-geolocation-service'
 import Ionicons from 'react-native-vector-icons/Ionicons'
-import { launchImageLibrary } from 'react-native-image-picker'
 import css from './css.ts'
 import Message from '../components/message/message.tsx'
-import addItem from '../../api/addItem.ts'
+import checkUser from '../../api/checkUser.ts'
+import imagePicker from '../functions/imagePicker.ts'
 const numList = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
 type activeTab = 'home' | 'search' | 'add' | 'profile'
 interface prop {
@@ -31,127 +29,36 @@ export default ({ setActiveTab }: prop) => {
     const [name, setName] = useState<string>('')
     const [quantity, setQuantity] = useState<string>('')
     const [desc, setDesc] = useState<string>('')
-    const [location, setLocation] = useState<Array<number>>([0, 0, 0])
+    const [location, setLocation] = useState<number[] | null>(null)
     const [posted, setPosted] = useState<boolean | null | ''>('')
     // const [loading, setLoading] = useState<boolean | null | 'uploading'>(null)
     const changeDate = (e: any, date?: Date) => {
         setShow(Platform.OS === 'ios')
         if (date) setDate(date)
     }
-    const locationPermission = async () => {
-        if (Platform.OS === 'android') {
-            const granted = await PermissionsAndroid.request(
-                PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
-            )
-            return granted === PermissionsAndroid.RESULTS.GRANTED
+    useEffect(() => {
+        const checkandValidateUser = async () => {
+            const access_token = await AsyncStorage.getItem('access_token')
+            const refresh_token = await AsyncStorage.getItem('refresh_token')
+            if (access_token && refresh_token) {
+                const res = await checkUser({
+                    access_token,
+                    refresh_token
+                })
+                await AsyncStorage.setItem('access_token', res.access_token)
+                await AsyncStorage.setItem('refresh_token', res.refresh_token)
+
+            } else setMess('Please Login to Upload Post!')
         }
-        return true
-    }
-    const getUserLocation = async () => {
-        const hasPermission = await locationPermission()
-        if (!hasPermission) return false;
-        else return true
-    }
+        checkandValidateUser()
+    }, [])
     const pickImage = () => {
-        launchImageLibrary(
-            { mediaType: 'photo', selectionLimit: 1 },
-            (res) => {
-                if (!res.didCancel && !res.errorCode) {
-                    const compressedImg = async () => {
-                        await compressor.compress(typeof res.assets !== 'undefined' && res.assets[0].uri || '', {
-                            compressionMethod: 'manual',
-                            maxWidth: 900,
-                            maxHeight: 900,
-                            quality: 0.7
-                        })
-                            .then((uri) => {
-                                console.log('uri => ', uri)
-                                typeof uri === 'string' ?
-                                    setPhoto(uri) : setMess('Invalid Photo')
-                            })
-                    }
-                    compressedImg()
-                }
-            }
-        )
+        return imagePicker({ setPhoto, setMess })
     }
     const handleSubmit = async () => {
-        if (photo &&
-            name.length > 0 &&
-            price.length > 0 &&
-            desc.length > 0
-        ) {
-            setPosted(null)
-            const access_token = await AsyncStorage.getItem('access_token')
-            if (access_token) {
-                const falseLocation = async () => {
-                    const d = await AsyncStorage.getItem('location')
-                    if (!d) return true // no location stored at all
-                    const r = JSON.parse(d)
-                    return !Array.isArray(r) || r.length !== 3 || r.every(v => v === 0)
-                }
-                const isfalseLocation = await falseLocation()
-                if (isfalseLocation) {
-                    const permission = await getUserLocation()
-                    if (permission) {
-                        Geolocation.getCurrentPosition(
-                            (position) => {
-                                setLocation(
-                                    [position.coords.latitude,
-                                    position.coords.longitude,
-                                    position.coords.accuracy])
-                                const setLctn = async () => {
-                                    await AsyncStorage.setItem("location",
-                                        JSON.stringify([
-                                            position.coords.latitude,
-                                            position.coords.longitude,
-                                            position.coords.accuracy]))
-                                }
-                                setLctn()
-                            },
-                            (error) => setMess(error.message),
-                            {
-                                enableHighAccuracy: true,
-                                timeout: 10000,
-                                maximumAge: 10000
-                            },
-                        )
-                    } else {
-                        setMess('Please set Location before Posting...')
-                        setPosted(false)
-                    }
-                }
-                // send the actual post function
-                const data = new FormData()
-                data.append("photo", {
-                    uri: photo,
-                    name: 'image.png',
-                    type: "image/png"
-                } as any)
-                data.append("info", JSON.stringify({
-                    name,
-                    price,
-                    expiryDate: date,
-                    quantity,
-                    desc,
-                    location,
-                    access_token: access_token
-                }))
-                const res = await addItem(data)
-                setPosted(res)
-                // function ends here
-            }
-            else {
-                setMess('Please Login Before Posting.')
-                setTimeout(() => {
-                    setActiveTab('profile')
-                }, 1500)
-            }
-        }
-        else {
-            setMess('Everything has to be filled!')
-            setPosted(false)
-        }
+        return await handleAddItem({
+            setPosted, photo, name, date, quantity, location, price, desc, setLocation, setMess, setActiveTab
+        })
     }
     useEffect(() => {
         if (posted) {
@@ -164,6 +71,7 @@ export default ({ setActiveTab }: prop) => {
     useEffect(() => {
         console.log(photo)
     }, [photo])
+    useEffect(() => console.log('location from addItem --->', location), [location])
 
     useEffect(() => {
         if (new Date(date).getTime() <= new Date().getTime()) {
@@ -300,7 +208,7 @@ export default ({ setActiveTab }: prop) => {
                                 onFocus={() => setFocus('desc')}
                                 onBlur={() => setFocus(null)}
                                 numberOfLines={10}
-                                textAlignVertical='top'
+
                             />
                         </View>
                         <View style={css.buttonView}>
@@ -313,10 +221,7 @@ export default ({ setActiveTab }: prop) => {
                                 <Text style={css.buttonTxt}>
                                     {posted === null ? 'Posting..' : (
                                         posted === false ? 'Try Again?' :
-                                            (
-                                                posted === true ? 'Posted!' :
-                                                    'Post'
-                                            )
+                                            (posted === true ? 'Posted!' : 'Post')
                                     )}
                                 </Text>
                             </Pressable>
