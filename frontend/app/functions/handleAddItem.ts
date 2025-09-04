@@ -1,19 +1,9 @@
-import { getAndSetLocation } from "../../api/getLocation"
-import addItem from "../../api/addItem"
-import AsyncStorage from "@react-native-async-storage/async-storage"
-export default async ({
-    setPosted,
-    photo,
-    name,
-    date,
-    quantity,
-    location,
-    price,
-    desc,
-    setLocation,
-    setMess,
-    setActiveTab
-}: {
+// utils/handleSubmit.ts
+import { getAndSetLocation } from "../../api/getLocation";
+import addItem from "../../api/addItem";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+type Props = {
     setPosted: React.Dispatch<React.SetStateAction<boolean | "" | null>>;
     photo: any;
     name: string;
@@ -24,48 +14,63 @@ export default async ({
     desc: string;
     setLocation: React.Dispatch<React.SetStateAction<number[] | null>>;
     setMess: React.Dispatch<React.SetStateAction<string>>;
-    setActiveTab: React.Dispatch<React.SetStateAction<'home' | 'search' | 'add' | 'profile'>>;
-}) => {
-    if (photo &&
-        name.length > 0 &&
-        price.length > 0 &&
-        desc.length > 0
-    ) {
-        setPosted(null)
-        const access_token = await AsyncStorage.getItem('access_token')
-        if (access_token) {
-            return await getAndSetLocation(setLocation, setMess)
-                .then(async () => {
-                    let data = new FormData()
-                    data.append("photo", {
-                        uri: photo,
-                        name: 'image.png',
-                        type: "image/png"
-                    } as any)
-                    data.append("info", JSON.stringify({
-                        name,
-                        price,
-                        expiryDate: date,
-                        quantity,
-                        desc,
-                        location,
-                        access_token
-                    }))
-                    // send the actual post function
-                    const res = await addItem(data)
-                    setPosted(res)
-                    // function ends here
-                })
-        }
-        else {
-            setMess('Please Login Before Posting.')
-            setTimeout(() => {
-                setActiveTab('profile')
-            }, 1500)
-        }
+    setActiveTab: React.Dispatch<
+        React.SetStateAction<"home" | "search" | "add" | "profile">
+    >;
+};
+
+export default async function handleSubmit({
+    setPosted,
+    photo,
+    name,
+    date,
+    quantity,
+    location,
+    price,
+    desc,
+    setLocation,
+    setMess,
+    setActiveTab,
+}: Props) {
+    if (!photo || !name || !price || !desc) {
+        setMess("Everything has to be filled!");
+        setPosted(false);
+        return;
     }
-    else {
-        setMess('Everything has to be filled!')
-        setPosted(false)
+
+    const access_token = await AsyncStorage.getItem("access_token");
+    if (!access_token) {
+        setMess("Please Login Before Posting.");
+        setTimeout(() => setActiveTab("profile"), 1500);
+        return;
     }
+
+    if (!location) {
+        await getAndSetLocation(setLocation, setMess);
+        return; // wait for location update first
+    }
+
+    let data = new FormData();
+    data.append("photo", {
+        uri: photo,
+        name: "image.png",
+        type: "image/png",
+    } as any);
+
+    data.append(
+        "info",
+        JSON.stringify({
+            name,
+            price,
+            expiryDate: date,
+            quantity,
+            desc,
+            location, // [lat, longitu, accuracy]
+            access_token,
+        })
+    );
+
+    setPosted(null); // disable button during submission
+    const res = await addItem(data);
+    setPosted(res);
 }

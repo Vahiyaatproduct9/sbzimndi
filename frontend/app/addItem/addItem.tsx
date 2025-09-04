@@ -4,7 +4,7 @@ import {
     Keyboard, Platform, Pressable, Text, TextInput,
     TouchableWithoutFeedback, View, Image, KeyboardAvoidingView, ScrollView,
 } from 'react-native'
-import handleAddItem from '../functions/handleAddItem.ts'
+import handleSubmit from '../functions/handleAddItem.ts'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import css from './css.ts'
@@ -55,11 +55,6 @@ export default ({ setActiveTab }: prop) => {
     const pickImage = () => {
         return imagePicker({ setPhoto, setMess })
     }
-    const handleSubmit = async () => {
-        return await handleAddItem({
-            setPosted, photo, name, date, quantity, location, price, desc, setLocation, setMess, setActiveTab
-        })
-    }
     useEffect(() => {
         if (posted) {
             setMess('Posted!')
@@ -68,6 +63,8 @@ export default ({ setActiveTab }: prop) => {
             }, 2000)
         }
     }, [posted])
+
+
     useEffect(() => {
         console.log(photo)
     }, [photo])
@@ -213,7 +210,11 @@ export default ({ setActiveTab }: prop) => {
                         </View>
                         <View style={css.buttonView}>
                             <Pressable style={[css.button, pressed && { transform: 'scale(0.98)' }]}
-                                onPress={handleSubmit}
+                                onPress={() => {
+                                    handleSubmit({
+                                        setPosted, photo, name, date, quantity, location, price, desc, setLocation, setMess, setActiveTab
+                                    })
+                                }}
                                 onPressIn={() => setPressed(true)}
                                 onPressOut={() => setPressed(false)}
                                 disabled={posted === null ? true : false}

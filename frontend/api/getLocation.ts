@@ -41,7 +41,6 @@ export async function getAndSetLocation(setLocation: (loc: [number, number, numb
                 position.coords.longitude,
                 position.coords.accuracy
             ];
-            console.log(loc)
             return setLocation(loc);
         },
         (error) => {

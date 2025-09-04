@@ -51,5 +51,3 @@ const search = async ({ latitude, longitude, query }) => {
         console.log(error)
     }
 }
-
-search({ latitude: 0, longitude: 0, query: 'Indian' })

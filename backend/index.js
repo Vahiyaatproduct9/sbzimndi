@@ -31,9 +31,10 @@ app.post('/signup', async (req, res) => {
     console.log(await req.body)
     const data = await signup({ name, email, password, phone, location })
     if (data === true) {
-        console.log('User', name, 'signed up...')
+        console.log(name, 'signed up...')
     }
     else {
+        console.log(data)
         console.log('Failed to create new user for ', name)
     }
     res.send(data)

@@ -6,6 +6,7 @@ export default async ({ name, email, password, phone, location: { lat, long, acc
         password,
         email_confirm: false
     })
+    if (createUserError) console.log(createUserError)
     if (createUserData.user) {
         const { error: authError } = await supabase.auth.signInWithOtp({
             email
