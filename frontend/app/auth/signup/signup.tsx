@@ -44,7 +44,7 @@ const SignUp = ({ navigation }: any) => {
             Geolocation.getCurrentPosition(
                 (position) => {
                     setLoading(true)
-                    setLocation([position.coords.latitude, position.coords.longitude, position.coords.accuracy])
+                    setLocation([position.coords.longitude, position.coords.latitude, position.coords.accuracy])
                 },
                 (e) => setLoading(null),
                 { enableHighAccuracy: true, timeout: 10000, maximumAge: 10000 }
@@ -62,8 +62,8 @@ const SignUp = ({ navigation }: any) => {
             password,
             repass,
             location: {
-                lat: location[0],
-                long: location[1],
+                long: location[0],
+                lat: location[1],
                 acc: location[2]
             }
         }

@@ -4,16 +4,16 @@ import css from './css.ts'
 import Feather from 'react-native-vector-icons/Feather'
 import Animated, { withSpring, useSharedValue } from 'react-native-reanimated'
 import search from '../../api/search.ts'
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import { getandsetCoarseLocation } from '../../api/getLocation.ts'
-import data from './data.ts'
+import { getandsetCoarseLocation, getAndSetLocation, requestLocationPermission } from '../../api/getLocation.ts'
 import MtoKm from '../functions/meterstokm.ts'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 const photo = require('../../assets/images/switzerland.jpg')
 const Search = () => {
     const [searchContent, setSearchContent] = useState<string>('')
     const [searchHistory, setSearchHistory] = useState<number>(0)
     const [location, setLocation] = useState<any | null>(null)
     const [searchResult, setSearchResult] = useState<any | null>(null)
+    const [mess, setMess] = useState<string>('')
     const searchBarProperty = {
         width: useSharedValue(0),
         opacity: useSharedValue(0)
@@ -28,16 +28,21 @@ const Search = () => {
         searchBarProperty.width.value = withSpring(width)
         searchBarProperty.opacity.value = withSpring(1)
 
-        // Getting location from local Storage
+        // Getting location from coarse location
         const setLoc = async () => {
-            const localloc = await AsyncStorage.getItem('location')
-            console.log(localloc)
-            if (typeof localloc === 'string' && localloc.length > 0) {
-                const parsedLoc = JSON.parse(localloc)
-                setLocation(parsedLoc)
-            }
-            else {
-                getandsetCoarseLocation(setLocation)
+            const hasPermission = await requestLocationPermission();
+            if (hasPermission) {
+                await getAndSetLocation(setLocation, setMess)
+            } else {
+                try {
+                    setMess('Location permission not granted! Switching to coarse location.')
+                    await getandsetCoarseLocation(setLocation)
+                }
+                catch (err) {
+                    const [long, lat, acc] = await AsyncStorage.getItem('location').then(res => res ? JSON.parse(res) : [0, 0, 0])
+                    setLocation([long, lat, acc])
+                    console.log('Error in getting coarse location ->', long, lat, acc)
+                }
             }
         }
         setLoc()
@@ -47,9 +52,6 @@ const Search = () => {
         }, 1000)
         return () => { clearInterval(interval) }
     }, [])
-    useEffect(() => {
-        console.log(searchHistory)
-    }, [searchHistory])
     useEffect(() => {
         if (searchContent.length > 0) {
             searchButton.width.value = withSpring(40)
@@ -63,15 +65,14 @@ const Search = () => {
     useEffect(() => {
         setSearchHistory(0)
         setSearchResult(null)
-        console.log('location ->', location)
     }, [searchContent])
     useEffect(() => {
         // the real search function
         const timer = setTimeout(() => {
             if (searchContent.length > 2) {
                 const res = async () => await search({
-                    latitude: location[0],
                     longitude: location[1],
+                    latitude: location[0],
                     query: searchContent
                 }).then(result => {
                     setSearchResult(result)
@@ -81,7 +82,7 @@ const Search = () => {
             }
             console.log(searchResult)
         }, 800)
-        return () => { clearTimeout(timer) }
+        return () => clearTimeout(timer)
     }, [searchContent])
     return (
         <SafeAreaView>
@@ -99,7 +100,7 @@ const Search = () => {
                 </Animated.View>
                 <ScrollView style={css.body}>
                     {(searchResult && Array.isArray(searchResult.result)) ? searchResult.result.map(item => {
-                        return (<View style={css.block}>
+                        return (<View key={item.id} style={css.block}>
                             <Image source={{ uri: item.item.image_url }} style={css.blockImage} />
                             <View style={css.blockInfo}>
                                 <View style={css.blockInfoHead}>

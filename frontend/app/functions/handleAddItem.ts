@@ -65,7 +65,7 @@ export default async function handleSubmit({
             expiryDate: date,
             quantity,
             desc,
-            location, // [lat, longitu, accuracy]
+            location, // [long, lat, accuracy]
             access_token,
         })
     );

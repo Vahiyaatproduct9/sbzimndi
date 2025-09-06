@@ -44,8 +44,8 @@ const Body = () => {
             }
             const fetchItems = async () => {
                 const res = await getNearestItems({
-                    latitude: location ? location[0] : 0,
-                    longitude: location ? location[1] : 0,
+                    longitude: location ? location[0] : 0,
+                    latitude: location ? location[1] : 0,
                     accuracy: location ? location[2] : 0
                 })
                 if (await res.status === 200) setItems(res)

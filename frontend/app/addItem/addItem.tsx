@@ -11,7 +11,8 @@ import css from './css.ts'
 import Message from '../components/message/message.tsx'
 import checkUser from '../../api/checkUser.ts'
 import imagePicker from '../functions/imagePicker.ts'
-const numList = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+import filterPrice from '../functions/filterPrice.ts'
+import compareDate from '../functions/compareDate.ts'
 type activeTab = 'home' | 'search' | 'add' | 'profile'
 interface prop {
     setActiveTab: React.Dispatch<React.SetStateAction<activeTab>>
@@ -64,45 +65,11 @@ export default ({ setActiveTab }: prop) => {
         }
     }, [posted])
 
-
     useEffect(() => {
-        console.log(photo)
-    }, [photo])
-    useEffect(() => console.log('location from addItem --->', location), [location])
-
-    useEffect(() => {
-        if (new Date(date).getTime() <= new Date().getTime()) {
-            setShowNote('Expiry date has to be atleast 1 day from today.')
-        } else {
-            setShowNote('')
-        }
+        compareDate({ date, setShowNote })
     }, [date])
     useEffect(() => {
-        if (price.length > 60) {
-            setMess('Stop Breaking my App 🙏🏻')
-        }
-        if (price.length > 5) {
-            setPrice(price.slice(0, 5))
-        }
-        else {
-            try {
-                if (price.length > 0) {
-                    for (const num of price) {
-                        if (!numList.includes(num)) {
-                            setPrice(price.slice(0, -1))
-                        }
-                    }
-                    if (parseInt(price) > 100) {
-                        setShowNote('Careful, High Prices might not attract Customers.')
-                    } else {
-                        setShowNote('')
-                    }
-                }
-            }
-            catch (e) {
-                setShowNote(`Invalid Number... ${e}`)
-            }
-        }
+        filterPrice({ price, setPrice, setMess, setShowNote })
     }, [price])
     return (
         <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>

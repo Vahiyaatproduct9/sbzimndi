@@ -37,8 +37,8 @@ export async function getAndSetLocation(setLocation: (loc: [number, number, numb
     Geolocation.getCurrentPosition(
         (position) => {
             const loc: [number, number, number] = [
-                position.coords.latitude,
                 position.coords.longitude,
+                position.coords.latitude,
                 position.coords.accuracy
             ];
             return setLocation(loc);
@@ -55,8 +55,8 @@ export async function getandsetCoarseLocation(setLocation: (loc: [number, number
     Geolocation.getCurrentPosition(
         (position) => {
             const loc: [number, number, number] = [
-                position.coords.latitude,
                 position.coords.longitude,
+                position.coords.latitude,
                 position.coords.accuracy
             ];
             return setLocation(loc);

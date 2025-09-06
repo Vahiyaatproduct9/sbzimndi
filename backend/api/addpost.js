@@ -3,7 +3,6 @@ import sbs from '../libs/createAuth.js'
 import { configDotenv } from 'dotenv'
 configDotenv()
 export default async function addPost({ photo, info }) {
-    console.log('addpost-->', photo, info)
     try {
         const access_token = await info.access_token
         const { data, error } = await sb.auth.getUser(access_token)

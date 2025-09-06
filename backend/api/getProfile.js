@@ -4,12 +4,10 @@ export default async ({ access_token }) => {
     const { data, error } = await sb.auth.getUser(access_token)
     const { data: userData, error: userError } = await sb
         .from("users")
-        .select(`
-      *,
-      items(*)
-    `)
+        .select(`*,items!items_user_id_fkey1(*)`)
         .eq("id", data.user.id)  // users.id
-        .single();
+        .single()
+    console.log('userData -->', userData, userError)
     if (!error && !userError) {
         return { ...data.user, items: userData, status: 200 }
     }

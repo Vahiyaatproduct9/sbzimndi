@@ -27,7 +27,6 @@ export default StyleSheet.create({
         backgroundColor: theme.tint,
         height: 40,
         width: 40,
-        backgroundColor: theme.extra,
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 400,
@@ -39,7 +38,6 @@ export default StyleSheet.create({
         width: '100%',
         display: 'flex',
         gap: 10,
-        backgroundColor: 'red'
     },
     block: {
         width: '100%',

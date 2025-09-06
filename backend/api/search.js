@@ -17,8 +17,8 @@ export default async ({ latitude, longitude, query }) => {
             {
                 name: 'price',
                 weight: 1
-            }
-                , {
+            },
+            {
                 name: 'expiry_date',
                 weight: 2
             }]
