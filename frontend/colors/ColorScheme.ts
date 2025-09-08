@@ -1,7 +1,6 @@
 import { Appearance } from "react-native"
 const heme = Appearance.getColorScheme()
 export const dark = heme === 'dark' ? true : false
-// theme = 'light'
 function check() {
     if (heme === 'dark') {
         return {

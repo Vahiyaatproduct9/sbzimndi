@@ -10,12 +10,17 @@ import extendToken from "./api/extendToken.js";
 import { read_items } from "./api/readitems.js";
 import search from "./api/search.js";
 import updateProfile from "./api/updateProfile.js";
+import getItem from "./api/getItem.js";
 const app = express();
+import payment from "./api/payment.js";
+import Razorpay from "razorpay";
+import verifyPayment from "./api/verifyPayment.js";
 const port = 8080;
 app.use(json());
 app.use(
   cors({
     allowedHeaders: ["*"],
+    allowedOrigins: ["*"],
   })
 );
 
@@ -35,6 +40,11 @@ app.post("/profile", async (req, res) => {
     const response = await getProfile({ access_token });
     res.status(response.status).json(response);
   }
+});
+app.get("/getpost", async (req, res) => {
+  const { id } = req.query;
+  const response = await getItem(id);
+  res.json(response);
 });
 
 app.post("/signup", async (req, res) => {
@@ -142,6 +152,22 @@ app.post("/updateprofile", upload.single("photo"), async (req, res) => {
   const { infoError } = await updateProfile({ info, photo });
   if (!infoError) return res.json({ updated: true });
   res.json({ updated: false });
+});
+
+// Razorpay integration
+
+app.post("/initiate-payment", async (req, res) => {
+  const { id } = req.body;
+  console.log(id);
+  const response = await payment({ id });
+  res.json(response);
+});
+
+app.post("/verify-payment", async (req, res) => {
+  const data = req.body;
+  console.log(data);
+  const response = await verifyPayment(data);
+  res.json(response);
 });
 
 app.listen(8080, () => {

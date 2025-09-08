@@ -1,26 +1,34 @@
-import { View, Text, StyleSheet, SafeAreaView } from 'react-native'
-import React, { SetStateAction } from 'react'
-import Hero from './sections/hero/hero.tsx'
-import Body from './sections/body/body.tsx'
+import React from 'react';
+import Home from './home';
+import ProductPage from './sections/product/mainPage';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+const Stack = createNativeStackNavigator();
 
-type activeTab = 'home' | 'search' | 'add' | 'profile'
-interface props {
-    setActiveTab: React.Dispatch<SetStateAction<activeTab>>
+export default function Main({
+  setActiveTab,
+}: {
+  setActiveTab: React.Dispatch<
+    React.SetStateAction<'home' | 'search' | 'add' | 'profile'>
+  >;
+}) {
+  return (
+    <NavigationContainer independent>
+      <Stack.Navigator>
+        <Stack.Screen
+          name="Home"
+          component={Home as never}
+          options={{ headerShown: false }}
+          initialParams={{ setActiveTab }}
+        />
+        <Stack.Screen
+          name="Product"
+          options={{
+            title: 'Details',
+          }}
+          component={ProductPage as never}
+        />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
 }
-export default function Main({ setActiveTab }: props) {
-    return (
-        <SafeAreaView style={styles.container}>
-            <Hero setActiveTab={setActiveTab} />
-            <Body />
-        </SafeAreaView>
-    )
-}
-
-const styles = StyleSheet.create({
-    container: {
-        width: '100%',
-        display: 'flex',
-        alignItems: 'center',
-        height: '100%',
-    }
-})

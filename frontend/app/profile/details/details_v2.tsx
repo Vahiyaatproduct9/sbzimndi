@@ -29,6 +29,7 @@ import getProfile from '../../../api/getProfile.ts';
 import { spirit } from '../../data/spiritAnimals.ts';
 
 const Details = ({ navigation, route }: any) => {
+  const { setLogged } = route.params;
   const isFocused = useIsFocused();
   const height = useWindowDimensions().height;
   const width = useWindowDimensions().width;
@@ -51,11 +52,11 @@ const Details = ({ navigation, route }: any) => {
         });
         console.log('final ->', await at, await rt);
         if ((await at) === null || (await rt) === null) {
-          route.params.setLogged(false);
+          setLogged(false);
           await AsyncStorage.removeItem('access_token');
           await AsyncStorage.removeItem('refresh_token');
         } else {
-          route.params.setLogged(true);
+          setLogged(true);
           await AsyncStorage.setItem('access_token', await at);
           await AsyncStorage.setItem('refresh_token', await rt);
         }

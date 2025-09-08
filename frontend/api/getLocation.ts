@@ -25,32 +25,6 @@ export async function requestLocationPermission(): Promise<boolean> {
         return false;
     }
 }
-
-export async function getAndSetLocation(setLocation: (loc: [number, number, number]) => void, setMessage: React.Dispatch<SetStateAction<string>>) {
-    const hasPermission = await requestLocationPermission();
-
-    if (!hasPermission) {
-        setMessage('Location permission denied');
-        return;
-    }
-
-    Geolocation.getCurrentPosition(
-        (position) => {
-            const loc: [number, number, number] = [
-                position.coords.longitude,
-                position.coords.latitude,
-                position.coords.accuracy
-            ];
-            return setLocation(loc);
-        },
-        (error) => {
-            console.log(error)
-            return setMessage(error.message);
-        },
-        { enableHighAccuracy: true, timeout: 10000, maximumAge: 10000 }
-    );
-}
-
 export async function getandsetCoarseLocation(setLocation: (loc: [number, number, number]) => void, setMessage?: React.Dispatch<SetStateAction<string>>) {
     Geolocation.getCurrentPosition(
         (position) => {
@@ -66,4 +40,32 @@ export async function getandsetCoarseLocation(setLocation: (loc: [number, number
         },
         { enableHighAccuracy: false }
     );
+}
+
+export async function getAndSetLocation(setLocation: (loc: [number, number, number]) => void, setMessage: React.Dispatch<SetStateAction<string>>) {
+    const hasPermission = await requestLocationPermission();
+    let localloc: number[] | null = null;
+    if (!hasPermission) {
+        setMessage('Using Approximate Location');
+        await getandsetCoarseLocation(setLocation, setMessage);
+        return;
+    }
+    Geolocation.getCurrentPosition(
+
+        (position) => {
+            const loc: [number, number, number] = [
+                position.coords.longitude,
+                position.coords.latitude,
+                position.coords.accuracy
+            ];
+            setLocation(loc);
+            localloc = loc
+        },
+        (error) => {
+            console.log(error)
+            setMessage(error.message);
+        },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 10000 }
+    );
+    return localloc
 }
