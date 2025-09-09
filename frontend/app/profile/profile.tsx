@@ -3,11 +3,12 @@ import Options from '../auth/options/options';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import SignIn from '../auth/signin/signin';
-import SignUp from '../auth/signup/signup';
+// import SignUp from '../auth/signup/signup';
 import Otp from '../auth/otp/otp';
 import LoadingScreen from '../loadingScreen';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ProfileScreen from './profileScreen';
+import MainPage from '../auth/signup/mainPage';
 const Stack = createNativeStackNavigator();
 
 type activeTab = 'home' | 'search' | 'add' | 'profile';
@@ -55,7 +56,7 @@ const Profile = ({ setActiveTab }: prop) => {
             />
             <Stack.Screen
               name="signup"
-              component={SignUp}
+              component={MainPage}
               options={{ headerShown: false }}
             />
             <Stack.Screen

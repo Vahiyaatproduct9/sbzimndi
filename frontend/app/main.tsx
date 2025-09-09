@@ -27,6 +27,7 @@ export default function Main({
             title: 'Details',
           }}
           component={ProductPage as never}
+          initialParams={{ setActiveTab }}
         />
       </Stack.Navigator>
     </NavigationContainer>

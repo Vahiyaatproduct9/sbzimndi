@@ -1,3 +1,49 @@
+# SbziMndi
+
+## Layout
+
+- Root(App)
+  - Tab
+    - Home
+      - Hero
+      - Body
+        - BlockTree(Navigation)
+          - Block
+          - Product Page
+          - Payment Page
+    - Search
+    - AddItem
+    - Profile
+      - Options(Auth)
+        - SignUp
+        - SignIn
+        - Otp
+        - Kyc
+      - Details
+        - Edit Profile
+        - Settings
+          - Change Language
+          - Privacy Policy
+          - Notification
+          - Donate
+          - Earn with SbziMndi
+    - Loading Screen
+
+## Sign up Flow
+
+1. User enters the Home Screen => Accepts location permission => Fetches Nearest Items
+2. User Enters Profile => Enters SignUp details => Clicks next => get asked whether to fill back details for future item upload. (skippable) => - If yes => enters back details =>
+   { - personal data including bank details gets submitted to DB with reference to that user - gets back an `access_token` and `refresh_token` - saved in local storage - redirected to home page with message of Login Successful.
+   } - if no => { - personal data gets stored to DB with bank details as NULL. - gets back an `access_token` and `refresh_token` - saved to local storage - redirected to home page with signup successful message.
+   } ## Purchase Flow 1. User clicks on the Item Block either on Home or Search. 2. Item info is displayed with a `buy` button 3. on clicking `buy` a confirm payment page appears 4. on clicking `pay` in the page, it checks if user is verified(logged in) - if no => { - message appears to log in first - navigates user to profile page after 1.8 secs.
+   } - if yes => { - Razorpay payment page appears - user makes the payment - if payment successful
+   { - Item is marked as bought and buyers id is added to the product's `bought_by` column
+   }
+   if not successful
+   { - message appears of Something went wrong.
+   }
+   }
+
 This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
 
 # Getting Started
@@ -76,22 +122,3 @@ When you want to forcefully reload, for example to reset the state of your app, 
 ## Congratulations! :tada:
 
 You've successfully run and modified your React Native App. :partying_face:
-
-### Now what?
-
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
-
-# Troubleshooting
-
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
-
-# Learn More
-
-To learn more about React Native, take a look at the following resources:
-
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.

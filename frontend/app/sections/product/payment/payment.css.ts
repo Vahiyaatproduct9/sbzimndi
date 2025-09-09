@@ -57,7 +57,18 @@ export default StyleSheet.create({
     borderRadius: 10,
     marginBottom: 80,
     boxShadow: '0 4px 10px 0 rgba(0,0,0,0.3)',
+  },
+  note: {
+    width: '100%',
+    padding: 30,
+    backgroundColor: 'rgba(255,255,0, 0.4)',
+    marginTop: 20,
+    borderRadius: 10,
 
+  },
+  noteText: {
+    color: theme.text,
+    fontWeight: 600,
   },
   pressed: {
     backgroundColor: 'rgba(182, 125, 26, 0.5)',

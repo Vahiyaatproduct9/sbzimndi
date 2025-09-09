@@ -4,8 +4,19 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import ProductPage from './productPage';
 import Payment from './payment/payment';
 const Stack = createNativeStackNavigator();
-const MainPage = ({ route }: { route: { params: { id: string } } }) => {
-  const { id } = route.params;
+const MainPage = ({
+  route,
+}: {
+  route: {
+    params: {
+      id: string;
+      setActiveTab: React.Dispatch<
+        React.SetStateAction<'home' | 'profile' | 'search' | 'additem'>
+      >;
+    };
+  };
+}) => {
+  const { id, setActiveTab } = route.params;
   return (
     <NavigationContainer independent={true}>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
@@ -17,7 +28,7 @@ const MainPage = ({ route }: { route: { params: { id: string } } }) => {
         <Stack.Screen
           name="RzpCheckout"
           component={Payment as never}
-          initialParams={{ id }}
+          initialParams={{ id, setActiveTab }}
         />
       </Stack.Navigator>
     </NavigationContainer>
