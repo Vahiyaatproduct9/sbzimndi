@@ -48,16 +48,25 @@ app.get("/getpost", async (req, res) => {
 });
 
 app.post("/signup", async (req, res) => {
-  const { name, email, password, phone, location } = await req.body;
+  const { name, email, password, phone, location, ifsc, accountNumber } =
+    await req.body;
   console.log(await req.body);
-  const data = await signup({ name, email, password, phone, location });
-  if (data === true) {
-    console.log(name, "signed up...");
+  const data = await signup({
+    name,
+    email,
+    password,
+    phone,
+    location,
+    ifsc,
+    accountNumber,
+  });
+  if (data.success === true) {
+    console.log(name, "signed up");
   } else {
     console.log(data);
     console.log("Failed to create new user for ", name);
   }
-  res.send(data);
+  res.json(data);
 });
 app.post("/signin", async (req, res) => {
   try {

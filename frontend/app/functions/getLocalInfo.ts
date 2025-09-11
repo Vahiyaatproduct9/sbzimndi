@@ -16,6 +16,18 @@ export async function getEmail() {
 export async function setEmail(email: string) {
     await AsyncStorage.setItem('email', email)
 }
+export async function setIfsc(ifsc: string) {
+    await AsyncStorage.setItem('ifsc', ifsc)
+}
+export async function setAccountNumber(number: string) {
+    await AsyncStorage.setItem('accountNumber', number)
+}
+export async function setLocation(location: number[]) {
+    await AsyncStorage.setItem('location', JSON.stringify(location))
+}
+export async function setPhone(phone: string | number) {
+    await AsyncStorage.setItem('phone', phone.toString())
+}
 export async function getBio() {
     const bio = await AsyncStorage.getItem('bio')
     if (bio) return bio

@@ -50,7 +50,6 @@ const Details = ({ navigation, route }: any) => {
           access_token,
           refresh_token,
         });
-        console.log('final ->', await at, await rt);
         if ((await at) === null || (await rt) === null) {
           setLogged(false);
           await AsyncStorage.removeItem('access_token');
@@ -73,25 +72,23 @@ const Details = ({ navigation, route }: any) => {
     textProperty.bottom.value = withDelay(500, withSpring(0));
     transform.value = withDelay(500, withSpring(0));
     settingsProperty.opacity.value = withDelay(500, withSpring(1));
-  }, []);
+  }, [setLogged]);
 
   useEffect(() => {
-    const d = async () => {
+    (async () => {
       await getSpirit().then(animal => {
         setSpiritAnimal(animal);
       });
-    };
-    d();
+    })();
   }, [isFocused]);
 
   useEffect(() => {
-    const getProf = async () => {
+    (async () => {
       const access_token = await getAccessToken();
       const profileData = await getProfile(access_token);
       console.log(profileData);
       setProfile(profileData);
-    };
-    getProf();
+    })();
   }, []);
   return (
     <View style={css.container}>
@@ -134,7 +131,9 @@ const Details = ({ navigation, route }: any) => {
       <Animation.View style={[css.body, textProperty]}>
         {profile && (
           <Animation.Image
-            source={spirit(profile.items.spirit_animal)}
+            source={spirit(
+              profile ? profile.items.spirit_animal : spiritAnimal,
+            )}
             style={[css.spirit, spiritProperty]}
           />
         )}
@@ -145,7 +144,7 @@ const Details = ({ navigation, route }: any) => {
             <Text style={[css.bodyTxt]}>Name</Text>
           </View>
           <Text style={css.bodySectionContent}>
-            {profile ? profile.items.full_name : 'Loading '}
+            {profile ? profile.items.full_name : getName() || 'Loading ...'}
           </Text>
         </View>
         <View style={css.bodySectionContainer}>

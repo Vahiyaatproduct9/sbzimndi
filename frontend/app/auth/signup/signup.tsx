@@ -7,6 +7,7 @@ import { useState } from 'react';
 import Message from '../../components/message/message.tsx';
 const image = require('../../../assets/images/fruit.png');
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import validateSignupInfo from '../../functions/validateSignupInfo.ts';
 
 const SignUp = ({ navigation, setActivePage }: any) => {
   const [name, setName] = useState<string>('');
@@ -30,8 +31,9 @@ const SignUp = ({ navigation, setActivePage }: any) => {
   useEffect(() => {
     const run = async () => {
       const res = await AsyncStorage.getItem('signupInfo');
+      console.log(res);
       const response = JSON.parse(res ? res : '');
-      if (response.length > 0) {
+      if (response) {
         setName(response.name);
         setEmail(response.email);
         setPhone(response.phone);
@@ -63,7 +65,13 @@ const SignUp = ({ navigation, setActivePage }: any) => {
         acc: location[2],
       },
     };
-    await AsyncStorage.setItem('signupInfo', JSON.stringify(info));
+    if ((await validateSignupInfo(info)) === null) {
+      await AsyncStorage.setItem('signupInfo', JSON.stringify(info));
+    } else {
+      setRes((await validateSignupInfo(info)) as string);
+      setLoading(false);
+      return;
+    }
     // await data().then(res => {
     //   if (typeof res !== 'undefined') {
     //     setRes(res);

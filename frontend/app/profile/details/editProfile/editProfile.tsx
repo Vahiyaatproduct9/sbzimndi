@@ -30,6 +30,7 @@ import updateProfile from '../../../../api/updateProfile.ts';
 import Message from '../../../components/message/message.tsx';
 import saveProfilePicture from '../../../functions/saveProfilePicture.ts';
 import saveRole, { getRole } from '../../../functions/toggleRole.ts';
+import blobtobase64 from '../../../functions/blobtobase64.ts';
 
 const EditProfile = ({ navigation }: any) => {
   const [mess, setMess] = useState<string>('');
@@ -51,7 +52,9 @@ const EditProfile = ({ navigation }: any) => {
     });
 
   const cleanPath = (uri: string) =>
-    uri.startsWith('file://') ? uri.replace('file://', '') : uri;
+    uri.toString().startsWith('file://')
+      ? uri.toString().replace('file://', '')
+      : uri.toString();
   const pickImage = () => {
     launchImageLibrary({ mediaType: 'photo', selectionLimit: 1 }, async res => {
       if (!res.didCancel && !res.errorCode) {
@@ -64,6 +67,7 @@ const EditProfile = ({ navigation }: any) => {
           const newPath = `file://${
             RNFS.DocumentDirectoryPath
           }/profile.jpg?time=${Date.now()}`;
+          console.log('New profile path:', newPath);
           setPhoto(newPath);
         }
       }
@@ -76,7 +80,6 @@ const EditProfile = ({ navigation }: any) => {
     const localPath = `${RNFS.DocumentDirectoryPath}/profile.jpg`;
     try {
       let shouldUpload = false;
-
       // Check if there's a new photo selected
       if (photo) {
         // Check if local profile exists
@@ -114,7 +117,7 @@ const EditProfile = ({ navigation }: any) => {
       console.log('Should upload:', shouldUpload);
 
       const res = await updateProfile({
-        photo: shouldUpload ? photo : null,
+        photo: shouldUpload && photo.length > 10 ? photo : null,
         access_token: await getAccessToken(),
         name,
         spirit_animal: spiritAnimal,
@@ -149,16 +152,21 @@ const EditProfile = ({ navigation }: any) => {
     }
   };
   useEffect(() => {
-    const d = async () => {
+    (async () => {
       await RNFS.exists(`${RNFS.DocumentDirectoryPath}/profile.jpg`).then(
         exists => {
           if (exists) {
             const path = `file://${
               RNFS.DocumentDirectoryPath
             }/profile.jpg?time=${Date.now()}`;
+            console.log('Profile picture path:', path);
             setPhoto(path);
           } else {
-            setPhoto(image);
+            const base64img = (async () => {
+              return await blobtobase64(image);
+            })();
+            setPhoto(base64img);
+            console.log('No local profile picture found, using default.');
           }
         },
       );
@@ -166,8 +174,7 @@ const EditProfile = ({ navigation }: any) => {
       await getBio().then(res => res && setBio(res));
       await getRole().then(res => res === 'seller' && setToggle(true));
       await getSpirit().then(spirit => spirit && setSpiritAnimal(spirit));
-    };
-    d();
+    })();
   }, []);
 
   useEffect(() => {
@@ -180,7 +187,13 @@ const EditProfile = ({ navigation }: any) => {
     <ScrollView style={css.container}>
       <Message state={setMess} content={mess} time={3} />
       <View style={css.box}>
-        <Image source={photo ? { uri: photo } : image} style={css.image} />
+        <Image
+          source={photo && photo.length > 0 ? { uri: photo } : image}
+          style={css.image}
+          onError={e => {
+            console.warn('Image load failed:', e.nativeEvent.error);
+          }}
+        />
         <Pressable style={css.changeBtn} onPress={pickImage}>
           <Text style={css.text}>Change Picture</Text>
         </Pressable>

@@ -1,4 +1,4 @@
-import { View, Text } from 'react-native';
+// import { View, Text } from 'react-native';
 import React from 'react';
 import SignUp from './signup';
 import Kyc from '../kyc/kyc';
