@@ -15,6 +15,7 @@ const app = express();
 import payment from "./api/payment.js";
 import Razorpay from "razorpay";
 import verifyPayment from "./api/verifyPayment.js";
+import { Readable } from "stream";
 const port = 8080;
 app.use(json());
 app.use(
@@ -30,6 +31,11 @@ app.use(
     origin: "*",
   })
 );
+const uploadFiles = upload.fields([
+  { name: "aadhar_front", maxCount: 1 },
+  { name: "personal_pan", maxCount: 1 },
+  { name: "bank_proof", maxCount: 1 },
+]);
 
 app.get("/", (req, res) => {
   res.send("Hello World!");
@@ -47,18 +53,47 @@ app.get("/getpost", async (req, res) => {
   res.json(response);
 });
 
-app.post("/signup", async (req, res) => {
-  const { name, email, password, phone, location, ifsc, accountNumber } =
-    await req.body;
-  console.log(await req.body);
-  const data = await signup({
+app.post("/signup", uploadFiles, async (req, res) => {
+  const info = await req.body;
+  const {
     name,
     email,
     password,
     phone,
-    location,
+    location: { lat, long, acc },
     ifsc,
     accountNumber,
+    pan,
+    verified,
+  } = JSON.parse(info.info);
+  console.log(info);
+  const aadharFront = req.files["aadhar_front"][0];
+  const personalPan = req.files["personal_pan"][0];
+  const bankProoof = req.files["bank_proof"][0];
+  console.log(aadharFront.size, personalPan.size, bankProoof.size);
+  const buffertoStream = (buffer) => {
+    const stream = new Readable();
+    stream.push(buffer);
+    stream.push(null);
+    return stream;
+  };
+  const data = await signup({
+    verified,
+    name,
+    email,
+    password,
+    phone,
+    location: {
+      lat,
+      long,
+      acc,
+    },
+    ifsc: verified ? ifsc : null,
+    accountNumber: verified ? accountNumber : null,
+    pan: verified ? pan : null,
+    aadhar_front: verified ? buffertoStream(aadharFront.buffer) : null,
+    personal_pan: verified ? buffertoStream(personalPan.buffer) : null,
+    bank_proof: verified ? buffertoStream(bankProoof.buffer) : null,
   });
   if (data.success === true) {
     console.log(name, "signed up");

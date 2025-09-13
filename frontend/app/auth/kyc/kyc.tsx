@@ -1,10 +1,9 @@
 import { View, Text, ScrollView, Pressable, TextInput } from 'react-native';
-import React from 'react';
+import React, { useEffect } from 'react';
 import css from './kyc.css';
 import validateBankDetails from '../../functions/validateBankDetails';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Message from '../../components/message/message';
-import { signup } from '../../../api/signUp';
 import { useNavigation } from '@react-navigation/native';
 import {
   setEmail,
@@ -12,15 +11,32 @@ import {
   setPhone,
   setIfsc as setifsc,
   setAccountNumber as setAN,
+  setPassword,
+  setLocation,
 } from '../../functions/getLocalInfo';
+import { signupPage } from '../../../types/signup';
 
-const Kyc = () => {
-  const navigation = useNavigation();
+const Kyc = ({
+  setActivePage,
+}: {
+  setActivePage: React.Dispatch<React.SetStateAction<signupPage>>;
+}) => {
   const [ifsc, setIfsc] = React.useState('');
   const [accountNumber, setAccountNumber] = React.useState('');
   const [message, setMessage] = React.useState<string>('');
   const [loading, setLoading] = React.useState<boolean | null>(null);
   const [confirmAccountNumber, setConfirmAccountNumber] = React.useState('');
+
+  useEffect(() => {
+    (async () => {
+      await AsyncStorage.getItem('email').then(res => setEmail(res || ''));
+      await AsyncStorage.getItem('name').then(res => setName(res || ''));
+      await AsyncStorage.getItem('phone').then(res => setPhone(res || ''));
+      await AsyncStorage.getItem('ifsc').then(res => setifsc(res || ''));
+      await AsyncStorage.getItem('accountNumber').then(res => setAN(res || ''));
+    })();
+  }, []);
+
   function handleSubmit(submitDetails: boolean) {
     setLoading(true);
     const bankDetails = submitDetails
@@ -35,38 +51,23 @@ const Kyc = () => {
     //Validate bank details
     const validate =
       bankDetails !== null ? validateBankDetails(bankDetails) : null;
-    try {
-      if (validate === null) {
-        const signUpInfo = (async () => {
-          const res = await AsyncStorage.getItem('signupInfo');
-          return JSON.parse(res ? res : '');
-        })();
-        signUpInfo.then(async info => {
-          const allInfo = { ...info, ...bankDetails };
-          console.log({ allInfo });
-          await AsyncStorage.setItem('signupInfo', JSON.stringify(allInfo));
-          await setEmail(allInfo.email);
-          await setName(allInfo.name);
-          await setPhone(allInfo.phone);
-          await setifsc(allInfo.ifsc || '');
-          await setAN(allInfo.accountNumber || '');
-          const signedUp = await signup(allInfo);
-          if (signedUp) {
-            setMessage('Signed up successfully! Please verify your email.');
-            navigation.navigate('otp' as never);
-          } else {
-            setMessage('Error signing up. Please try again.');
-          }
-        });
-      } else {
-        //Show error message
-        setMessage((validateBankDetails(bankDetails) as string) || '');
-        return;
-      }
-    } catch (error) {
-      setMessage('An unexpected error occurred. Please try again.');
-      console.error('Error during signup:', error);
-      setLoading(null);
+    if (validate === null) {
+      const signUpInfo = (async () => {
+        const res = await AsyncStorage.getItem('signupInfo');
+        return JSON.parse(res ? res : '');
+      })();
+      signUpInfo.then(async info => {
+        const allInfo = { ...info, ...bankDetails };
+        console.log({ allInfo });
+        await AsyncStorage.setItem('signupInfo', JSON.stringify(allInfo));
+        await setEmail(allInfo.email);
+        await setName(allInfo.name);
+        await setPhone(allInfo.phone);
+        await setifsc(allInfo.ifsc || '');
+        await setAN(allInfo.accountNumber || '');
+        await setPassword(allInfo.password || '');
+        setActivePage('documents');
+      });
     }
     setLoading(false);
   }
@@ -119,13 +120,7 @@ const Kyc = () => {
           style={css.button}
           onPress={() => handleSubmit(true)}
         >
-          <Text style={css.buttonText}>
-            {loading === null
-              ? 'Submit'
-              : loading === true
-              ? 'Submitting...'
-              : 'Try Again?'}
-          </Text>
+          <Text style={css.buttonText}>Next</Text>
         </Pressable>
       </View>
     </View>

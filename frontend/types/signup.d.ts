@@ -1,0 +1,1 @@
+export type signupPage = 'signup' | 'kyc' | 'documents';

@@ -7,7 +7,6 @@ export async function getName() {
 export async function setName(name: string) {
     await AsyncStorage.setItem('name', name)
 }
-
 export async function getEmail() {
     const email = await AsyncStorage.getItem('email')
     if (email) return email
@@ -22,11 +21,39 @@ export async function setIfsc(ifsc: string) {
 export async function setAccountNumber(number: string) {
     await AsyncStorage.setItem('accountNumber', number)
 }
+export async function getIfsc() {
+    const ifsc = await AsyncStorage.getItem('ifsc')
+    if (ifsc) return ifsc
+    else return ''
+}
+export async function getAccountNumber() {
+    const accountNumber = await AsyncStorage.getItem('accountNumber')
+    if (accountNumber) return accountNumber
+    else return ''
+}
 export async function setLocation(location: number[]) {
     await AsyncStorage.setItem('location', JSON.stringify(location))
 }
+export async function getLocation() {
+    const location = await AsyncStorage.getItem('location')
+    if (location) return JSON.parse(location)
+    else return 
+}
 export async function setPhone(phone: string | number) {
     await AsyncStorage.setItem('phone', phone.toString())
+}
+export async function getPhone() {
+    const phone = await AsyncStorage.getItem('phone')
+    if (phone) return phone
+    else return ''
+}
+export async function setPassword(password: string) {
+    await AsyncStorage.setItem('password', password)
+}
+export async function getPassword() {
+    const password = await AsyncStorage.getItem('password')
+    if (password) return password
+    else return ''
 }
 export async function getBio() {
     const bio = await AsyncStorage.getItem('bio')

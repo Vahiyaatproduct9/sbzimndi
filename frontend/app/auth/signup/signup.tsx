@@ -8,6 +8,13 @@ import Message from '../../components/message/message.tsx';
 const image = require('../../../assets/images/fruit.png');
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import validateSignupInfo from '../../functions/validateSignupInfo.ts';
+import {
+  setName as sN,
+  setLocation as sL,
+  setEmail as sE,
+  setPassword as sP,
+  setPhone as sPh,
+} from '../../functions/getLocalInfo.ts';
 
 const SignUp = ({ navigation, setActivePage }: any) => {
   const [name, setName] = useState<string>('');
@@ -41,8 +48,8 @@ const SignUp = ({ navigation, setActivePage }: any) => {
         setPassword(response.password);
         setLctnEnbld(response.lctnEnbld);
         const loc = [
-          response.location.long,
           response.location.lat,
+          response.location.long,
           response.location.acc,
         ];
         setLocation(loc);
@@ -72,26 +79,6 @@ const SignUp = ({ navigation, setActivePage }: any) => {
       setLoading(false);
       return;
     }
-    // await data().then(res => {
-    //   if (typeof res !== 'undefined') {
-    //     setRes(res);
-    //     console.log(res);
-    //     if (res === 'Registered! :D') {
-    //       const doit = async () => {
-    //         await AsyncStorage.setItem('email', email);
-    //         await AsyncStorage.setItem('password', password);
-    //         await AsyncStorage.setItem('name', name);
-    //         await AsyncStorage.setItem('phone', phone);
-    //         await AsyncStorage.setItem('location', JSON.stringify(location));
-    //       };
-    //       doit();
-    //       if (res === 'Registered! :D') navigation.navigate('otp');
-    //       setLoading(null);
-    //     }
-    //   } else {
-    //     setRes('invalid');
-    //   }
-    // });
     setLoading(false);
     setActivePage('kyc');
   };
