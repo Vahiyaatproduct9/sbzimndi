@@ -68,7 +68,7 @@ yarn start
 
 With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
 
-### Android
+## Android
 
 ```sh
 # Using npm
@@ -76,6 +76,38 @@ npm run android
 
 # OR using Yarn
 yarn android
+```
+
+### Next Setup
+
+After you've finished building the app, it gets installed in your phone and run automatically.
+To start immediately next time, follow these steps:
+
+- Connect your mobile phone or turn on your emulator if you have one.
+- Type these command in your Console/Terminal
+
+```sh
+# Reversing port 8081 (frontend) from computer to phone/emulator
+# you must ensure you have java & javac installed and USB debugging enabled in your phone
+adb reverse tcp:8081 tcp:8081
+# Reversing post 8080 (backend) from computer to phone/emulator
+adb reverse tcp:8080 tcp:8080
+
+#For Linux user you can control or mirror your screen on your computer for convenience using the following command
+# If you dont have it installed, install it using the following command
+sudo apt update
+sudo apt install scrcpy
+# After you've installed type the following command
+scrcpy
+#or
+scrcpy -K -M #K for Keyboard control M for Mouse
+#or
+scrcpy --otg #if you only want the control from the computer and not the screen
+
+```
+
+```Notice
+I would like to notify that there may be some error in IOS devices as I've not optimized it for them.
 ```
 
 ### iOS
@@ -103,22 +135,3 @@ npm run ios
 # OR using Yarn
 yarn ios
 ```
-
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
-
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
-
-## Step 3: Modify your app
-
-Now that you have successfully run the app, let's make changes!
-
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
-
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
-
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
-
-## Congratulations! :tada:
-
-You've successfully run and modified your React Native App. :partying_face:
