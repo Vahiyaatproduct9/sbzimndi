@@ -3,6 +3,9 @@ import sbs from "../libs/createAuth.js";
 import rzp from "../libs/rzpClient.js";
 import createStakeholderAccount from "./createStakeholderAccount.js";
 import getUserLocation from "./getUserLocation.js";
+function w(i) {
+  return console.log(i);
+}
 export default async ({
   verified,
   name,
@@ -17,6 +20,10 @@ export default async ({
   personal_pan,
   bank_proof,
 }) => {
+  console.log("Executing signup function");
+  let id = "";
+  let lnid = "";
+  email = `grishma${Date.now()}@example.com`;
   try {
     const { data: createUserData, error: createUserError } =
       await sbs.auth.admin.createUser({
@@ -32,10 +39,13 @@ export default async ({
           location: { lat, long, acc },
         },
       });
+    id = createUserData.user.id;
+    console.log("past line 36 - createUser");
     if (createUserError) {
       console.log({ createUserError });
       return { success: false, message: createUserError.message };
     }
+    console.log("creating public.users ");
     if (verified === false) {
       const { error } = await sbs.from("users").insert({
         id: createUserData.user.id,
@@ -51,38 +61,32 @@ export default async ({
         return { success: true, message: "User created successfully" };
       else console.log(error);
     }
-    const {
-      address: {
-        neighbourhood,
-        road,
-        city,
-        town,
-        village,
-        state,
-        postcode,
-        country: country_code,
-      },
-    } = await getUserLocation({ lat, long });
-    console.log(res);
+    w("created Publlic Userazs, getting user location");
+    const { address, display_name } = await getUserLocation({ lat, long });
+    const { street1, street2, city, state, postal_code, country } = address;
+    console.log(address);
+    w("FInished location, creating linked account");
     const Merchant = await rzp.accounts.create({
-      contact_name: name,
+      email,
+      phone: `${phone}`,
+      type: "route",
+      reference_id: `${Date.now()}` || `${pan}`,
       legal_business_name: name,
       business_type: "individual",
-      phone,
-      email,
-      reference_id: createUserData.user.id,
+      contact_name: name,
       profile: {
-        category: "retail",
-        subcategory: "groceries",
-        description: "SbziMndi",
+        category: "ecommerce",
+        subcategory: "non_durable_goods",
+        business_model:
+          "SbziMndi where people sells and buys 'soon to be expired' goods at lower prices.",
         addresses: {
           registered: {
-            street1: `${neighbourhood || ""}`,
-            street2: `${road || ""}`,
-            city: `${city || town || village || ""}`,
-            state: `${state || ""}`,
-            postal_code: `${postcode || ""}`,
-            country: `${country_code}`,
+            street1,
+            street2,
+            city,
+            state,
+            postal_code,
+            country,
           },
         },
       },
@@ -90,14 +94,15 @@ export default async ({
         platform: "SbziMndi",
       },
     });
+    lnid = Merchant.id;
     console.log({ Merchant });
     if (Merchant.error) {
-      const { error } = await sbs.auth.admin.deleteUser(createUserData.user.id);
-      console.log({ error });
+      console.log("Merchant Error", { error });
       return { success: false, message: Merchant.error.description };
     }
 
     // Create a Stackeholder Account with the Merchant Linked Account Id
+    w("creating stakeholder account");
     const { stakeholderAccount, docs_uri, status } =
       await createStakeholderAccount({
         sb_account_id: createUserData.user.id,
@@ -105,10 +110,13 @@ export default async ({
         linkedAccountId: Merchant.id,
         name,
         email,
+        street: display_name
+          ? `${display_name}`
+          : `${street1}, ${street2}, ${state}, ${country}`,
         city,
         state,
-        postal_code: postcode,
-        country: country_code.toString().toUpperCase() || country_code,
+        postal_code,
+        country,
         pan,
         file: {
           aadhar_front,
@@ -116,7 +124,7 @@ export default async ({
         },
         bank_proof,
       });
-    console.log({ stakeholderAccount, status });
+    w("line 2", { stakeholderAccount, status });
     if (status !== true) {
       const { error } = await sbs.auth.admin.deleteUser(createUserData.user.id);
       console.log({ error });
@@ -171,6 +179,9 @@ export default async ({
     }
   } catch (err) {
     console.log(err);
+    const { error } = await sbs.auth.admin.deleteUser(id);
+    await rzp.accounts.delete(lnid);
+    if (!error) w("Deleted user");
     return { success: false, message: "try & catch error" };
   }
 };

@@ -14,6 +14,21 @@ export default async ({
   file: { aadhar_front, personal_pan },
   bank_proof,
 }) => {
+  console.log({
+    sb_account_id,
+    phone,
+    linkedAccountId,
+    name,
+    email,
+    street,
+    city,
+    state,
+    postal_code,
+    country,
+    pan,
+    file: { aadhar_front, personal_pan },
+    bank_proof,
+  });
   const stakeholderAccount = await rzp.stakeholders.create(linkedAccountId, {
     name,
     email,
@@ -22,8 +37,9 @@ export default async ({
       director: true,
       executive: true,
     },
-    phone,
-
+    phone: {
+      primary: `${phone}`,
+    },
     addresses: {
       residential: {
         street,

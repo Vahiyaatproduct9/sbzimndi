@@ -4,7 +4,7 @@ interface signupInfo {
     email: string;
     password: string;
     phone: string;
-    location: number[],
+    location: number[] | {lat: number, long: number, acc: number},
     ifsc?: string | null;
     accountNumber?: string | null;
     pan_number?: string | null;
@@ -36,9 +36,9 @@ try{
             password,
             phone,
             location: {
-                lat: location[0],
-                long: location[1],
-                acc: location[2]
+                lat: Array.isArray(location) ? location[0] : location.lat,
+                long:Array.isArray(location) ? location[1] : location.long,
+                acc: Array.isArray(location) ? location[2] : location.acc
             },
             ifsc: ifsc || null,
             accountNumber: accountNumber || null,

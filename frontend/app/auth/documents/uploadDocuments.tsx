@@ -20,7 +20,7 @@ import {
   getPassword,
   getPhone,
 } from '../../functions/getLocalInfo';
-const image = require('../../../assets/images/sky.png');
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const UploadDocuments = () => {
   const [aadharCard, setAadharCard] = useState<string | null>(null);
@@ -34,12 +34,11 @@ const UploadDocuments = () => {
     setImage: React.Dispatch<React.SetStateAction<string | null>>,
     name: string,
   ) => {
-    const uri = await imagePicker({
+    await imagePicker({
       setPhoto: setImage,
       setMess: setMessage,
       name,
     });
-    console.log('uri', uri);
   };
   useEffect(() => {
     const panRegex = /^[a-zA-z]{5}\d{4}[a-zA-Z]{1}$/;
@@ -52,14 +51,17 @@ const UploadDocuments = () => {
   }, [aadharCard, panCard, bankProof]);
   const handleSubmit = async () => {
     if (aadharCard && panNumber.length >= 10 && panCard && bankProof) {
+      const allInfo = await AsyncStorage.getItem('signupInfo').then(res =>
+        JSON.parse(res || ''),
+      );
       const res = await signup({
-        name: await getName(),
-        email: await getEmail(),
-        password: await getPassword(),
-        phone: await getPhone(),
-        location: await getLocation(),
-        ifsc: await getIfsc(),
-        accountNumber: await getAccountNumber(),
+        name: allInfo.name || (await getName()),
+        email: allInfo.email || (await getEmail()),
+        password: allInfo.password || (await getPassword()),
+        phone: allInfo.phone || (await getPhone()),
+        location: allInfo.location || (await getLocation()),
+        ifsc: allInfo.ifsc || (await getIfsc()),
+        accountNumber: allInfo.accountNumber || (await getAccountNumber()),
         pan_number: panNumber,
         aadhar_uri: aadharCard,
         bank_proof_uri: bankProof,
