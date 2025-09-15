@@ -92,8 +92,18 @@ To start immediately next time, follow these steps:
 adb reverse tcp:8081 tcp:8081
 # Reversing post 8080 (backend) from computer to phone/emulator
 adb reverse tcp:8080 tcp:8080
+# Start the project using this command
+#Make sure you are in the root directory
+cd frontend
+npm start
+#Now open another tab/window and navigate to backend
+cd backend
+npm run dev
+```
 
-#For Linux user you can control or mirror your screen on your computer for convenience using the following command
+For Linux user you can control or mirror your screen on your computer for convenience using the following command
+
+```sh
 # If you dont have it installed, install it using the following command
 sudo apt update
 sudo apt install scrcpy
