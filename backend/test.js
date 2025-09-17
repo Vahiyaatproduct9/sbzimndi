@@ -22,12 +22,6 @@ const deleteUser = async () => {
   }
 };
 deleteUser();
-
-(async () => {
-  const res = await rzp.accounts.delete("acc_RHQg1F7wBuehdv");
-  console.log(res);
-})();
-
 // const url =
 //   "https://us1.locationiq.com/v1/reverse?lat=40.748442&lon=-73.985658&format=json&key=pk.37b6d23af9758767948e37989056c09f";
 // const options = { method: "GET", headers: { accept: "application/json" } };

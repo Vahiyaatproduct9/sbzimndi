@@ -58,6 +58,8 @@ app.post("/signup", uploadFiles, async (req, res) => {
   const {
     name,
     email,
+    fullName,
+    upiId,
     password,
     phone,
     location: { lat, long, acc },
@@ -67,10 +69,16 @@ app.post("/signup", uploadFiles, async (req, res) => {
     verified,
   } = JSON.parse(info.info);
   console.log(info);
-  const aadharFront = req.files["aadhar_front"][0];
-  const personalPan = req.files["personal_pan"][0];
-  const bankProoof = req.files["bank_proof"][0];
-  console.log(aadharFront.size, personalPan.size, bankProoof.size);
+  const aadharFront = req.files["aadhar_front"]
+    ? req.files["aadhar_front"][0]
+    : null;
+  const personalPan = req.files["personal_pan"]
+    ? req.files["personal_pan"][0]
+    : null;
+  const bankProoof = req.files["bank_proof"]
+    ? req.files["bank_proof"][0]
+    : null;
+  // console.log(aadharFront.size, personalPan.size, bankProoof.size);
   const buffertoStream = (buffer) => {
     const stream = new Readable();
     stream.push(buffer);
@@ -81,6 +89,8 @@ app.post("/signup", uploadFiles, async (req, res) => {
     verified,
     name,
     email,
+    fullName,
+    upiId,
     password,
     phone,
     location: {
@@ -91,9 +101,16 @@ app.post("/signup", uploadFiles, async (req, res) => {
     ifsc: verified ? ifsc : null,
     accountNumber: verified ? accountNumber : null,
     pan: verified ? pan : null,
-    aadhar_front: verified ? buffertoStream(aadharFront.buffer) : null,
-    personal_pan: verified ? buffertoStream(personalPan.buffer) : null,
-    bank_proof: verified ? buffertoStream(bankProoof.buffer) : null,
+    aadhar_front:
+      verified && aadharFront.buffer
+        ? buffertoStream(aadharFront.buffer)
+        : null,
+    personal_pan:
+      verified && personalPan.buffer
+        ? buffertoStream(personalPan.buffer)
+        : null,
+    bank_proof:
+      verified && bankProoof.buffer ? buffertoStream(bankProoof.buffer) : null,
   });
   if (data.success === true) {
     console.log(name, "signed up");

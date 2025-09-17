@@ -1,7 +1,7 @@
 import rzp from "../libs/rzpClient.js";
 export default async ({ linkedAccountId, ifsc, account_number, name }) => {
   const fundAccount = await rzp.fundAccount.create({
-    customer_id: linkedAccountId,
+    contact_id: linkedAccountId,
     bank_account: {
       name,
       account_number,

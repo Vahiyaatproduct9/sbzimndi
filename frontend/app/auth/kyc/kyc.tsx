@@ -15,12 +15,14 @@ import {
   setLocation,
 } from '../../functions/getLocalInfo';
 import { signupPage } from '../../../types/signup';
+import { signup } from '../../../api/signUp';
 
 const Kyc = ({
   setActivePage,
 }: {
   setActivePage: React.Dispatch<React.SetStateAction<signupPage>>;
 }) => {
+  const navigation = useNavigation();
   const [ifsc, setIfsc] = React.useState('');
   const [accountNumber, setAccountNumber] = React.useState('');
   const [message, setMessage] = React.useState<string>('');
@@ -39,6 +41,7 @@ const Kyc = ({
 
   function handleSubmit(submitDetails: boolean) {
     setLoading(true);
+    let allInfo;
     const bankDetails = submitDetails
       ? {
           //for testing purposes
@@ -57,7 +60,7 @@ const Kyc = ({
         return JSON.parse(res ? res : '');
       })();
       signUpInfo.then(async info => {
-        const allInfo = { ...info, ...bankDetails };
+        allInfo = { ...info, ...bankDetails };
         console.log({ allInfo });
         await AsyncStorage.setItem('signupInfo', JSON.stringify(allInfo));
         await setEmail(allInfo.email);
@@ -66,7 +69,13 @@ const Kyc = ({
         await setifsc(allInfo.ifsc || '');
         await setAN(allInfo.accountNumber || '');
         await setPassword(allInfo.password || '');
-        setActivePage('documents');
+        if (submitDetails) {
+          setActivePage('UPI');
+          return;
+        }
+        const { success, message: msg } = await signup(allInfo);
+        if (success) navigation.navigate('otp' as never);
+        else setMessage(msg);
       });
     }
     setLoading(false);

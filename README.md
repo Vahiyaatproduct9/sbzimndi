@@ -44,11 +44,7 @@
    }
    }
 
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
-
-# Getting Started
-
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+#Frontend
 
 ## Step 1: Start Metro
 
@@ -96,8 +92,8 @@ adb reverse tcp:8080 tcp:8080
 #Make sure you are in the root directory
 cd frontend
 npm start
-#Now open another tab/window and navigate to backend
-cd backend
+#Now open another tab/window and navigate to backend (Ctrl + SHift + T)
+cd ../backend
 npm run dev
 ```
 

@@ -1,21 +1,11 @@
 import backendUrl from './path.ts'
-interface signupInfo {
-    name: string;
-    email: string;
-    password: string;
-    phone: string;
-    location: number[] | {lat: number, long: number, acc: number},
-    ifsc?: string | null;
-    accountNumber?: string | null;
-    pan_number?: string | null;
-    aadhar_uri?: string | null;
-    bank_proof_uri?: string | null;
-    pan_uri?: string | null;
-}
+import { signUpInfo } from '../types/signup'
 export async function signup({ name, email, password, phone,
     location, ifsc,
     accountNumber,pan_number, aadhar_uri,
-    bank_proof_uri, pan_uri }: signupInfo) {
+    fullName,
+    upiId,
+    bank_proof_uri, pan_uri }: signUpInfo) {
     console.log({
         name,
         email,
@@ -23,6 +13,8 @@ export async function signup({ name, email, password, phone,
         phone,
         location,
         ifsc, accountNumber,
+        upiId,
+        fullName,
         pan_number,
         aadhar_uri,
         bank_proof_uri,
@@ -35,6 +27,8 @@ try{
             email,
             password,
             phone,
+            upiId,
+            fullName,
             location: {
                 lat: Array.isArray(location) ? location[0] : location.lat,
                 long:Array.isArray(location) ? location[1] : location.long,
@@ -45,17 +39,17 @@ try{
             pan: pan_number || null,
             verified: ifsc && accountNumber && pan_number && aadhar_uri && bank_proof_uri && pan_uri ? true : false
         }))
-        form.append('aadhar_front', {
+        aadhar_uri && form.append('aadhar_front', {
             uri: aadhar_uri || '',
             type: `image/${aadhar_uri?.split('.').pop()?.split('?')[0] || 'jpg'}`,
             name: `aadhar_front.${aadhar_uri?.split('.').pop() || 'jpg'}`
         } as any)
-        form.append('bank_proof', {
+        bank_proof_uri && form.append('bank_proof', {
             uri: bank_proof_uri || '',
             type: `image/${bank_proof_uri?.split('.').pop()?.split('?')[0] || 'jpg'}`,
             name: `bank_proof.${bank_proof_uri?.split('.').pop() || 'jpg'}`
         } as any)
-        form.append('personal_pan', {
+        pan_uri && form.append('personal_pan', {
             uri: pan_uri || '',
             type: `image/${pan_uri?.split('.').pop()?.split('?')[0] || 'jpg'}`,
             name: `personal_pan.${pan_uri?.split('.').pop() || 'jpg'}`
@@ -67,8 +61,7 @@ try{
             body: form
         })
         const response = await data.json()
-        if (response.success === true) return true
-        return false
+        return await response
         }
         catch(e){
             console.log(e)

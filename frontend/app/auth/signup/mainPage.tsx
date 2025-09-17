@@ -4,6 +4,7 @@ import SignUp from './signup';
 import Kyc from '../kyc/kyc';
 import { signupPage } from '../../../types/signup';
 import UploadDocuments from '../documents/uploadDocuments';
+import Upi from '../upi/upi';
 
 const MainPage = () => {
   const [activePage, setActivePage] = React.useState<signupPage>('signup');
@@ -15,6 +16,8 @@ const MainPage = () => {
       // break;
       case 'kyc':
         return <Kyc setActivePage={setActivePage} />;
+      case 'UPI':
+        return <Upi />;
       default:
         return <UploadDocuments />;
     }
