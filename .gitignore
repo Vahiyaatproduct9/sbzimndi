@@ -74,3 +74,39 @@ frontend/*.keystore
 frontend/.gradle/
 frontend/**/build/
 frontend/local.properties
+# React Native
+node_modules/
+android/.gradle/
+android/app/build/
+android/build/
+ios/build/
+ios/Pods/
+*.keystore
+
+# Build outputs
+*.apk
+*.aab
+*.so
+
+# Expo
+.expo/
+.expo-shared/
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Node modules
+/frontend/node_modules/
+
+# Android build artifacts
+/frontend/android/app/build/
+frontend/android/build/
+*.apk
+*.aab
+*.so
+android/.gradle/
+
+# iOS build artifacts
+ios/build/
+ios/Pods/
