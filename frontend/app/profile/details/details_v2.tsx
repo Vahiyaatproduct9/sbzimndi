@@ -11,9 +11,9 @@ import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Theme from '../../../colors/ColorScheme.ts';
 import Animation, { withDelay, withSpring } from 'react-native-reanimated';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import checkUser from '../../../api/checkUser.ts';
-import { getAccessToken, getName } from '../../functions/getLocalInfo.ts';
+// import AsyncStorage from '@react-native-async-storage/async-storage';
+// import checkUser from '../../../api/checkUser.ts';
+import { getName } from '../../functions/getLocalInfo.ts';
 import {
   imageProperty,
   spiritProperty,
@@ -23,45 +23,52 @@ import {
   settingsProperty,
   animatedStyle,
 } from '../../animation/animation.ts';
+import { useNavigation } from '@react-navigation/native';
 import { getSpirit } from '../../functions/toggleSpiritAnimal.ts';
 import { useIsFocused } from '@react-navigation/native';
-import getProfile from '../../../api/getProfile.ts';
+// import getProfile from '../../../api/getProfile.ts';
 import { spirit } from '../../data/spiritAnimals.ts';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const Details = ({ navigation, route }: any) => {
-  const { setLogged } = route.params;
+const Details = ({ route }: any) => {
+  const navigation = useNavigation();
+  const {
+    setLogged,
+    // profile: nProfile
+  } = route.params;
   const isFocused = useIsFocused();
   const height = useWindowDimensions().height;
   const width = useWindowDimensions().width;
   const [spiritAnimal, setSpiritAnimal] = useState<string>('');
-  const [profile, setProfile] = useState<any | null>(null);
+  const [profile, setProfile] = useState<any>(null);
+  // setProfile(nProfile);
   useEffect(() => {
-    async function res() {
-      console.log('executing res');
-      const access_token = await AsyncStorage.getItem('access_token');
-      const refresh_token = await AsyncStorage.getItem('refresh_token');
-      if (
-        access_token &&
-        access_token.length > 0 &&
-        refresh_token &&
-        refresh_token.length > 0
-      ) {
-        const { access_token: at, refresh_token: rt } = await checkUser({
-          access_token,
-          refresh_token,
-        });
-        if ((await at) === null || (await rt) === null) {
-          setLogged(false);
-          await AsyncStorage.removeItem('access_token');
-          await AsyncStorage.removeItem('refresh_token');
-        } else {
-          setLogged(true);
-          await AsyncStorage.setItem('access_token', await at);
-          await AsyncStorage.setItem('refresh_token', await rt);
-        }
-      }
-    }
-    res();
+    // async function res() {
+    //   console.log('executing res');
+    //   const access_token = await AsyncStorage.getItem('access_token');
+    //   const refresh_token = await AsyncStorage.getItem('refresh_token');
+    //   if (
+    //     access_token &&
+    //     access_token.length > 0 &&
+    //     refresh_token &&
+    //     refresh_token.length > 0
+    //   ) {
+    //     const { access_token: at, refresh_token: rt } = await checkUser({
+    //       access_token,
+    //       refresh_token,
+    //     });
+    //     if ((await at) === null || (await rt) === null) {
+    //       setLogged(false);
+    //       await AsyncStorage.removeItem('access_token');
+    //       await AsyncStorage.removeItem('refresh_token');
+    //     } else {
+    //       setLogged(true);
+    //       await AsyncStorage.setItem('access_token', await at);
+    //       await AsyncStorage.setItem('refresh_token', await rt);
+    //     }
+    //   }
+    // }
+    // res();
     imageProperty.top.value = withDelay(500, withSpring(30));
     imageProperty.opacity.value = withDelay(500, withSpring(1));
     spiritProperty.opacity.value = withDelay(500, withSpring(1));
@@ -76,27 +83,26 @@ const Details = ({ navigation, route }: any) => {
 
   useEffect(() => {
     (async () => {
-      await getSpirit().then(animal => {
-        setSpiritAnimal(animal);
-      });
+      const localProfile = await AsyncStorage.getItem('profile').then(res =>
+        JSON.parse(res || ''),
+      );
+      console.log({ localProfile });
+      localProfile && setProfile(localProfile);
     })();
+    // (async () => {
+    //   const access_token = await getAccessToken();
+    //   const profileData = await getProfile(access_token);
+    //   console.log(profileData);
+    //   setProfile(profileData);
+    // })();
   }, [isFocused]);
-
-  useEffect(() => {
-    (async () => {
-      const access_token = await getAccessToken();
-      const profileData = await getProfile(access_token);
-      console.log(profileData);
-      setProfile(profileData);
-    })();
-  }, []);
   return (
     <View style={css.container}>
       <View style={css.head}>
         <Animation.View
           style={[css.settingsView, settingsProperty, animatedStyle]}
         >
-          <Pressable onPress={() => navigation.navigate('settings')}>
+          <Pressable onPress={() => navigation.navigate('settings' as never)}>
             <View>
               <Ionicons
                 name="settings-outline"
@@ -187,7 +193,9 @@ const Details = ({ navigation, route }: any) => {
       <View style={css.foot}>
         <Pressable
           style={css.button}
-          onPress={() => navigation.navigate('editProfile')}
+          onPress={() =>
+            navigation.navigate('editProfile' as never, { profile })
+          }
         >
           <Text style={css.buttonText}>Edit Profile</Text>
         </Pressable>

@@ -17,9 +17,10 @@ export default async function ({ id }) {
       const order = await rzpClient.orders.create({
         amount: price * 100,
         currency: "INR",
-        receipt: `receipt_order`,
+        receipt: id,
         notes: {
           Expires: expires_in,
+          id,
         },
       });
       return {

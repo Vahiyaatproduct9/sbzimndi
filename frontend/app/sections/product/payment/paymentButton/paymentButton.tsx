@@ -5,7 +5,13 @@ import initiatePayment from '../../../../../api/initiatePayment';
 import theme from '../../../../../colors/ColorScheme';
 import rzpCheckout from 'react-native-razorpay';
 import verifyPayment from '../../../../../api/verifyPayment';
-import { getAccessToken, getName } from '../../../../functions/getLocalInfo';
+import {
+  getAccessToken,
+  getEmail,
+  getName,
+  getPhone,
+  getRefreshToken,
+} from '../../../../functions/getLocalInfo';
 
 const PaymentButton = ({
   style,
@@ -24,7 +30,13 @@ const PaymentButton = ({
 }) => {
   const [processing, setProcessing] = useState<boolean>(false);
   const handleSubmit = async () => {
-    if ((await getName()) === '' || (await getAccessToken()) === '') {
+    const access_token = await getAccessToken().then(res =>
+      res !== null ? res : '',
+    );
+    const Pname = await getName();
+    const email = await getEmail();
+    const contact = await getPhone();
+    if ((await getRefreshToken()) === '' || (await getAccessToken()) === '') {
       setMessage('Please Login to buy a product.');
       setTimeout(() => setActiveTab('profile'), 1800);
       return;
@@ -39,22 +51,25 @@ const PaymentButton = ({
       const options = {
         key,
         order_id, // Razorpay order_id (from backend)
-        amount, // in paisa
+        amount, // in paisa>
         currency,
         name,
         description: 'SbziMndi',
         prefill: {
-          name: 'Mohan roy',
-          email: 'something@something.com',
-          contact: '1234567890',
+          name: Pname,
+          email,
+          contact,
         },
         theme: {
           color: theme.tint,
         },
       };
       const result = await rzpCheckout.open(options);
-      console.log(result);
-      const { message } = await verifyPayment(result);
+      console.log({ result, access_token });
+      const { success, message } = await verifyPayment({
+        result,
+        access_token,
+      });
       setMessage(message);
       console.log(message);
     } catch (err) {
@@ -72,7 +87,7 @@ const PaymentButton = ({
       disabled={processing}
       onPress={handleSubmit}
     >
-      <Text style={textStyle}>{processing ? 'Please wait' : 'Pay'}</Text>
+      <Text style={textStyle}>{processing ? 'Please wait' : 'P ay'}</Text>
     </Pressable>
   );
 };

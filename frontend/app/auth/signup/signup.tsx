@@ -7,16 +7,11 @@ import { useState } from 'react';
 import Message from '../../components/message/message.tsx';
 const image = require('../../../assets/images/fruit.png');
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation } from '@react-navigation/native';
 import validateSignupInfo from '../../functions/validateSignupInfo.ts';
-import {
-  setName as sN,
-  setLocation as sL,
-  setEmail as sE,
-  setPassword as sP,
-  setPhone as sPh,
-} from '../../functions/getLocalInfo.ts';
 
-const SignUp = ({ navigation, setActivePage }: any) => {
+const SignUp = ({ setActivePage }: any) => {
+  const nv = useNavigation();
   const [name, setName] = useState<string>('');
   const [phone, setPhone] = useState<string>('');
   // const []
@@ -162,7 +157,7 @@ const SignUp = ({ navigation, setActivePage }: any) => {
           <Pressable
             style={{ justifyContent: 'center' }}
             onPress={() => {
-              navigation.navigate('signin');
+              nv.navigate('signin' as never);
             }}
           >
             <Text style={{ fontWeight: '600', color: 'orange' }}>

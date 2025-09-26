@@ -14,13 +14,13 @@ export default [
     { id: 1, label: "Brown Bear", value: "brown_bear", },
     { id: 2, label: "Cheetah", value: "cheetah", },
     { id: 3, label: "Elephant", value: "elephant", },
-    { id: 4, label: "Sparrow", value: "flying_sparrow", },
+    { id: 4, label: "Sparrow", value: "sparrow", },
     { id: 5, label: "Kingfisher", value: "kingfisher", },
     { id: 6, label: "Orca", value: "orca", },
     { id: 7, label: "Barn Owl", value: "owl", },
     { id: 8, label: "Polar Bear", value: "polar_bear", },
     { id: 9, label: "Snow Leopard", value: "snow_leopard", },
-    { id: 10, label: "Sparrow 2", value: "sparrow", },
+    { id: 10, label: "Sparrow 2", value: "sparrow2", },
 ]
 export const spirit = (spirit_animal: spirit | null) => {
     switch (spirit_animal) {

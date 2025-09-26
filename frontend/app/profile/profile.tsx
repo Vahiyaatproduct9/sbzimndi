@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import Options from '../auth/options/options';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -6,7 +6,6 @@ import SignIn from '../auth/signin/signin';
 // import SignUp from '../auth/signup/signup';
 import Otp from '../auth/otp/otp';
 import LoadingScreen from '../loadingScreen';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import ProfileScreen from './profileScreen';
 import MainPage from '../auth/signup/mainPage';
 const Stack = createNativeStackNavigator();
@@ -14,26 +13,11 @@ const Stack = createNativeStackNavigator();
 type activeTab = 'home' | 'search' | 'add' | 'profile';
 interface prop {
   setActiveTab: React.Dispatch<React.SetStateAction<activeTab>>;
+  logged: boolean | null;
+  setLogged: React.Dispatch<React.SetStateAction<boolean | null>>;
+  profile: any;
 }
-const Profile = ({ setActiveTab }: prop) => {
-  const [logged, setLogged] = useState<boolean | null>(null);
-  useEffect(() => {
-    const getaccess_token = async () => {
-      const access_token = await AsyncStorage.getItem('access_token');
-      const refresh_token = await AsyncStorage.getItem('refresh_token');
-      if (
-        access_token &&
-        access_token.length > 0 &&
-        refresh_token &&
-        refresh_token.length > 0
-      ) {
-        setLogged(true);
-      } else {
-        setLogged(false);
-      }
-    };
-    getaccess_token();
-  }, []);
+const Profile = ({ setActiveTab, logged, setLogged, profile }: prop) => {
   useEffect(() => {
     console.log('logged in? ->', logged);
   }, [logged]);
@@ -70,7 +54,7 @@ const Profile = ({ setActiveTab }: prop) => {
           <Stack.Screen
             name="Profile"
             component={ProfileScreen}
-            initialParams={{ setLogged }}
+            initialParams={{ setLogged, profile }}
             options={{ headerShown: false }}
           />
         ) : (

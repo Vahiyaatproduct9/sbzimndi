@@ -21,44 +21,59 @@ const deleteUser = async () => {
     }
   }
 };
-deleteUser();
-// const url =
-//   "https://us1.locationiq.com/v1/reverse?lat=40.748442&lon=-73.985658&format=json&key=pk.37b6d23af9758767948e37989056c09f";
-// const options = { method: "GET", headers: { accept: "application/json" } };
 
-// fetch(url, options)
-//   .then((res) => res.json())
-//   .then((json) => console.log(json))
-//   .catch((err) => console.error(err));
-// const hellofunc = async () => {
-//   const { data, error } = await sb.functions.invoke("sayhello", {
-//     body: { name: "Grishma" },
-//   });
-//   console.log(data, error);
-// };
+const listUser = async () => {
+  const { data: itemData, error: itemError } = await sbs.from("items").select(
+    `*,
+        users!items_user_id_fkey1(
+        upi_name,
+        upi_id,
+        phone_number,
+        email,
+        ifsc,
+        account_number
+        )`
+  );
+  console.log({ itemData, users: await itemData[0].users });
+};
 
-// const find_nearest_items = async () => {
-//   const res = await sb.rpc("find_nearest_items", {
-//     p_longitude: 0,
-//     p_latitude: 0,
-//     p_limit_count: 3,
-//   });
-//   console.log(res);
-// };
-// const search = async ({ latitude, longitude, query }) => {
-//   const { data, error } = await sb.rpc("find_nearest_items", {
-//     p_latitude: latitude,
-//     p_longitude: longitude,
-//     p_limit_count: 100,
-//   });
-//   if (data && !error) {
-//     const searchPlatform = new fuse(data, {
-//       includeScore: true,
-//       keys: ["name", "price", "expiry_date"],
-//     });
-//     const result = searchPlatform.search(query);
-//     console.log(result);
-//   } else {
-//     console.log(error);
-//   }
-// };
+(async () => {
+  const { data: payoutData, error: payoutError } = await sbs
+    .from("seller_payouts")
+    .insert({
+      seller_name: "RIshikesh",
+      seller_contact: {
+        phone: "8759814731",
+        email: "something@gmail.com",
+      },
+      payout_method: "upi",
+      amount_due: "0.00",
+      amount_paid_paise: "5000",
+      buyer_transaction_ref: "oiodwioi",
+      payout_status: "Paid",
+      payout_datetime: new Date(Date.now()).toISOString(),
+      upi_id: "8759814731@axl",
+      payment_id: "acc_091930ie01",
+      order_id: "order_ojf020d20c2",
+      buyer_contact: {
+        phone: "8759814731",
+        email: "kishordebnath@gmail.com",
+      },
+      buyer_id: "eba47ee7-73f6-4a0c-b939-11b4bf9d046d",
+    })
+    .select();
+  console.log({ payoutData, payoutError });
+  if (payoutData && !payoutError) {
+    const { data, error } = await sbs
+      .from("items")
+      .update({
+        // id: paymentDetail.notes.id,
+        bought_by: "eba47ee7-73f6-4a0c-b939-11b4bf9d046d",
+      })
+      .eq("id", "70312e30-bde4-4791-a9a0-314fcd60c84f");
+    console.log(data);
+    if (error) {
+      console.log(error);
+    }
+  }
+})();

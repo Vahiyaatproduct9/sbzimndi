@@ -31,9 +31,13 @@ import Message from '../../../components/message/message.tsx';
 import saveProfilePicture from '../../../functions/saveProfilePicture.ts';
 import saveRole, { getRole } from '../../../functions/toggleRole.ts';
 import blobtobase64 from '../../../functions/blobtobase64.ts';
+import getProfile from '../../../../api/getProfile.ts';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const EditProfile = ({ navigation }: any) => {
+const EditProfile = ({ navigation, route }: any) => {
+  const { profile } = route.params;
   const [mess, setMess] = useState<string>('');
+  const [uploading, setUploading] = useState<boolean>(false);
   const [spiritAnimal, setSpiritAnimal] = useState<string>('');
   const [pressed, setPressed] = useState<boolean>(false);
   const [toggle, setToggle] = useState<boolean>(false);
@@ -76,7 +80,11 @@ const EditProfile = ({ navigation }: any) => {
   useEffect(() => {
     console.log(photo);
   }, [photo]);
+  useEffect(() => {
+    console.log(profile);
+  }, [profile]);
   const handleSubmit = async () => {
+    setUploading(true);
     const localPath = `${RNFS.DocumentDirectoryPath}/profile.jpg`;
     try {
       let shouldUpload = false;
@@ -138,7 +146,15 @@ const EditProfile = ({ navigation }: any) => {
           }
 
           setMess('Profile Updated Successfully!');
-          navigation.goBack();
+          await getProfile(await getAccessToken())
+            .then(
+              async newProfile =>
+                await AsyncStorage.setItem(
+                  'profile',
+                  JSON.stringify(newProfile),
+                ),
+            )
+            .then(() => navigation.goBack());
         } catch (saveError) {
           console.log('Error saving profile data:', saveError);
           setMess('Some Error Occurred!');
@@ -150,32 +166,52 @@ const EditProfile = ({ navigation }: any) => {
       console.log('Main error:', err);
       setMess('Some Error Occurred!');
     }
+    setUploading(false);
   };
   useEffect(() => {
+    if (
+      profile.items.profile_picture &&
+      profile.items.profile_picture.length > 0
+    ) {
+      setPhoto(profile.items.profile_picture);
+    } else {
+      (async () => {
+        await RNFS.exists(`${RNFS.DocumentDirectoryPath}/profile.jpg`).then(
+          exists => {
+            if (exists) {
+              const path = `file://${
+                RNFS.DocumentDirectoryPath
+              }/profile.jpg?time=${Date.now()}`;
+              console.log('Profile picture path:', path);
+              setPhoto(path);
+            } else {
+              const base64img = (async () => {
+                return await blobtobase64(image);
+              })();
+              setPhoto(base64img);
+              console.log('No local profile picture found, using default.');
+            }
+          },
+        );
+      })();
+    }
+  }, [profile.items.profile_picture]);
+  useEffect(() => {
     (async () => {
-      await RNFS.exists(`${RNFS.DocumentDirectoryPath}/profile.jpg`).then(
-        exists => {
-          if (exists) {
-            const path = `file://${
-              RNFS.DocumentDirectoryPath
-            }/profile.jpg?time=${Date.now()}`;
-            console.log('Profile picture path:', path);
-            setPhoto(path);
-          } else {
-            const base64img = (async () => {
-              return await blobtobase64(image);
-            })();
-            setPhoto(base64img);
-            console.log('No local profile picture found, using default.');
-          }
-        },
-      );
-      await getName().then(res => res && setName(res));
-      await getBio().then(res => res && setBio(res));
-      await getRole().then(res => res === 'seller' && setToggle(true));
-      await getSpirit().then(spirit => spirit && setSpiritAnimal(spirit));
+      if (profile.items) {
+        setName(profile.items.full_name);
+        setBio(profile.items.bio);
+        setSpiritAnimal(profile.items.spirit_animal);
+        setToggle(profile.items.user_type === 'seller' ? true : false);
+        console.log(profile.items.name);
+      } else {
+        await getName().then(res => res && setName(res));
+        await getBio().then(res => res && setBio(res));
+        await getRole().then(res => res === 'seller' && setToggle(true));
+        await getSpirit().then(spirit => spirit && setSpiritAnimal(spirit));
+      }
     })();
-  }, []);
+  }, [profile]);
 
   useEffect(() => {
     const run = async () => {
@@ -226,10 +262,13 @@ const EditProfile = ({ navigation }: any) => {
             {toggle ? 'Seller' : 'Buyer'}
           </Text>
         </View>
-        <View style={[css.TextBox, css.switch]}>
-          <Text style={[css.text, css.label]}>Force Seller</Text>
-          <Switch value={toggle} pressedState={setToggle} />
-        </View>
+        {profile.items.upi_id.length > 0 &&
+          profile.items.upi_name.length > 0 && (
+            <View style={[css.TextBox, css.switch]}>
+              <Text style={[css.text, css.label]}>Force Seller</Text>
+              <Switch value={toggle} pressedState={setToggle} />
+            </View>
+          )}
         <View style={css.TextBox}>
           <Text style={[css.text, css.label]}>Bio:</Text>
           <TextInput
@@ -249,6 +288,8 @@ const EditProfile = ({ navigation }: any) => {
           text="Save"
           pressedState={setPressed}
           pressed={pressed}
+          loading={uploading}
+          loadingWord="Saving..."
           onPress={handleSubmit}
         />
       </View>

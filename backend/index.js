@@ -11,26 +11,14 @@ import { read_items } from "./api/readitems.js";
 import search from "./api/search.js";
 import updateProfile from "./api/updateProfile.js";
 import getItem from "./api/getItem.js";
-const app = express();
 import payment from "./api/payment.js";
-import Razorpay from "razorpay";
 import verifyPayment from "./api/verifyPayment.js";
 import { Readable } from "stream";
 const port = 8080;
+const app = express();
 app.use(json());
-app.use(
-  cors({
-    allowedHeaders: ["*"],
-    allowedOrigins: ["*"],
-  })
-);
 
 const upload = multer({ storage: multer.memoryStorage() });
-app.use(
-  cors({
-    origin: "*",
-  })
-);
 const uploadFiles = upload.fields([
   { name: "aadhar_front", maxCount: 1 },
   { name: "personal_pan", maxCount: 1 },
@@ -225,12 +213,12 @@ app.post("/initiate-payment", async (req, res) => {
 });
 
 app.post("/verify-payment", async (req, res) => {
-  const data = req.body;
-  console.log(data);
-  const response = await verifyPayment(data);
+  const { result, access_token } = await req.body;
+  console.log({ result, access_token });
+  const response = await verifyPayment({ result, access_token });
   res.json(response);
 });
 
-app.listen(8080, () => {
+app.listen(port, () => {
   console.log("Listening on Port: ", port);
 });

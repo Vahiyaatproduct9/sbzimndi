@@ -22,22 +22,24 @@ const ProductPage = ({
   const [item, setItem] = useState<any>(null);
   // Startup FUnction below!
   useEffect(() => {
-    const fetchItem = async () => {
-      await getAndSetLocation(setLocation, setMessage);
-      const dist = await getItem(id)
-        .then(r => setItem(r))
-        .then(() => {
-          return calculateDistance(
-            location ? location[1] : 0,
-            location ? location[0] : 0,
-            item ? item.latitude : 0,
-            item ? item.longitude : 0,
-          );
-        });
-      setItem((prev: any) => ({ ...prev, distance_meters: dist }));
-    };
-    fetchItem();
+    (async () => await getAndSetLocation(setLocation, setMessage))();
+  }, []);
+  useEffect(() => {
+    (async () =>
+      await getItem(id).then(res => setItem(prev => ({ ...prev, ...res }))))();
   }, [id]);
+  useEffect(() => {
+    (async () => {
+      const distance_meters = calculateDistance(
+        location ? location[0] : 0,
+        location ? location[1] : 0,
+        item ? item.latitude : 0,
+        item ? item.longitude : 0,
+      );
+      setItem((prev: any) => ({ ...prev, distance_meters }));
+    })();
+    console.log('ran function');
+  }, []);
   useEffect(() => {
     console.log('item updated', item);
   }, [item]);
@@ -63,7 +65,9 @@ const ProductPage = ({
           <Text style={css.price}>expires {timeline(item.expiry_date)}</Text>
         </View>
         <View style={css.ownerContainer}>
-          <Text style={css.owner}>{item.users.full_name}</Text>
+          <Text style={css.owner}>
+            {item.users ? item.users.full_name : 'K'}
+          </Text>
           <Text style={css.away}>
             {item.distance_meters > 1000
               ? MtoKm(item.distance_meters)

@@ -10,6 +10,7 @@ export default async function (access_token: string) {
         }
     )
     const d = await data.json()
+    console.log(d)
     return await d
 }
 

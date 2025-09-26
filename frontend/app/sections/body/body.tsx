@@ -6,6 +6,10 @@ import {
   FlatList,
   Pressable,
 } from 'react-native';
+import {
+  getLocation,
+  setLocation as sL,
+} from '../../functions/getLocalInfo.ts';
 import React, { useEffect, useState } from 'react';
 import Theme from '../../../colors/ColorScheme.ts';
 import Card from '../../components/Card/card.tsx';
@@ -34,40 +38,59 @@ const Body = () => {
   useEffect(() => {
     containerProperty.opacity.value = withDelay(0, withSpring(1));
     containerProperty.top.value = withDelay(0, withSpring(0));
-    const setLoc = async () => {
-      const res = await AsyncStorage.getItem('location');
-      if (res) setLocation(JSON.parse(res));
-      else {
-        setLocation([0, 0, 0]);
-        setMessage(
-          'Please Enable Location Permission to view the nearby Items.',
-        );
-      }
-    };
-    setLoc();
+    (async () => {
+      await getLocation()
+        .then(setLocation)
+        .catch(() => {
+          setLocation([0, 0, 0]);
+          setMessage(
+            'Please Enable Location Permission to view the nearby Items.',
+          );
+        });
+    })();
     setFetched(false);
   }, []);
   useEffect(() => {
-    const componentDidMount = async () => {
-      getAndSetLocation(setLocation, setMessage);
-      await AsyncStorage.setItem('location', JSON.stringify(location));
-      const fetchItems = async () => {
-        const res = await getNearestItems({
+    (async () => {
+      try {
+        const res = await AsyncStorage.getItem('items');
+        const parsedRes = res ? JSON.parse(res) : null;
+        console.log(parsedRes);
+        if (parsedRes) {
+          setItems(parsedRes);
+          if (Date.now() - parseInt(parsedRes.time, 10) < 600000) {
+            return; // cache still valid
+          }
+        }
+
+        const loc = await getAndSetLocation(setLocation, setMessage);
+        setLocation(loc);
+        const response = await getNearestItems({
           longitude: location ? location[0] : 0,
           latitude: location ? location[1] : 0,
           accuracy: location ? location[2] : 0,
         });
-        if ((await res.status) === 200) setItems(res);
-        else
-          setMessage(
-            'PLease Check your Internet Connection before trying again.',
+
+        if (response.status === 200) {
+          setItems(response);
+          await AsyncStorage.setItem(
+            'items',
+            JSON.stringify({ ...response, time: Date.now() }),
           );
-      };
-      fetched === false && fetchItems();
-    };
-    componentDidMount();
+        } else {
+          setMessage(
+            'Please check your Internet Connection before trying again.',
+          );
+        }
+      } catch (err) {
+        console.log('Error in useEffect:', err);
+      }
+    })();
+  }, []);
+
+  useEffect(() => {
     console.log(items);
-  }, [fetched]);
+  }, [items]);
 
   useEffect(() => {
     items === null ? setFetched(false) : setFetched(true);
@@ -76,17 +99,13 @@ const Body = () => {
     <Animated.View style={[css.container, containerProperty]}>
       <Message time={3} content={message} state={setMessage} />
       <Text style={css.head}>Nearby Picks</Text>
-      {items !== null ? (
+      {items && typeof items !== 'undefined' ? (
         <View style={css.slider}>
           <FlatList
             data={items.data}
             renderItem={({ item }) => (
               <Pressable
-                onPress={() =>
-                  navigation.navigate('Product', {
-                    id: item.id,
-                  })
-                }
+                onPress={() => navigation.navigate('Product', { id: item.id })}
               >
                 <Card style={css.card}>
                   <Image

@@ -21,5 +21,6 @@ export default (lat1Deg: number,
             * sin(dLon / 2) * sin(dLon / 2);
     const c = 2 * atan2(sqrt(a), sqrt(1 - a)); 
     const d = R * c;
+    console.log(d)
     return d; // distance in m
 }
