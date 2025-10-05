@@ -8,12 +8,13 @@ import Search from './app/search/search.tsx';
 import Profile from './app/profile/profile.tsx';
 import Animated, { useSharedValue, withSpring } from 'react-native-reanimated';
 import AddItem from './app/addItem/addItem.tsx';
-// import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type activeTab = 'home' | 'search' | 'add' | 'profile';
 
 function App() {
   const [logged, setLogged] = useState<boolean | null>(null);
+  // const [isSeller, setSeller] = useState<boolean>(false);
   const animateProperty = {
     y: useSharedValue(80),
     opacity: useSharedValue(0),
@@ -26,7 +27,11 @@ function App() {
     setLoaded(true);
     animateProperty.y.value = withSpring(0);
     animateProperty.opacity.value = withSpring(1);
-  }, []);
+  }, [animateProperty.opacity, animateProperty.y]);
+  useEffect(() => {
+    (async () =>
+      await AsyncStorage.setItem('profile', JSON.stringify(profile)))();
+  }, [profile]);
   const activeBlock = () => {
     if (active === 'home') {
       return <Main setActiveTab={setActive} />;
@@ -40,6 +45,7 @@ function App() {
           logged={logged}
           profile={profile}
           setLogged={setLogged}
+          setProfile={setProfile}
           setActiveTab={setActive}
         />
       );
@@ -68,6 +74,13 @@ function App() {
             active={active}
             setActive={setActive}
             profile={profile}
+            isSeller={
+              profile
+                ? profile.items.user_type === 'seller'
+                  ? true
+                  : false
+                : false
+            }
           />
         </>
       ) : (

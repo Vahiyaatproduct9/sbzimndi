@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "130557058757",
+    "project_id": "sbzimndi-d11a3",
+    "storage_bucket": "sbzimndi-d11a3.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:130557058757:android:42b60c635539883f4c9aac",
+        "android_client_info": {
+          "package_name": "com.sbzimndi"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCw8Pg3sDMTu3gr9f8oTrW8HBZc0N8OzVE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

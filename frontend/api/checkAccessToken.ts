@@ -1,4 +1,5 @@
 export default function isAccessTokenExpired(token: string) {
+    console.log({ 'access_token from checkAccessToken.js': token })
     try {
         const payloadBase64 = token.split('.')[1];
         const payloadJson = atob(payloadBase64);

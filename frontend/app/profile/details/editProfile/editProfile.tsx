@@ -124,17 +124,17 @@ const EditProfile = ({ navigation, route }: any) => {
 
       console.log('Should upload:', shouldUpload);
 
-      const res = await updateProfile({
+      const { success, message } = await updateProfile({
         photo: shouldUpload && photo.length > 10 ? photo : null,
-        access_token: await getAccessToken(),
         name,
         spirit_animal: spiritAnimal,
         user_type: toggle ? 'seller' : 'buyer',
         bio,
       });
 
-      if (res) {
+      if (success === true) {
         try {
+          setMess(message || 'Success');
           await saveSpirit(spiritAnimal);
           await saveRole(toggle ? 'seller' : 'buyer');
           await sn(name);
@@ -146,7 +146,7 @@ const EditProfile = ({ navigation, route }: any) => {
           }
 
           setMess('Profile Updated Successfully!');
-          await getProfile(await getAccessToken())
+          await getProfile()
             .then(
               async newProfile =>
                 await AsyncStorage.setItem(

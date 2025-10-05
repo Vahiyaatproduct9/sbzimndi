@@ -7,8 +7,12 @@ export default async ({ access_token }) => {
     .select(`*,items!items_user_id_fkey1(*)`)
     .eq("id", data.user.id) // users.id
     .single();
-  console.log("userData -->", userData, userError);
+  if (error) {
+    console.log("user Error :( --> ", error);
+  }
   if (!error && !userError) {
     return { success: true, ...data.user, items: userData, status: 200 };
-  } else return { success: false, error, status: error.status };
+  } else {
+    return { success: false, error, status: error.status };
+  }
 };

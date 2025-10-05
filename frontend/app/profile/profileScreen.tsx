@@ -6,7 +6,7 @@ import EditProfile from './details/editProfile/editProfile';
 import Settings from './details/settings/settings';
 const Stack = createNativeStackNavigator();
 const ProfileScreen = ({ route }: any) => {
-  const { setLogged, profile } = route.params;
+  const { setLogged, profile, setActiveTab } = route.params;
   return (
     <NavigationContainer independent>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
@@ -20,7 +20,11 @@ const ProfileScreen = ({ route }: any) => {
           component={EditProfile}
           initialParams={{ setLogged }}
         />
-        <Stack.Screen name="settings" component={Settings} />
+        <Stack.Screen
+          initialParams={{ setActiveTab }}
+          name="settings"
+          component={Settings as never}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );

@@ -13,7 +13,7 @@ import Theme from '../../../colors/ColorScheme.ts';
 import Animation, { withDelay, withSpring } from 'react-native-reanimated';
 // import AsyncStorage from '@react-native-async-storage/async-storage';
 // import checkUser from '../../../api/checkUser.ts';
-import { getName } from '../../functions/getLocalInfo.ts';
+import { getAccessToken, getName } from '../../functions/getLocalInfo.ts';
 import {
   imageProperty,
   spiritProperty,
@@ -24,11 +24,11 @@ import {
   animatedStyle,
 } from '../../animation/animation.ts';
 import { useNavigation } from '@react-navigation/native';
-import { getSpirit } from '../../functions/toggleSpiritAnimal.ts';
 import { useIsFocused } from '@react-navigation/native';
 // import getProfile from '../../../api/getProfile.ts';
 import { spirit } from '../../data/spiritAnimals.ts';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import getProfile from '../../../api/getProfile.ts';
 
 const Details = ({ route }: any) => {
   const navigation = useNavigation();
@@ -39,7 +39,6 @@ const Details = ({ route }: any) => {
   const isFocused = useIsFocused();
   const height = useWindowDimensions().height;
   const width = useWindowDimensions().width;
-  const [spiritAnimal, setSpiritAnimal] = useState<string>('');
   const [profile, setProfile] = useState<any>(null);
   // setProfile(nProfile);
   useEffect(() => {
@@ -88,13 +87,9 @@ const Details = ({ route }: any) => {
       );
       console.log({ localProfile });
       localProfile && setProfile(localProfile);
+      !localProfile &&
+        (await getProfile().then(profile => setProfile(profile)));
     })();
-    // (async () => {
-    //   const access_token = await getAccessToken();
-    //   const profileData = await getProfile(access_token);
-    //   console.log(profileData);
-    //   setProfile(profileData);
-    // })();
   }, [isFocused]);
   return (
     <View style={css.container}>
@@ -137,9 +132,7 @@ const Details = ({ route }: any) => {
       <Animation.View style={[css.body, textProperty]}>
         {profile && (
           <Animation.Image
-            source={spirit(
-              profile ? profile.items.spirit_animal : spiritAnimal,
-            )}
+            source={spirit(profile ? profile.items.spirit_animal : 'cheetah')}
             style={[css.spirit, spiritProperty]}
           />
         )}

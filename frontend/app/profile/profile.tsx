@@ -3,7 +3,6 @@ import Options from '../auth/options/options';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import SignIn from '../auth/signin/signin';
-// import SignUp from '../auth/signup/signup';
 import Otp from '../auth/otp/otp';
 import LoadingScreen from '../loadingScreen';
 import ProfileScreen from './profileScreen';
@@ -16,11 +15,20 @@ interface prop {
   logged: boolean | null;
   setLogged: React.Dispatch<React.SetStateAction<boolean | null>>;
   profile: any;
+  setProfile: React.Dispatch<React.SetStateAction<any>>;
 }
-const Profile = ({ setActiveTab, logged, setLogged, profile }: prop) => {
+const Profile = ({
+  setProfile,
+  setActiveTab,
+  logged,
+  setLogged,
+  profile,
+}: prop) => {
   useEffect(() => {
     console.log('logged in? ->', logged);
   }, [logged]);
+  // const getLocalProfile = async () =>
+  //   await AsyncStorage.getItem('profile').then(res => JSON.parse(res || ''));
   return (
     // <Details />
     <NavigationContainer>
@@ -35,12 +43,13 @@ const Profile = ({ setActiveTab, logged, setLogged, profile }: prop) => {
             <Stack.Screen
               name="signin"
               component={SignIn}
-              initialParams={{ setLogged }}
+              initialParams={{ setLogged, setProfile }}
               options={{ headerShown: false }}
             />
             <Stack.Screen
               name="signup"
               component={MainPage}
+              initialParams={{ setProfile, setLogged, setActiveTab }}
               options={{ headerShown: false }}
             />
             <Stack.Screen
@@ -50,11 +59,13 @@ const Profile = ({ setActiveTab, logged, setLogged, profile }: prop) => {
               options={{ headerShown: false }}
             />
           </>
-        ) : logged === true ? (
+        ) : logged === true && profile !== 0 ? (
+          // (async () => await getLocalProfile())() !== null &&
+          // (async () => await getLocalProfile())().length !== 0
           <Stack.Screen
             name="Profile"
             component={ProfileScreen}
-            initialParams={{ setLogged, profile }}
+            initialParams={{ setLogged, profile, setActiveTab }}
             options={{ headerShown: false }}
           />
         ) : (

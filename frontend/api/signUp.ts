@@ -1,8 +1,9 @@
 import backendUrl from './path.ts'
 import { signUpInfo } from '../types/signup'
+import messaging from '@react-native-firebase/messaging'
 export async function signup({ name, email, password, phone,
     location, ifsc,
-    accountNumber,pan_number, aadhar_uri,
+    accountNumber, pan_number, aadhar_uri,
     fullName,
     upiId,
     bank_proof_uri, pan_uri }: signUpInfo) {
@@ -20,7 +21,8 @@ export async function signup({ name, email, password, phone,
         bank_proof_uri,
         pan_uri
     })
-try{
+    try {
+        const fcm_token = await messaging().getToken()
         const form = new FormData()
         form.append('info', JSON.stringify({
             name,
@@ -29,9 +31,10 @@ try{
             phone,
             upiId,
             fullName,
+            fcm_token,
             location: {
                 lat: Array.isArray(location) ? location[0] : location.lat,
-                long:Array.isArray(location) ? location[1] : location.long,
+                long: Array.isArray(location) ? location[1] : location.long,
                 acc: Array.isArray(location) ? location[2] : location.acc
             },
             ifsc: ifsc || null,
@@ -55,15 +58,15 @@ try{
             name: `personal_pan.${pan_uri?.split('.').pop() || 'jpg'}`
         } as any)
         console.log(form)
-    
+
         const data = await fetch(`${backendUrl}/signup`, {
             method: 'POST',
             body: form
         })
         const response = await data.json()
         return await response
-        }
-        catch(e){
-            console.log(e)
-        }
     }
+    catch (e) {
+        console.log(e)
+    }
+}

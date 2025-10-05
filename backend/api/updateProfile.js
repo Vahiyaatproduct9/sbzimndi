@@ -8,13 +8,13 @@ export default async ({ info, photo }) => {
   if (photo) {
     const { data: imgData, error: imgError } = await sbs.storage
       .from("pfp")
-      .upload(`${data.user.id}.${Date.now()}.png`, photo.buffer, {
+      .upload(`${data.user.id}.png`, photo.buffer, {
         contentType: photo.mimetype,
+        upsert: true,
       });
     if (!imgError && imgData)
       profile_picture = `${process.env.supabaseUrl}/storage/v1/object/public/${imgData.fullPath}`;
-    console.log(imgError);
-    console.log("img Data ==> ", imgData);
+    console.log("img Error --> ", imgError);
   }
   info = {
     full_name: name,
@@ -39,7 +39,7 @@ export default async ({ info, photo }) => {
     }
   }
   console.log("dataList-->", dataList);
-  const { data: infoData, error: infoError } = await sbs
+  const { error: infoError } = await sbs
     .from("users")
     .upsert({
       ...dataList,
@@ -47,7 +47,26 @@ export default async ({ info, photo }) => {
     })
     .eq("id", data.user.id)
     .select();
-  console.log("info Data ==> ", infoData);
   console.log("infoError ==> ", infoError);
-  return { infoError };
+  if (!error && !infoError && !publicError) {
+    return {
+      success: true,
+      message: "Profile updated Successfully!",
+    };
+  } else {
+    console.log({
+      error,
+      imgError,
+      infoError,
+      publicError,
+    });
+    return {
+      success: false,
+      message: "Some Error Occured!",
+      error,
+      infoError,
+      imgError,
+      publicError,
+    };
+  }
 };

@@ -14,10 +14,15 @@ import getItem from "./api/getItem.js";
 import payment from "./api/payment.js";
 import verifyPayment from "./api/verifyPayment.js";
 import { Readable } from "stream";
+import sendNotification from "./api/sendNotification.js";
+import signOut from "./api/signOut.js";
+import updateFcn from "./api/updateFcn.js";
+import handleNotification from "./api/handleNotification.js";
+import { deleteNotification } from "./api/manageNotification.js";
 const port = 8080;
 const app = express();
 app.use(json());
-
+(async () => await handleNotification())();
 const upload = multer({ storage: multer.memoryStorage() });
 const uploadFiles = upload.fields([
   { name: "aadhar_front", maxCount: 1 },
@@ -25,14 +30,17 @@ const uploadFiles = upload.fields([
   { name: "bank_proof", maxCount: 1 },
 ]);
 
-app.get("/", (req, res) => {
+app.get("/", (_, res) => {
   res.send("Hello World!");
 });
 app.post("/profile", async (req, res) => {
-  const { access_token } = await req.body;
+  const { access_token, fcm_token } = await req.body;
   if (access_token) {
-    const response = await getProfile({ access_token });
-    res.status(response.status).json(response);
+    const response = await getProfile({ access_token }).then(async (res) => {
+      await updateFcn({ access_token, fcm_token });
+      return res;
+    });
+    res.json(response);
   }
 });
 app.get("/getpost", async (req, res) => {
@@ -55,6 +63,7 @@ app.post("/signup", uploadFiles, async (req, res) => {
     accountNumber,
     pan,
     verified,
+    fcm_token,
   } = JSON.parse(info.info);
   console.log(info);
   const aadharFront = req.files["aadhar_front"]
@@ -80,6 +89,7 @@ app.post("/signup", uploadFiles, async (req, res) => {
     fullName,
     upiId,
     password,
+    fcm_token,
     phone,
     location: {
       lat,
@@ -108,26 +118,18 @@ app.post("/signup", uploadFiles, async (req, res) => {
   }
   res.json(data);
 });
+
 app.post("/signin", async (req, res) => {
   try {
-    const { email, password } = req.body;
-    const { data, error } = await signin({ email, password });
-    console.log(data.session.access_token, error);
-    if (error) {
-      return res.status(400).json({ error: error.message });
+    const { email, password, fcm_token } = req.body;
+    const response = await signin({ email, password });
+    if (response.access_token) {
+      await updateFcn({ access_token: response.access_token, fcm_token });
     }
-
-    if (data.session) {
-      return res.status(200).json({
-        access_token: data.session.access_token,
-        refresh_token: data.session.refresh_token,
-      });
-    }
-    // fallback if no error but no session
-    return res.status(400).json({ error: "Login failed" });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Internal server error" });
+    res.json(response);
+  } catch (e) {
+    console.log("try catch error -> ", e);
+    res.json({ success: false, message: "Internal Server Error!" });
   }
 });
 
@@ -152,11 +154,13 @@ app.post("/extendToken", async (req, res) => {
       status: 200,
       access_token: data.session.access_token,
       refresh_token: data.session.refresh_token,
+      success: true,
     });
   } else
     return res.json({
       status: error ? error.status : 400,
       ...error,
+      success: false,
     });
 });
 
@@ -170,7 +174,6 @@ app.post("/search", async (req, res) => {
 app.post("/getItems", async (req, res) => {
   const { latitude, longitude } = req.body;
   const { data, error } = await read_items({ latitude, longitude });
-  console.log(data.slice(1, 3), error);
   console.log("Provided location goes", latitude, longitude);
   if (error || !data)
     res.status(error.code).json({
@@ -198,9 +201,8 @@ app.post("/updateprofile", upload.single("photo"), async (req, res) => {
   console.log("update profile api running...");
   const info = JSON.parse(req.body.info);
   const photo = req.file;
-  const { infoError } = await updateProfile({ info, photo });
-  if (!infoError) return res.json({ updated: true });
-  res.json({ updated: false });
+  const response = await updateProfile({ info, photo });
+  res.json(response);
 });
 
 // Razorpay integration
@@ -216,6 +218,34 @@ app.post("/verify-payment", async (req, res) => {
   const { result, access_token } = await req.body;
   console.log({ result, access_token });
   const response = await verifyPayment({ result, access_token });
+  res.json(response);
+});
+
+app.post("/get-notification", async (req, res) => {
+  const { token } = req.body;
+  const response = await sendNotification({
+    fcm_token: token,
+    // data: { foo: "bar" },
+  });
+  res.json(response);
+});
+
+app.post("/delete-notification", async (req, res) => {
+  const { access_token, notification_id } = req.body;
+  const response = await deleteNotification({ access_token, notification_id });
+  res.json(response);
+});
+
+app.post("/update-fcm", async (req, res) => {
+  const { access_token, fcm_token } = req.body;
+  console.log("rumning update-fcm from index");
+  const response = await updateFcn({ access_token, fcm_token });
+  res.json(response);
+});
+
+app.post("/signOut", async (req, res) => {
+  const { access_token } = req.body;
+  const response = await signOut(access_token);
   res.json(response);
 });
 

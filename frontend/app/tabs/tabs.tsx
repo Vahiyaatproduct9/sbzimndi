@@ -1,9 +1,10 @@
 import { StyleSheet, Pressable, useWindowDimensions, View } from 'react-native';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import Theme from '../../colors/ColorScheme.ts';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Animation, { useSharedValue, withSpring } from 'react-native-reanimated';
-// import AsyncStorage from '@react-native-async-storage/async-storage';
+import messaging from '@react-native-firebase/messaging';
+import notifee, { AndroidImportance } from '@notifee/react-native';
 import {
   getAccessToken,
   getRefreshToken,
@@ -13,6 +14,9 @@ import {
 import checkUser from '../../api/checkUser.ts';
 import gP from '../../api/getProfile.ts';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import requestNotificationPermission from '../functions/requestNotificationPermission.ts';
+import getNotification from '../../api/getNotification.ts';
+import updateFcm from '../functions/updateFcm.ts';
 
 type ActiveTab = 'home' | 'search' | 'add' | 'profile';
 
@@ -23,57 +27,59 @@ interface props {
   logged: boolean | null;
   setLogged: React.Dispatch<React.SetStateAction<boolean | null>>;
   profile: any;
+  isSeller: boolean;
 }
 const Tabs = (props: props) => {
-  // const [refreshTOken, sRT] = useState><string>('')
-  // const [accessToken, sAT] = useState><string>('')
   useEffect(() => {
-    (async () => {
-      console.log('test');
-      let access_token = await getAccessToken();
-      let refresh_token = await getRefreshToken();
-      (async () => {
-        const { access_token: newAccessToken, refresh_token: newRefreshToken } =
-          await checkUser({ access_token, refresh_token });
-
-        const newProfile =
-          newAccessToken.length > 0 ? await gP(newAccessToken) : null;
-        if (newProfile) {
-          console.log({ newProfile });
-          props.setProfile(newProfile);
-          await AsyncStorage.setItem('profile', JSON.stringify(newProfile));
+    console.log('test');
+    const check_user_and_update_profile = async () => {
+      try {
+        const {
+          access_token: newAccessToken,
+          // refresh_token: newRefreshToken,
+          success,
+        } = await checkUser();
+        if (success === false) {
+          await AsyncStorage.multiRemove([
+            'profile',
+            'access_token',
+            'refresh_token',
+          ]).then(() => console.log('removed user 1'));
         }
-        access_token = newAccessToken;
-        await setAccessToken(newAccessToken);
-        refresh_token = newRefreshToken;
-        await setRefreshToken(newRefreshToken);
-      })();
-      if (
-        access_token &&
-        access_token.length > 0 &&
-        refresh_token &&
-        refresh_token.length > 0
-      ) {
-        props.setLogged(true);
-      } else {
+        const newProfile =
+          newAccessToken && newAccessToken.length > 0
+            ? await gP(newAccessToken)
+            : null;
+        if (newProfile && newProfile.success === true) {
+          console.log({ 'successful new profile': newProfile });
+          props.setProfile(newProfile);
+          props.setLogged(true);
+          await updateFcm(newProfile.items.fcm_token);
+        } else {
+          props.setLogged(false);
+          await AsyncStorage.multiRemove([
+            'profile',
+            'access_token',
+            'refresh_token',
+          ]).then(() => console.log('removed user 2'));
+        }
+      } catch (e) {
+        console.log('Error from tabs: ', e);
         props.setLogged(false);
       }
-    })();
+    };
+    check_user_and_update_profile();
   }, []);
   useEffect(() => {
-    console.log('hello');
-    console.log({ props: props.profile });
-  }, [props.profile]);
+    console.log({ isSeller: props.isSeller });
+  }, [props.isSeller]);
   useEffect(() => {
     const timer = setInterval(() => {
       (async () => {
         const access_token = await getAccessToken();
         const refresh_token = await getRefreshToken();
         if (access_token && refresh_token) {
-          await checkUser({
-            access_token,
-            refresh_token,
-          }).then(async res => {
+          await checkUser().then(async res => {
             setAccessToken(res.access_token);
             // sAT(res.access_token);
             setRefreshToken(res.refresh_token);
@@ -81,14 +87,11 @@ const Tabs = (props: props) => {
           });
         }
       })();
-    }, 177000);
+    }, 600000);
     return clearInterval(timer);
   }, []);
-  // useEffect(() => {
-  //   (async () =>
-  //     await AsyncStorage.setItem('profile', JSON.stringify(props.profile)))();
-  //   console.log(props.profile);
-  // }, [props.profile]);
+
+  useEffect(() => {}, []);
 
   const animateProperty = {
     width: useSharedValue(20),
@@ -106,18 +109,43 @@ const Tabs = (props: props) => {
     animateProperty.width,
     w.width,
   ]);
+
+  const showNotification = async () => {
+    const token = await requestNotificationPermission();
+    const { response, success }: { response: string; success: boolean } = token
+      ? await getNotification({ token })
+      : null;
+    console.log({ response, success });
+    if (token) {
+      messaging().onMessage(async remoteMessage => {
+        console.log('Foreground Notif:', remoteMessage);
+        await notifee.displayNotification({
+          title: remoteMessage.notification?.title || 'This is the title.',
+          body: remoteMessage.notification?.body || 'This is the Body.',
+          android: {
+            channelId: 'default',
+            importance: AndroidImportance.HIGH,
+          },
+        });
+      });
+      messaging().setBackgroundMessageHandler(async message => {
+        console.log('background message sent!', message);
+        notifee.displayNotification({
+          title: message.notification?.title || 'This is the background Title',
+          body: message.notification?.body || 'This is the body part !',
+          android: {
+            channelId: 'default',
+            importance: AndroidImportance.HIGH,
+          },
+        });
+      });
+    } else {
+      console.log('NO token');
+    }
+  };
+
   return (
-    <View
-      style={{
-        position: 'absolute',
-        bottom: 0,
-        left: 0,
-        width: '100%',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}
-    >
+    <View style={css.box}>
       <Animation.View
         style={[
           css.container,
@@ -128,7 +156,13 @@ const Tabs = (props: props) => {
           },
         ]}
       >
-        <Pressable onPress={() => props.setActive('home')} style={css.button}>
+        <Pressable
+          onPress={() => {
+            props.setActive('home');
+            showNotification();
+          }}
+          style={css.button}
+        >
           <Ionicons
             name={props.active === 'home' ? 'home' : 'home-outline'}
             size={30}
@@ -145,7 +179,8 @@ const Tabs = (props: props) => {
         {props.logged &&
           props.profile !== null &&
           props.profile.items.upi_id.length > 0 &&
-          props.profile.items.upi_name.length > 0 && (
+          props.profile.items.upi_name.length > 0 &&
+          props.isSeller && (
             <Pressable
               onPress={() => props.setActive('add')}
               style={css.button}
@@ -177,6 +212,15 @@ const Tabs = (props: props) => {
 };
 
 const css = StyleSheet.create({
+  box: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    width: '100%',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   container: {
     flexDirection: 'row',
     padding: 10,

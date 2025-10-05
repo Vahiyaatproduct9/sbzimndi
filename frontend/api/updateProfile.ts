@@ -1,3 +1,4 @@
+import { getAccessToken } from "../app/functions/getLocalInfo";
 import path from "./path";
 export default async ({
     photo,
@@ -14,6 +15,7 @@ export default async ({
     user_type?: string | null;
     bio?: string | null;
 }) => {
+    const local_access_token = await getAccessToken()
     try {
         console.log('updating profile')
         const form = new FormData();
@@ -24,7 +26,7 @@ export default async ({
         });
         form.append('info', JSON.stringify({
             name,
-            access_token,
+            access_token: access_token ? access_token : local_access_token,
             spirit_animal,
             user_type,
             bio
@@ -33,10 +35,10 @@ export default async ({
             method: 'POST',
             body: form
         })
-        return await res.json().then(data => data.updated);
+        return await res.json()
     }
     catch (err) {
         console.log(err)
-        return false
+        return { success: false, message: 'Internal Error' }
     }
 }
