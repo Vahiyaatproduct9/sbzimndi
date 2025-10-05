@@ -38,8 +38,10 @@ backend/api/test.js
 **/package-lock.json
 
 # Node dependencies
+backend/libs/serviceAccountKey.json
 
 frontend/node_modules/
+frontend/android/app/google-services.json
 frontend/dist/
 frontend/build/
 frontend/.next/

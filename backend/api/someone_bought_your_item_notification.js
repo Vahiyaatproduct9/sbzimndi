@@ -22,6 +22,9 @@ export default async () => {
           const notification = {
             title: "GOOD NEWS!",
             body: "Your Item was Sold!!",
+            data: {
+              code: "bought_item",
+            },
           };
           const { success, id } = await addInNotificationTable({
             user_id: oldRow.seller_id,
@@ -32,6 +35,7 @@ export default async () => {
             notification: {
               ...notification,
               data: {
+                ...notification.data,
                 notification_id: success === true ? id : "NA",
               },
             },
