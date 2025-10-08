@@ -14,15 +14,21 @@ import getItem from "./api/getItem.js";
 import payment from "./api/payment.js";
 import verifyPayment from "./api/verifyPayment.js";
 import { Readable } from "stream";
-import sendNotification from "./api/sendNotification.js";
 import signOut from "./api/signOut.js";
 import updateFcn from "./api/updateFcn.js";
-import handleNotification from "./api/handleNotification.js";
-import { deleteNotification } from "./api/manageNotification.js";
+import someone_bought_your_item_notification from "./api/someone_bought_your_item_notification.js";
+import {
+  deleteNotification,
+  getNotification,
+} from "./api/manageNotification.js";
+import listOrders from "./api/listOrders.js";
+import you_have_a_new_message_notification from "./api/you_have_a_new_message_notification.js";
+import message from "./api/message.js";
 const port = 8080;
 const app = express();
 app.use(json());
-(async () => await handleNotification())();
+(async () => await someone_bought_your_item_notification())();
+(async () => await you_have_a_new_message_notification())();
 const upload = multer({ storage: multer.memoryStorage() });
 const uploadFiles = upload.fields([
   { name: "aadhar_front", maxCount: 1 },
@@ -222,11 +228,8 @@ app.post("/verify-payment", async (req, res) => {
 });
 
 app.post("/get-notification", async (req, res) => {
-  const { token } = req.body;
-  const response = await sendNotification({
-    fcm_token: token,
-    // data: { foo: "bar" },
-  });
+  const { access_token, user_id } = req.body;
+  const response = await getNotification({ access_token, user_id });
   res.json(response);
 });
 
@@ -240,6 +243,36 @@ app.post("/update-fcm", async (req, res) => {
   const { access_token, fcm_token } = req.body;
   console.log("rumning update-fcm from index");
   const response = await updateFcn({ access_token, fcm_token });
+  res.json(response);
+});
+
+// LIST ORDERS HERE ...
+
+app.post("/get-orders", async (req, res) => {
+  const { access_token } = req.body;
+  if (access_token && access_token.length > 0)
+    console.log("access token recieved.");
+  else console.log("no access token");
+  const response = await listOrders(access_token);
+  res.json(response);
+});
+
+// ENDS...
+
+app.post("/conversation/create", async (req, res) => {
+  const { access_token, user_id: id_1, reciever_id: id_2, iambuyer } = req.body;
+  const response = await message.createCoversation({
+    access_token,
+    id_2,
+    id_1,
+    iambuyer,
+  });
+  res.json(response);
+});
+
+app.post("/conversation/list", async (req, res) => {
+  const { access_token, user_id } = req.body;
+  const response = await message.getContactList({ access_token, user_id });
   res.json(response);
 });
 

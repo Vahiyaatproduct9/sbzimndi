@@ -83,7 +83,56 @@ export async function addInNotificationTable({
   if (!notificationError) {
     console.log("Saved to NOtification Table!");
     return { success: true, id: notificationData ? notificationData.id : null };
-  } else return { success: false, id: null };
+  } else {
+    console.log("SOme error occured :( -> ", notificationError);
+    return { success: false, id: null };
+  }
+}
+
+export async function getNotification({ user_id, access_token }) {
+  const runFunction = async ({ user_id }) => {
+    const { data, error } = await sbs
+      .from("notifications")
+      .select("*")
+      .eq("user_id", user_id)
+      .order("created_at", { ascending: false });
+    if (!error) {
+      return {
+        data,
+        error,
+        success: true,
+      };
+    } else {
+      console.log("some Error occured when fetching notifications 💔");
+      return { data, error, success: false };
+    }
+  };
+  try {
+    if (user_id) return await runFunction({ user_id });
+    else if (access_token) {
+      const { success, id } = await getUserfromAccessToken(access_token);
+      if (success === true) {
+        return await runFunction({ user_id: id });
+      } else {
+        console.log("Error, you are NOT a sigma.");
+        return {
+          data: null,
+          error: "Couldn't get notifications",
+          success: false,
+        };
+      }
+    } else {
+      console.log("Nothing provided, returning error.");
+      return {
+        data: null,
+        error: "Couldn't get notifications",
+        success: false,
+      };
+    }
+  } catch (e) {
+    console.log("Try and catch error..", e);
+    return { data: null, error: e, success: false };
+  }
 }
 
 export async function deleteNotification({

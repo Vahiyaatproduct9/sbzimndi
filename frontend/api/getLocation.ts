@@ -42,11 +42,11 @@ export async function getandsetCoarseLocation(setLocation: (loc: [number, number
     );
 }
 
-export async function getAndSetLocation(setLocation: (loc: [number, number, number]) => void, setMessage: React.Dispatch<SetStateAction<string>>) {
+export async function getAndSetLocation(setLocation: (loc: [number, number, number]) => void, setMessage?: React.Dispatch<SetStateAction<string>>) {
     const hasPermission = await requestLocationPermission();
     let localloc: number[] | null = null;
     if (!hasPermission) {
-        setMessage('Using Approximate Location');
+        setMessage && setMessage('Using Approximate Location')
         await getandsetCoarseLocation(setLocation, setMessage);
         return;
     }
@@ -63,7 +63,7 @@ export async function getAndSetLocation(setLocation: (loc: [number, number, numb
         },
         (error) => {
             console.log(error)
-            setMessage(error.message);
+            setMessage && setMessage(error.message);
         },
         { enableHighAccuracy: true, timeout: 10000, maximumAge: 10000 }
     );

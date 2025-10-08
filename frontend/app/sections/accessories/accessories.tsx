@@ -1,4 +1,4 @@
-import { View, Text, Pressable } from 'react-native';
+import { View, Text, Pressable, Image } from 'react-native';
 import React from 'react';
 import css from './accessories.css';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -7,14 +7,36 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Octicons from 'react-native-vector-icons/Octicons';
 import theme from '../../../colors/ColorScheme';
 import { useNavigation } from '@react-navigation/native';
-const Accessories = () => {
+import { tabs } from '../../../types/signup';
+const Accessories = ({
+  profile,
+  setActiveTab,
+}: {
+  profile: any;
+  setActiveTab: React.Dispatch<React.SetStateAction<tabs>>;
+}) => {
   const navigation = useNavigation();
+
   return (
     <View style={css.container}>
-      <Pressable style={[css.box, css.profile]} onPress={() => {}}>
-        <FontAwesome name="user-circle" size={28} color={theme.text} />
+      <Pressable
+        style={[css.box, css.profile]}
+        onPress={() => setActiveTab('profile')}
+      >
+        {profile?.items?.profile_picture ? (
+          <Image
+            source={{ uri: profile.items.profile_picture }}
+            style={css.profilePicture}
+          />
+        ) : (
+          <FontAwesome name="user-circle" size={28} color={theme.text} />
+        )}
         <View style={css.profile_box}>
-          <Text style={css.text}>User</Text>
+          <Text style={css.text}>
+            {profile?.items?.full_name
+              ? String(profile.items.full_name).split(' ')[0]
+              : 'User'}
+          </Text>
         </View>
       </Pressable>
       <Pressable

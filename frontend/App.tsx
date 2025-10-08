@@ -9,6 +9,10 @@ import Profile from './app/profile/profile.tsx';
 import Animated, { useSharedValue, withSpring } from 'react-native-reanimated';
 import AddItem from './app/addItem/addItem.tsx';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import notifee, { AndroidImportance } from '@notifee/react-native';
+import requestNotificationPermission from './app/functions/requestNotificationPermission';
+// import getNotification from './api/getNotification';
+import messaging from '@react-native-firebase/messaging';
 
 type activeTab = 'home' | 'search' | 'add' | 'profile';
 
@@ -34,7 +38,7 @@ function App() {
   }, [profile]);
   const activeBlock = () => {
     if (active === 'home') {
-      return <Main setActiveTab={setActive} />;
+      return <Main setActiveTab={setActive} profile={profile} />;
     } else if (active === 'search') {
       return <Search />;
     } else if (active === 'add') {
@@ -51,6 +55,28 @@ function App() {
       );
     }
   };
+  (async () => {
+    try {
+      const token = await requestNotificationPermission();
+      console.log('FCM Token:', token);
+
+      if (token) {
+        messaging().onMessage(async remoteMessage => {
+          console.log('Foreground message received:', remoteMessage);
+          await notifee.displayNotification({
+            title: remoteMessage.notification?.title || 'New Update',
+            body: remoteMessage.notification?.body || 'Check your app!',
+            android: {
+              channelId: 'default',
+              importance: AndroidImportance.HIGH,
+            },
+          });
+        });
+      }
+    } catch (e) {
+      console.log('Error from Notification Tab: ', e);
+    }
+  })();
 
   return (
     <View style={styles.container}>

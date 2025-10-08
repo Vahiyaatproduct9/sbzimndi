@@ -6,7 +6,7 @@ export default StyleSheet.create({
         backgroundColor: theme.backgroundColor,
         height: '100%',
         padding: 10,
-        gap: 10,
+        // gap: 10,
     },
     notification_block: {
         flexDirection: 'row',
@@ -15,7 +15,8 @@ export default StyleSheet.create({
         borderRadius: 10,
         minHeight: 60,
         paddingHorizontal: 7,
-        alignItems: 'center'
+        alignItems: 'center',
+        marginVertical: 5
     },
     notification_icon: {
         opacity: 0.5
@@ -36,5 +37,20 @@ export default StyleSheet.create({
     },
     clicked: {
         backgroundColor: 'rgba(255,255,255,0.4)'
+    },
+    noNotification: {
+        flex: 1,
+        width: '100%',
+        fontSize: 20,
+        flexDirection: 'column',
+        padding: 80,
+        position: 'absolute',
+        // left: 0,
+        // right: 0,
+        color: theme.text,
+        // backgroundColor: 'red',
+        justifyContent: 'center',
+        textAlign: 'center',
+        alignItems: 'center'
     }
 }) 

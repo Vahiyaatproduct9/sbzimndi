@@ -3,8 +3,6 @@ import React, { useEffect } from 'react';
 import Theme from '../../colors/ColorScheme.ts';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Animation, { useSharedValue, withSpring } from 'react-native-reanimated';
-import messaging from '@react-native-firebase/messaging';
-import notifee, { AndroidImportance } from '@notifee/react-native';
 import {
   getAccessToken,
   getRefreshToken,
@@ -14,8 +12,6 @@ import {
 import checkUser from '../../api/checkUser.ts';
 import gP from '../../api/getProfile.ts';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import requestNotificationPermission from '../functions/requestNotificationPermission.ts';
-import getNotification from '../../api/getNotification.ts';
 import updateFcm from '../functions/updateFcm.ts';
 
 type ActiveTab = 'home' | 'search' | 'add' | 'profile';
@@ -90,9 +86,6 @@ const Tabs = (props: props) => {
     }, 600000);
     return clearInterval(timer);
   }, []);
-
-  useEffect(() => {}, []);
-
   const animateProperty = {
     width: useSharedValue(20),
     borderRadius: useSharedValue(200),
@@ -110,40 +103,6 @@ const Tabs = (props: props) => {
     w.width,
   ]);
 
-  const showNotification = async () => {
-    const token = await requestNotificationPermission();
-    const { response, success }: { response: string; success: boolean } = token
-      ? await getNotification({ token })
-      : null;
-    console.log({ response, success });
-    if (token) {
-      messaging().onMessage(async remoteMessage => {
-        console.log('Foreground Notif:', remoteMessage);
-        await notifee.displayNotification({
-          title: remoteMessage.notification?.title || 'This is the title.',
-          body: remoteMessage.notification?.body || 'This is the Body.',
-          android: {
-            channelId: 'default',
-            importance: AndroidImportance.HIGH,
-          },
-        });
-      });
-      messaging().setBackgroundMessageHandler(async message => {
-        console.log('background message sent!', message);
-        notifee.displayNotification({
-          title: message.notification?.title || 'This is the background Title',
-          body: message.notification?.body || 'This is the body part !',
-          android: {
-            channelId: 'default',
-            importance: AndroidImportance.HIGH,
-          },
-        });
-      });
-    } else {
-      console.log('NO token');
-    }
-  };
-
   return (
     <View style={css.box}>
       <Animation.View
@@ -156,13 +115,7 @@ const Tabs = (props: props) => {
           },
         ]}
       >
-        <Pressable
-          onPress={() => {
-            props.setActive('home');
-            showNotification();
-          }}
-          style={css.button}
-        >
+        <Pressable onPress={() => props.setActive('home')} style={css.button}>
           <Ionicons
             name={props.active === 'home' ? 'home' : 'home-outline'}
             size={30}

@@ -1,7 +1,7 @@
 import sb from "../libs/createClient.js";
 import sbs from "../libs/createAuth.js";
 export default async ({ access_token, fcm_token }) => {
-  console.log("running update fcm", access_token, fcm_token);
+  console.log("running update fcm");
   try {
     const { data: userData, error: userError } = await sbs.auth.getUser(
       access_token
@@ -17,13 +17,7 @@ export default async ({ access_token, fcm_token }) => {
       })
       .eq("id", `${userData.user.id}`);
     if (!error) {
-      console.log(
-        "FCM updated for user",
-        userData.user.user_metadata.full_name,
-        "with fcm id",
-        fcm_token,
-        ":D."
-      );
+      console.log("updated fcm token!");
       return { success: true, data, message: "Success" };
     } else
       return { success: false, error, message: "Couldn't update FCM Token" };

@@ -67,6 +67,7 @@ const SignIn = ({ navigation, route }: any) => {
           placeholder="********"
           textContentType="password"
           value={password}
+          secureTextEntry
           onChangeText={setPassword}
         />
       </View>

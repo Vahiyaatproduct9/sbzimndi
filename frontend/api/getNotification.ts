@@ -1,18 +1,15 @@
+import { getAccessToken } from "../app/functions/getLocalInfo"
 import path from "./path"
 
-export default async ({
-    token
-}: {
-    token: string
-}) => {
-
+export default async () => {
+    const access_token = await getAccessToken()
     const response = await fetch(`${path}/get-notification`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            token
+            access_token
         })
     })
     const res = await response.json()

@@ -1,3 +1,3 @@
-// export default 'http://192.168.0.103:8080'
+// export default 'http://10.136.249.8:8080'
 // export default 'https://sbzimndi.onrender.com'
 export default 'http://localhost:8080'

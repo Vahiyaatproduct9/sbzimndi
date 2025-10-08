@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Home from './home';
 import ProductPage from './sections/product/mainPage';
 import { NavigationContainer } from '@react-navigation/native';
@@ -9,10 +9,12 @@ import Messages from './sections/accessories/items/messages/messages';
 import Orders from './sections/accessories/items/orders/orders';
 const Stack = createNativeStackNavigator();
 
-export default function Main({
+export default function ({
   setActiveTab,
+  profile,
 }: {
   setActiveTab: React.Dispatch<React.SetStateAction<tabs>>;
+  profile: any;
 }) {
   return (
     <NavigationContainer independent>
@@ -21,11 +23,12 @@ export default function Main({
           name="Home"
           component={Home as never}
           options={{ headerShown: false }}
-          initialParams={{ setActiveTab }}
+          initialParams={{ setActiveTab, profile }}
         />
         <Stack.Screen
           name="Notifications"
           component={Notifications}
+          // initialParams={{ setActiveTab }}
           options={{ headerShown: true }}
         />
         <Stack.Screen

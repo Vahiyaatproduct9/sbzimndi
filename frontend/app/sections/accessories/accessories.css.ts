@@ -31,5 +31,10 @@ export default StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         flex: 1,
+    },
+    profilePicture: {
+        height: 35,
+        width: 35,
+        borderRadius: 600
     }
 })

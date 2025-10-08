@@ -6,7 +6,10 @@ export default async ({ fcm_token, title, body, data }) => {
       token: fcm_token,
       title: title ? title : "New Update ",
       body: body ? body : "We're not sure what the update is 🥀",
-      data: data ? data : { foo: "bar" },
+      data: data ? { data: JSON.stringify(data) } : { foo: "bar" },
     });
+  } else {
+    console.log("No FCM token. did't send notification.");
+    return { response: null, success: false };
   }
 };

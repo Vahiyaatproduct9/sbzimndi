@@ -4,7 +4,7 @@ import {
   postNotification,
 } from "./manageNotification.js";
 export default async () => {
-  console.log("runing channel");
+  console.log("running channel");
   sbs
     .channel("schema-db-changes")
     .on(
@@ -18,20 +18,22 @@ export default async () => {
         const oldRow = payload.old;
         const newRow = payload.new;
         console.log("payload --> ", payload);
-        if (oldRow && oldRow.seller_id) {
+        if (newRow && newRow.user_id) {
           const notification = {
             title: "GOOD NEWS!",
             body: "Your Item was Sold!!",
             data: {
               code: "bought_item",
+              oldRow,
+              newRow,
             },
           };
           const { success, id } = await addInNotificationTable({
-            user_id: oldRow.seller_id,
+            user_id: newRow.user_id,
             notification,
           });
           await postNotification({
-            user_id: oldRow.seller_id,
+            user_id: newRow.user_id,
             notification: {
               ...notification,
               data: {
