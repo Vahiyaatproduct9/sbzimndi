@@ -11,7 +11,7 @@ import calculateDistance from '../../../../functions/calculateDistance';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import theme from '../../../../../colors/ColorScheme';
 import { useNavigation } from '@react-navigation/native';
-import getAConversation from '../../../../../api/getAConversation';
+import conversation from '../../../../../api/conversation';
 const Orders = () => {
   const navigation = useNavigation();
   const [orders, setOrders] = useState<null | undefined | orders_bought_by[]>();
@@ -42,7 +42,7 @@ const Orders = () => {
       success,
       message: fetchMessage,
       error,
-    } = await getAConversation({ iambuyer, reciever_id });
+    } = await conversation.start({ reciever_id, iambuyer });
     if (success) {
       // do somethinf ...
       navigation.goBack();

@@ -126,7 +126,7 @@ function M() {
           const { data, error } = await sbs
             .from("conversations")
             .select("*")
-            .or(`buyer_id.eq.${user_id},seller_id.eq${user_id}`);
+            .or(`buyer_id.eq.${user_id},seller_id.eq.${user_id}`);
           console.log("contact list : ", data, error);
           if (!error)
             return { success: true, data, error, message: error.message };
@@ -147,7 +147,13 @@ function M() {
               error,
               message: "Access Token Invalid",
             };
-        }
+        } else
+          return {
+            success: false,
+            data: null,
+            error: null,
+            message: "No user_id not Access Token provided.",
+          };
       } catch (e) {
         return { success: false, data: null, error: e, message: e };
       }

@@ -7,7 +7,8 @@
     "ios": "react-native run-ios",
     "lint": "eslint .",
     "start": "react-native start",
-    "test": "jest"
+    "test": "jest",
+    "push": "git add . && git commit -m 'added features' && git push"
   },
   "dependencies": {
     "@notifee/react-native": "^9.1.8",
