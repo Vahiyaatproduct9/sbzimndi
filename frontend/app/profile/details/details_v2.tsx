@@ -13,7 +13,7 @@ import Theme from '../../../colors/ColorScheme.ts';
 import Animation, { withDelay, withSpring } from 'react-native-reanimated';
 // import AsyncStorage from '@react-native-async-storage/async-storage';
 // import checkUser from '../../../api/checkUser.ts';
-import { getAccessToken, getName } from '../../functions/getLocalInfo.ts';
+import { getName } from '../../functions/getLocalInfo.ts';
 import {
   imageProperty,
   spiritProperty,
@@ -42,32 +42,6 @@ const Details = ({ route }: any) => {
   const [profile, setProfile] = useState<any>(null);
   // setProfile(nProfile);
   useEffect(() => {
-    // async function res() {
-    //   console.log('executing res');
-    //   const access_token = await AsyncStorage.getItem('access_token');
-    //   const refresh_token = await AsyncStorage.getItem('refresh_token');
-    //   if (
-    //     access_token &&
-    //     access_token.length > 0 &&
-    //     refresh_token &&
-    //     refresh_token.length > 0
-    //   ) {
-    //     const { access_token: at, refresh_token: rt } = await checkUser({
-    //       access_token,
-    //       refresh_token,
-    //     });
-    //     if ((await at) === null || (await rt) === null) {
-    //       setLogged(false);
-    //       await AsyncStorage.removeItem('access_token');
-    //       await AsyncStorage.removeItem('refresh_token');
-    //     } else {
-    //       setLogged(true);
-    //       await AsyncStorage.setItem('access_token', await at);
-    //       await AsyncStorage.setItem('refresh_token', await rt);
-    //     }
-    //   }
-    // }
-    // res();
     imageProperty.top.value = withDelay(500, withSpring(30));
     imageProperty.opacity.value = withDelay(500, withSpring(1));
     spiritProperty.opacity.value = withDelay(500, withSpring(1));
@@ -86,9 +60,14 @@ const Details = ({ route }: any) => {
         JSON.parse(res || ''),
       );
       console.log({ localProfile });
-      localProfile && setProfile(localProfile);
-      !localProfile &&
-        (await getProfile().then(profile => setProfile(profile)));
+      if (localProfile) {
+        setProfile(localProfile);
+      } else {
+        const fetchProfile = await getProfile();
+        if (fetchProfile?.success) {
+          setProfile(fetchProfile);
+        }
+      }
     })();
   }, [isFocused]);
   return (
@@ -110,7 +89,7 @@ const Details = ({ route }: any) => {
         {profile && (
           <Animation.Image
             source={
-              profile.items.profile_picture
+              profile?.items?.profile_picture
                 ? { uri: profile.items.profile_picture }
                 : image
             }

@@ -7,7 +7,7 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Octicons from 'react-native-vector-icons/Octicons';
 import theme from '../../../colors/ColorScheme';
 import { useNavigation } from '@react-navigation/native';
-import { tabs } from '../../../types/signup';
+import { tabs } from '../../../types/types';
 const Accessories = ({
   profile,
   setActiveTab,

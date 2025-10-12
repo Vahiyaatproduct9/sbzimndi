@@ -2,7 +2,7 @@
 import React from 'react';
 import SignUp from './signup';
 import Kyc from '../kyc/kyc';
-import { signupPage } from '../../../types/signup';
+import { signupPage } from '../../../types/types';
 import UploadDocuments from '../documents/uploadDocuments';
 import Upi from '../upi/upi';
 

@@ -1,5 +1,5 @@
 import backendUrl from './path.ts'
-import { signUpInfo } from '../types/signup'
+import { signUpInfo } from '../types/types'
 import messaging from '@react-native-firebase/messaging'
 export async function signup({ name, email, password, phone,
     location, ifsc,

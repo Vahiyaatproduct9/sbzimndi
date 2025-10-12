@@ -1,5 +1,6 @@
 import express, { json } from "express";
 import cors from "cors";
+import message from "./api/message.js";
 import verifyWithOTP from "./api/verifyWithOTP.js";
 import signup from "./api/signup.js";
 import getProfile from "./api/getProfile.js";
@@ -16,6 +17,7 @@ import verifyPayment from "./api/verifyPayment.js";
 import { Readable } from "stream";
 import signOut from "./api/signOut.js";
 import updateFcn from "./api/updateFcn.js";
+import { WebSocketServer } from "ws";
 import someone_bought_your_item_notification from "./api/someone_bought_your_item_notification.js";
 import {
   deleteNotification,
@@ -23,18 +25,35 @@ import {
 } from "./api/manageNotification.js";
 import listOrders from "./api/listOrders.js";
 import you_have_a_new_message_notification from "./api/you_have_a_new_message_notification.js";
-import message from "./api/message.js";
+// import conversations from "./endponts/conversations.js";
 const port = 8080;
 const app = express();
 app.use(json());
 (async () => await someone_bought_your_item_notification())();
-(async () => await you_have_a_new_message_notification())();
 const upload = multer({ storage: multer.memoryStorage() });
 const uploadFiles = upload.fields([
   { name: "aadhar_front", maxCount: 1 },
   { name: "personal_pan", maxCount: 1 },
   { name: "bank_proof", maxCount: 1 },
 ]);
+const wss = new WebSocketServer({ port: 9000 });
+const clients = new Map();
+wss.on("connection", (ws, req) => {
+  const params = new URLSearchParams(req.url.replace("/?", ""));
+  const conversation_id = params.get("conversation_id");
+  if (!conversation_id) {
+    ws.close();
+    console.log("Connection closed due to no conversation_id");
+    return;
+  }
+  clients.set(conversation_id, ws);
+  console.log("Convo id -", conversation_id, "connected.");
+  ws.on("close", () => {
+    clients.delete(conversation_id);
+    console.log("Convo id -", conversation_id, "disconnected.");
+  });
+});
+you_have_a_new_message_notification(clients);
 
 app.get("/", (_, res) => {
   res.send("Hello World!");
@@ -269,13 +288,34 @@ app.post("/conversation/create", async (req, res) => {
   });
   res.json(response);
 });
+app.get("/conversation", async (_, res) => {
+  res.send("Conversations");
+});
+app.post("/conversation/send", async (req, res) => {
+  const { conversation_id, user_id, access_token, message: body } = req.body;
+  const response = await message.sendMessage({
+    conversation_id,
+    sender_id: user_id,
+    access_token,
+    body,
+  });
+  res.json(response);
+});
 
 app.post("/conversation/list", async (req, res) => {
   const { access_token, user_id } = req.body;
   const response = await message.getContactList({ access_token, user_id });
   res.json(response);
 });
-
+app.post("/conversation/get", async (req, res) => {
+  console.log("getting chat logs");
+  const { conversation_id, last_message_at: created_at } = req.body;
+  const response = await message.fetchChatLogs({
+    conversation_id,
+    created_at: created_at ? created_at : null,
+  });
+  res.json(response);
+});
 app.post("/signOut", async (req, res) => {
   const { access_token } = req.body;
   const response = await signOut(access_token);

@@ -24,10 +24,9 @@ import {
   getName,
   setName as sn,
   setBio as sb,
-  getAccessToken,
 } from '../../../functions/getLocalInfo.ts';
 import updateProfile from '../../../../api/updateProfile.ts';
-import Message from '../../../components/message/message.tsx';
+// import Message from '../../../components/message/message.tsx';
 import saveProfilePicture from '../../../functions/saveProfilePicture.ts';
 import saveRole, { getRole } from '../../../functions/toggleRole.ts';
 import blobtobase64 from '../../../functions/blobtobase64.ts';
@@ -36,7 +35,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const EditProfile = ({ navigation, route }: any) => {
   const { profile } = route.params;
-  const [mess, setMess] = useState<string>('');
+  // const [mess, setMess] = useState<string>('');
   const [uploading, setUploading] = useState<boolean>(false);
   const [spiritAnimal, setSpiritAnimal] = useState<string>('');
   const [pressed, setPressed] = useState<boolean>(false);
@@ -124,7 +123,10 @@ const EditProfile = ({ navigation, route }: any) => {
 
       console.log('Should upload:', shouldUpload);
 
-      const { success, message } = await updateProfile({
+      const {
+        success,
+        // message
+      } = await updateProfile({
         photo: shouldUpload && photo.length > 10 ? photo : null,
         name,
         spirit_animal: spiritAnimal,
@@ -134,7 +136,7 @@ const EditProfile = ({ navigation, route }: any) => {
 
       if (success === true) {
         try {
-          setMess(message || 'Success');
+          // setMess(message || 'Success');
           await saveSpirit(spiritAnimal);
           await saveRole(toggle ? 'seller' : 'buyer');
           await sn(name);
@@ -145,7 +147,7 @@ const EditProfile = ({ navigation, route }: any) => {
             await saveProfilePicture(cleanPath(photo), 'profile');
           }
 
-          setMess('Profile Updated Successfully!');
+          // setMess('Profile Updated Successfully!');
           await getProfile()
             .then(
               async newProfile =>
@@ -157,14 +159,14 @@ const EditProfile = ({ navigation, route }: any) => {
             .then(() => navigation.goBack());
         } catch (saveError) {
           console.log('Error saving profile data:', saveError);
-          setMess('Some Error Occurred!');
+          // setMess('Some Error Occurred!');
         }
       } else {
-        setMess('Some Error Occurred!');
+        // setMess('Some Error Occurred!');
       }
     } catch (err) {
       console.log('Main error:', err);
-      setMess('Some Error Occurred!');
+      // setMess('Some Error Occurred!');
     }
     setUploading(false);
   };
@@ -221,7 +223,7 @@ const EditProfile = ({ navigation, route }: any) => {
   }, [spiritAnimal]);
   return (
     <ScrollView style={css.container}>
-      <Message state={setMess} content={mess} time={3} />
+      {/* <Message state={setMess} content={mess} time={3} /> */}
       <View style={css.box}>
         <Image
           source={photo && photo.length > 0 ? { uri: photo } : image}

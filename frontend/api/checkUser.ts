@@ -25,6 +25,7 @@ export default async function () {
         })
         console.log('Getting new access_token!')
         const response = await res.json()
+        console.log('response form  checkUser: ', response)
         if (response.access_token && response.refresh_token) {
             await setAccessToken(response.access_token)
             await setRefreshToken(response.refresh_token)

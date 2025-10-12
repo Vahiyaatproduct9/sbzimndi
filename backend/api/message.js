@@ -98,22 +98,47 @@ function M() {
     sendMessage: async function sendMessage({
       conversation_id,
       sender_id,
+      access_token,
       body,
     }) {
-      try {
+      async function runFunction(user_id) {
         const { data, error } = await sbs
           .from("messages")
           .insert({
             conversation_id,
-            sender_id,
+            sender_id: user_id,
             body,
           })
           .select()
           .single();
+        console.log("send message: ", data, error);
         if (!error && data) {
           return { success: true, data, error, message: null };
         } else {
-          return { success: false, data: null, error, message: error.message };
+          return {
+            success: false,
+            data: null,
+            error,
+            message: error.message,
+          };
+        }
+      }
+      try {
+        if (sender_id) {
+          return await runFunction(sender_id);
+        } else if (access_token) {
+          const { success, id, error } = await getUserfromAccessToken(
+            access_token
+          );
+          if (success) {
+            return await runFunction(id);
+          } else
+            return {
+              success: false,
+              message: "Incorrect access token provided. PLease Login again.",
+              data: null,
+              error,
+            };
         }
       } catch (e) {
         console.log("Try and catch error", e);
@@ -125,12 +150,37 @@ function M() {
         async function runFunction(user_id) {
           const { data, error } = await sbs
             .from("conversations")
-            .select("*")
+            .select(
+              `*,
+              conversations_buyer_id_fkey(*),
+              conversations_seller_id_fkey(*)
+              `
+            )
             .or(`buyer_id.eq.${user_id},seller_id.eq.${user_id}`);
           console.log("contact list : ", data, error);
-          if (!error)
-            return { success: true, data, error, message: error.message };
-          else return { success: false, data, error };
+          if (!error || data)
+            return {
+              success: true,
+              data:
+                data?.map((item) => {
+                  return {
+                    ...item,
+                    seller: item.conversations_seller_id_fkey,
+                    buyer: item.conversations_buyer_id_fkey,
+                    conversations_buyer_id_fkey: undefined,
+                    conversations_seller_id_fkey: undefined,
+                  };
+                }) || null,
+              error,
+              message: error?.message,
+            };
+          else
+            return {
+              success: false,
+              data,
+              error: { ...error, message: "Error 3" },
+              message: "Internal Server Error",
+            };
         }
         if (user_id) {
           return await runFunction(user_id);
@@ -155,7 +205,48 @@ function M() {
             message: "No user_id not Access Token provided.",
           };
       } catch (e) {
-        return { success: false, data: null, error: e, message: e };
+        console.log("Error: ", e);
+        return {
+          success: false,
+          data: null,
+          error: e,
+          message: "Try & Catch Error.",
+        };
+      }
+    },
+    fetchChatLogs: async function ({ conversation_id, created_at }) {
+      function runFunction(data, error) {
+        if (error) {
+          return { success: false, data: null, error, message: error.message };
+        }
+        console.log("Returning messages for convo id:", conversation_id);
+        return { success: true, data, error: null, message: null };
+      }
+
+      try {
+        if (!created_at) {
+          //  Initial load: get latest 60 messages, newest last
+          const { data, error } = await sbs
+            .from("messages")
+            .select("*")
+            .eq("conversation_id", conversation_id)
+            .order("created_at", { ascending: true })
+            .limit(60);
+
+          return runFunction(data, error);
+        } else {
+          // Fetch messages created AFTER the given timestamp
+          const { data, error } = await sbs
+            .from("messages")
+            .select("*")
+            .eq("conversation_id", conversation_id)
+            .gt("created_at", created_at)
+            .order("created_at", { ascending: true }); // maintain chat order
+
+          return runFunction(data, error);
+        }
+      } catch (err) {
+        return { success: false, data: null, error: err, message: err.message };
       }
     },
   };

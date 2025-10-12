@@ -35,6 +35,7 @@ const Tabs = (props: props) => {
           // refresh_token: newRefreshToken,
           success,
         } = await checkUser();
+        console.log('ran 1');
         if (success === false) {
           await AsyncStorage.multiRemove([
             'profile',
@@ -46,6 +47,7 @@ const Tabs = (props: props) => {
           newAccessToken && newAccessToken.length > 0
             ? await gP(newAccessToken)
             : null;
+        console.log('newProfile: ', newProfile);
         if (newProfile && newProfile.success === true) {
           console.log({ 'successful new profile': newProfile });
           props.setProfile(newProfile);
@@ -60,7 +62,7 @@ const Tabs = (props: props) => {
           ]).then(() => console.log('removed user 2'));
         }
       } catch (e) {
-        console.log('Error from tabs: ', e);
+        console.error('Error from tabs: ', e);
         props.setLogged(false);
       }
     };

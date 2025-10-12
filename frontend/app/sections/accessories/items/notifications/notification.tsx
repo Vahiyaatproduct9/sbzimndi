@@ -4,7 +4,7 @@ import css from './notification.css';
 // import Ionicons from 'react-native-vector-icons/Ionicons';
 import Feather from 'react-native-vector-icons/Feather';
 import theme from '../../../../../colors/ColorScheme';
-import { notification, tabs } from '../../../../../types/signup';
+import { notification, tabs } from '../../../../../types/types';
 import getNotification from '../../../../../api/getNotification';
 import deleteNotification from '../../../../../api/deleteNotification';
 import Message from '../../../../components/message/message';

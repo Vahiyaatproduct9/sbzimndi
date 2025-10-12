@@ -2,7 +2,7 @@ import { View, Text, ScrollView, Image, Pressable } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import listOrders from '../../../../../api/listOrders';
 import Message from '../../../../components/message/message';
-import { orders_bought_by } from '../../../../../types/signup';
+import { orders_bought_by } from '../../../../../types/types';
 import css from './orders.css';
 // import { getRelativeTime } from '../../../../functions/getRelativeTime';
 import { getAndSetLocation } from '../../../../../api/getLocation';

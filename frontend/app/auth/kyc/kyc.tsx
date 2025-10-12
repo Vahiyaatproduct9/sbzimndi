@@ -14,7 +14,7 @@ import {
   setPassword,
   setLocation,
 } from '../../functions/getLocalInfo';
-import { signupPage } from '../../../types/signup';
+import { signupPage } from '../../../types/types';
 import { signup } from '../../../api/signUp';
 
 const Kyc = ({
