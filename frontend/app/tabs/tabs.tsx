@@ -35,7 +35,7 @@ const Tabs = (props: props) => {
           // refresh_token: newRefreshToken,
           success,
         } = await checkUser();
-        console.log('ran 1');
+        console.log('new Access Token from tabs:', newAccessToken);
         if (success === false) {
           await AsyncStorage.multiRemove([
             'profile',
@@ -45,11 +45,11 @@ const Tabs = (props: props) => {
         }
         const newProfile =
           newAccessToken && newAccessToken.length > 0
-            ? await gP(newAccessToken)
+            ? await gP({ access_token: newAccessToken })
             : null;
         console.log('newProfile: ', newProfile);
-        if (newProfile && newProfile.success === true) {
-          console.log({ 'successful new profile': newProfile });
+        if (newProfile?.success === true) {
+          console.log('successful new profile:', newProfile);
           props.setProfile(newProfile);
           props.setLogged(true);
           await updateFcm(newProfile.items.fcm_token);

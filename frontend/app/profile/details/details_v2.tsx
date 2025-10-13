@@ -32,10 +32,8 @@ import getProfile from '../../../api/getProfile.ts';
 
 const Details = ({ route }: any) => {
   const navigation = useNavigation();
-  const {
-    setLogged,
-    // profile: nProfile
-  } = route.params;
+  const [isMyProfile, setIsMyProfile] = useState<boolean>(false);
+  const { setLogged, user_id } = route.params;
   const isFocused = useIsFocused();
   const height = useWindowDimensions().height;
   const width = useWindowDimensions().width;
@@ -55,36 +53,56 @@ const Details = ({ route }: any) => {
   }, [setLogged]);
 
   useEffect(() => {
+    if (user_id) setIsMyProfile(false);
+    else setIsMyProfile(true);
+  }, [user_id]);
+
+  useEffect(() => {
+    // getProfilee..
     (async () => {
-      const localProfile = await AsyncStorage.getItem('profile').then(res =>
-        JSON.parse(res || ''),
-      );
-      console.log({ localProfile });
-      if (localProfile) {
-        setProfile(localProfile);
+      if (!isMyProfile) {
+        const userProfile = await getProfile({ user_id });
+        console.log('userProfile: ', userProfile);
+        if (userProfile.success) {
+          setProfile(userProfile);
+        }
+        return;
       } else {
-        const fetchProfile = await getProfile();
-        if (fetchProfile?.success) {
-          setProfile(fetchProfile);
+        const localProfile = await AsyncStorage.getItem('profile').then(res =>
+          JSON.parse(res || ''),
+        );
+        console.log('localProfile from details_v2:', localProfile);
+        if (localProfile) {
+          setProfile(localProfile);
+        } else {
+          const fetchProfile = await getProfile({
+            access_token: null,
+            user_id: null,
+          });
+          if (fetchProfile?.success) {
+            setProfile(fetchProfile);
+          }
         }
       }
     })();
-  }, [isFocused]);
+  }, [isFocused, isMyProfile, user_id]);
   return (
     <View style={css.container}>
       <View style={css.head}>
         <Animation.View
           style={[css.settingsView, settingsProperty, animatedStyle]}
         >
-          <Pressable onPress={() => navigation.navigate('settings' as never)}>
-            <View>
-              <Ionicons
-                name="settings-outline"
-                size={32}
-                color={css.settingsView.color}
-              />
-            </View>
-          </Pressable>
+          {isMyProfile && (
+            <Pressable onPress={() => navigation.navigate('settings' as never)}>
+              <View>
+                <Ionicons
+                  name="settings-outline"
+                  size={32}
+                  color={css.settingsView.color}
+                />
+              </View>
+            </Pressable>
+          )}
         </Animation.View>
         {profile && (
           <Animation.Image
@@ -163,14 +181,16 @@ const Details = ({ route }: any) => {
         </View>
       </Animation.View>
       <View style={css.foot}>
-        <Pressable
-          style={css.button}
-          onPress={() =>
-            navigation.navigate('editProfile' as never, { profile })
-          }
-        >
-          <Text style={css.buttonText}>Edit Profile</Text>
-        </Pressable>
+        {isMyProfile && (
+          <Pressable
+            style={css.button}
+            onPress={() =>
+              navigation.navigate('editProfile' as never, { profile })
+            }
+          >
+            <Text style={css.buttonText}>Edit Profile</Text>
+          </Pressable>
+        )}
       </View>
     </View>
   );

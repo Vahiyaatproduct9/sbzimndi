@@ -33,7 +33,6 @@ async function initializeNotifications() {
     });
 
     const token = await requestNotificationPermission();
-    console.log('FCM Token:', token);
 
     if (token) {
       messaging().onMessage(async remoteMessage => {

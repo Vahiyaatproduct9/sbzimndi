@@ -1,22 +1,23 @@
-import { View, Text, ScrollView, Image, Pressable } from 'react-native';
 import React, { useEffect, useState } from 'react';
+import { Image, Pressable, ScrollView, Text, View } from 'react-native';
 import listOrders from '../../../../../api/listOrders';
-import Message from '../../../../components/message/message';
 import { orders_bought_by } from '../../../../../types/types';
+import Message from '../../../../components/message/message';
 import css from './orders.css';
 // import { getRelativeTime } from '../../../../functions/getRelativeTime';
-import { getAndSetLocation } from '../../../../../api/getLocation';
-import getRelativeDistance from '../../../../functions/getRelativeDistance';
-import calculateDistance from '../../../../functions/calculateDistance';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import theme from '../../../../../colors/ColorScheme';
 import { useNavigation } from '@react-navigation/native';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import conversation from '../../../../../api/conversation';
+import { getAndSetLocation } from '../../../../../api/getLocation';
+import theme from '../../../../../colors/ColorScheme';
+import calculateDistance from '../../../../functions/calculateDistance';
+import getRelativeDistance from '../../../../functions/getRelativeDistance';
 const Orders = () => {
   const navigation = useNavigation();
   const [orders, setOrders] = useState<null | undefined | orders_bought_by[]>();
   const [message, setMessage] = useState<string>('');
   const [location, setLocation] = useState<number[] | null>(null);
+
   useEffect(() => {
     (async () => {
       await getAndSetLocation(setLocation);
@@ -27,7 +28,9 @@ const Orders = () => {
       const res = await listOrders();
       if (res?.success) setOrders(res.data);
       else setMessage(`${res?.error || 'Some Error occured.'}`);
+      console.log('orders: ', orders, res);
     };
+
     fetch_orders();
   }, []);
   const startConversation = async ({
@@ -49,6 +52,11 @@ const Orders = () => {
       navigation.navigate('Messages' as never, { conversation_id });
     } else setMessage(error || fetchMessage);
   };
+
+  function viewProfile({ user_id }: { user_id: string }) {
+    navigation.goBack();
+    navigation.navigate('Profile' as never, { user_id });
+  }
 
   const blocks = () =>
     orders?.map(order => (
@@ -74,7 +82,11 @@ const Orders = () => {
           </Text>
           {/* <Text style={css.date}>Contact</Text> */}
           <View style={css.options}>
-            <Pressable>
+            <Pressable
+              onPress={() => {
+                viewProfile({ user_id: order.user_id });
+              }}
+            >
               <MaterialIcons
                 style={css.profile}
                 name="account-circle"
@@ -112,7 +124,6 @@ const Orders = () => {
       ) : (
         <Text style={css.bold}>Loading...</Text>
       )}
-      {/* <Text style={css.bold}>Loading...</Text> */}
     </ScrollView>
   );
 };

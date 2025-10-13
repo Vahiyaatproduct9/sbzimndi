@@ -10,7 +10,7 @@ export default async (profile_fcm_token?: string | null) => {
             return await update_fcm({ access_token, fcm_token })
         }
         messaging().onTokenRefresh(async token => {
-            console.log('New Token:', token)
+            console.log('New FCM Token from updateFcm:', token)
             return await update_fcm({ access_token, fcm_token: token })
         })
     }

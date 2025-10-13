@@ -14,11 +14,19 @@ export default async ({ setList, setMessage }: {
     setList: React.Dispatch<React.SetStateAction<enhancedUser[] | null>>,
     setMessage: React.Dispatch<React.SetStateAction<string>>
 }) => {
-    const contacts = await AsyncStorage.getItem('contacts').then(res =>
-        JSON.parse(res || ''),
-    );
+    let contacts: { data: enhancedUser[], time: number } | null;
+    try {
+        const local_contacts = await AsyncStorage.getItem('contacts').then(res =>
+            JSON.parse(res || ''),
+        );
+        contacts = local_contacts;
+    }
+    catch (err) {
+        contacts = null;
+        console.error('Error from getContacts:', err)
+    }
     console.log('contacts: ', contacts)
-    if (contacts?.time - Date.now() > 600000) {
+    if (contacts && contacts?.time - Date.now() > 600000) {
         setList(contacts.data);
     } else {
         const {

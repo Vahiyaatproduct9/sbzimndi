@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import Home from './home';
 import ProductPage from './sections/product/mainPage';
 import { NavigationContainer } from '@react-navigation/native';
@@ -8,6 +8,7 @@ import Notifications from './sections/accessories/items/notifications/notificati
 import Messages from './sections/accessories/items/messages/messages';
 import Orders from './sections/accessories/items/orders/orders';
 import Text from './sections/accessories/items/messages/text/text';
+import Details from './profile/details/details_v2';
 const Stack = createNativeStackNavigator();
 
 export default function ({
@@ -49,6 +50,11 @@ export default function ({
           }}
           component={ProductPage as never}
           initialParams={{ setActiveTab }}
+        />
+        <Stack.Screen
+          name="Profile"
+          component={Details}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name="Text"

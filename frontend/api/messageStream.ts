@@ -3,8 +3,8 @@ import { Message } from "../types/types";
 export default class {
     public openConnection;
     public closeConnection;
-    constructor(props: { user_id: string; state: React.Dispatch<React.SetStateAction<Message[] | null | undefined>> }) {
-        const wss = new WebSocket(`ws://localhost:9000?user_id=${props.user_id}`);
+    constructor(props: { conversation_id: string; state: React.Dispatch<React.SetStateAction<Message[] | null | undefined>> }) {
+        const wss = new WebSocket(`ws://localhost:9000?conversation_id=${props.conversation_id}`);
         this.openConnection = async function () {
 
             wss.onopen = () => {
@@ -23,16 +23,17 @@ export default class {
                 console.log('mainChatLogObject: ', mainChatLogObject)
                 if (mainChatLogObject) {
                     console.log('websocket data: ', mainChatLogObject)
-                    props.state((prev) => {
-                        if (prev) {
-                            if (mainChatLogObject)
-                                return [...prev, mainChatLogObject]
-                        } else {
-                            if (mainChatLogObject)
-                                return [mainChatLogObject]
-                            else return []
-                        }
-                    })
+                    // props.state((prev) => {
+                    //     if (prev) {
+                    //         if (mainChatLogObject)
+                    //             return [...prev, mainChatLogObject]
+                    //     } else {
+                    //         if (mainChatLogObject)
+                    //             return [mainChatLogObject]
+                    //         else return []
+                    //     }
+                    // })
+                    props.state(prev => prev ? [...prev, mainChatLogObject] : [mainChatLogObject])
                 }
             }
 

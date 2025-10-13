@@ -32,14 +32,12 @@ const Notifications = () => {
       setMessage("Could't delete notification :(");
       return;
     }
-    setList(prev =>
-      prev?.filter(item => item.body.data.newRow.id !== notification_id),
-    );
-    const { data, success } = await getNotification();
-    if (success) {
-      setList(data);
-    } else setMessage('Some Error Occured');
+    setList(prev => prev?.filter(item => item?.id !== notification_id));
   };
+
+  useEffect(() => {
+    console.log('notification list: ', list);
+  }, [list]);
 
   const blocks = () =>
     list && list.length > 0 ? (

@@ -39,6 +39,7 @@ const uploadFiles = upload.fields([
 const wss = new WebSocketServer({ port: 9000 });
 const clients = new Map();
 wss.on("connection", (ws, req) => {
+  // ws.send("Connection Established.");
   const params = new URLSearchParams(req.url.replace("/?", ""));
   const conversation_id = params.get("conversation_id");
   if (!conversation_id) {
@@ -47,10 +48,10 @@ wss.on("connection", (ws, req) => {
     return;
   }
   clients.set(conversation_id, ws);
-  console.log("Convo id -", conversation_id, "connected.");
+  console.log(conversation_id, "connected.");
   ws.on("close", () => {
     clients.delete(conversation_id);
-    console.log("Convo id -", conversation_id, "disconnected.");
+    console.log(conversation_id, "disconnected.");
   });
 });
 you_have_a_new_message_notification(clients);
@@ -59,13 +60,16 @@ app.get("/", (_, res) => {
   res.send("Hello World!");
 });
 app.post("/profile", async (req, res) => {
-  const { access_token, fcm_token } = await req.body;
-  if (access_token) {
-    const response = await getProfile({ access_token }).then(async (res) => {
-      await updateFcn({ access_token, fcm_token });
-      return res;
-    });
-    res.json(response);
+  const { access_token, fcm_token, user_id } = await req.body;
+  if (!user_id) {
+    if (access_token) {
+      const response = await getProfile({ access_token }).then(async (res) => {
+        await updateFcn({ access_token, fcm_token });
+        return res;
+      });
+      res.json(response);
+    }
+  } else {
   }
 });
 app.get("/getpost", async (req, res) => {
@@ -304,6 +308,7 @@ app.post("/conversation/send", async (req, res) => {
 
 app.post("/conversation/list", async (req, res) => {
   const { access_token, user_id } = req.body;
+  console.log("running list conversations: ", access_token, user_id);
   const response = await message.getContactList({ access_token, user_id });
   res.json(response);
 });

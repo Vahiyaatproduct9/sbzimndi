@@ -1,7 +1,8 @@
+import React, { forwardRef } from 'react';
 import { View, Text, FlatList } from 'react-native';
 import css from '../../sections/accessories/items/messages/text/text.css';
-import React from 'react';
 import { Message } from '../../../types/types';
+
 export const MessageFromHere = React.memo(({ text }: { text: string }) => (
   <View style={[css.TextContainer, css.TFHContainer]}>
     <Text style={css.TextText}>{text}</Text>
@@ -13,26 +14,23 @@ export const MessageFromThere = React.memo(({ text }: { text: string }) => (
   </View>
 ));
 
-// 'list' is a state array.
-// my_id is the id of the localUser
-export default React.memo(
-  ({ list, my_id }: { list?: Message[]; my_id: string }) => (
+const MessageList = forwardRef(
+  ({ list, my_id }: { list?: Message[]; my_id: string }, ref) => (
     <FlatList
+      ref={ref}
       data={list}
-      keyExtractor={item => item?.id || String(Math.random())}
+      style={css.ScrollView}
+      keyExtractor={item => item?.id || Math.random().toString()}
       renderItem={({ item }) =>
         item.sender_id === my_id ? (
-          <MessageFromHere
-            key={item.id}
-            text={item?.body || 'Unknown Messsage'}
-          />
+          <MessageFromHere text={item?.body || 'Unknown Message'} />
         ) : (
-          <MessageFromThere
-            key={item?.id}
-            text={item?.body || 'Unknown Message'}
-          />
+          <MessageFromThere text={item?.body || 'Unknown Message'} />
         )
       }
+      onContentSizeChange={() => ref?.current?.scrollToEnd({ animated: true })}
     />
   ),
 );
+
+export default React.memo(MessageList);

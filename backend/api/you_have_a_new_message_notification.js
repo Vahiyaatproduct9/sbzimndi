@@ -13,9 +13,9 @@ export default (clients) => {
       { event: "*", schema: "public", table: "messages" },
       async (payload) => {
         console.log(payload);
-        const client = clients.get(payload.new.sender_id);
+        const client = clients.get(payload.new.conversation_id);
         if (client && client.readyState === WebSocket.OPEN) {
-          if (payload.new && payload.eventType === "INSERT") {
+          if (payload.new) {
             console.log("sending thru websocket:", payload.new);
             client.send(
               JSON.stringify({

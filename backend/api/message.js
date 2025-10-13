@@ -111,7 +111,7 @@ function M() {
           })
           .select()
           .single();
-        console.log("send message: ", data, error);
+        console.log("send message from message.js: ", data, error);
         if (!error && data) {
           return { success: true, data, error, message: null };
         } else {

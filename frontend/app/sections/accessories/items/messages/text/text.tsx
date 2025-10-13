@@ -1,12 +1,5 @@
-import {
-  View,
-  Text,
-  ScrollView,
-  Pressable,
-  Image,
-  TextInput,
-} from 'react-native';
-import React, { useEffect, useState } from 'react';
+import { View, Text, Pressable, Image, TextInput } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
 import css from './text.css';
 import Texts from '../../../../../components/textMessage/texts';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -22,6 +15,7 @@ import {
 } from '../../../../../functions/getLocalInfo';
 import MSGBubble from '../../../../../components/message/message';
 import messageStream from '../../../../../../api/messageStream';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const DirectMessage = ({ route }: any) => {
   const navigation = useNavigation();
@@ -31,6 +25,7 @@ const DirectMessage = ({ route }: any) => {
       navigation.goBack();
     }
   }, [conversation_id, navigation]);
+  const flatListRef = useRef(null);
   const [isMenuOpen, setMenu] = useState<boolean>(false);
   const [textMessage, setTextMessage] = useState<string>('');
   const [chatLogs, setChatLogs] = useState<Message[] | null | undefined>(null);
@@ -41,6 +36,9 @@ const DirectMessage = ({ route }: any) => {
   const sendWidth = useSharedValue(0);
   const sendOpacity = useSharedValue(0);
 
+  useEffect(() => {
+    flatListRef.current?.scrollToEnd({ animated: true });
+  }, [chatLogs]);
   const MenuValue = React.useMemo(() => {
     return { paddingTop, borderRadius };
   }, [paddingTop, borderRadius]);
@@ -99,7 +97,7 @@ const DirectMessage = ({ route }: any) => {
 
   useEffect(() => {
     const websocket = new messageStream({
-      user_id: my_id,
+      conversation_id: conversation_id,
       state: setChatLogs,
     });
     websocket.openConnection();
@@ -113,7 +111,8 @@ const DirectMessage = ({ route }: any) => {
     (async () => await saveChatLogs(conversation_id, chatLogs))();
   }, [conversation_id, chatLogs]);
 
-  const deleteChats = async () => {};
+  const deleteChats = async () =>
+    await AsyncStorage.removeItem(`${conversation_id}`);
   const sendMessage = async () => {
     const res = await conversation.send({
       conversation_id,
@@ -196,9 +195,7 @@ const DirectMessage = ({ route }: any) => {
           </View>
         </View>
       </Animated.View>
-      <ScrollView>
-        <Texts list={chatLogs || []} my_id={my_id} />
-      </ScrollView>
+      <Texts ref={flatListRef} list={chatLogs || []} my_id={my_id} />
       <View style={css.textArea}>
         <TextInput
           onChangeText={setTextMessage}

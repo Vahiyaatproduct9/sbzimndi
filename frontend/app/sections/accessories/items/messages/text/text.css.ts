@@ -110,5 +110,8 @@ export default StyleSheet.create({
     },
     TFTContainer: {
         backgroundColor: theme.extra
+    },
+    ScrollView: {
+        marginBottom: 120
     }
 })

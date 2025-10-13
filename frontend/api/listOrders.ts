@@ -1,6 +1,7 @@
 import { getAccessToken } from "../app/functions/getLocalInfo";
 import path from "./path";
 export default async (access_token?: string) => {
+    console.log('getting orders from getOrders')
     const local_access_token = await getAccessToken()
     const res = await fetch(`${path}/get-orders`, {
         method: 'POST',

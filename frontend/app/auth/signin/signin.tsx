@@ -24,7 +24,7 @@ const SignIn = ({ navigation, route }: any) => {
       password,
     });
     if (success === true) {
-      await getProfile(access_token).then(async res => {
+      await getProfile({ access_token }).then(async res => {
         if (res) {
           await AsyncStorage.setItem('profile', JSON.stringify(res));
           setProfile(res);

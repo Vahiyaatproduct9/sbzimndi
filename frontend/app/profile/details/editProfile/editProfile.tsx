@@ -148,7 +148,7 @@ const EditProfile = ({ navigation, route }: any) => {
           }
 
           // setMess('Profile Updated Successfully!');
-          await getProfile()
+          await getProfile({ access_token: null, user_id: null })
             .then(
               async newProfile =>
                 await AsyncStorage.setItem(

@@ -10,7 +10,7 @@ export default async (access_token) => {
         .from("items")
         .select(
           `*,
-          users!items_bought_by_fkey(id, full_name, latitude, longitude)`
+          users!items_bought_by_fkey(*)`
         )
         .eq("user_id", id)
         .not("bought_by", "is", null);
