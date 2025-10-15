@@ -2,16 +2,15 @@ import { View, Text, Image, TextInput, Pressable } from 'react-native';
 import React, { useState } from 'react';
 import css from '../style/css';
 import signIn from '../../../api/signIn';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import Message from '../../components/message/message';
-import getProfile from '../../../api/getProfile';
+import { useProfileStore } from '../../store/useProfileStore';
 
-const SignIn = ({ navigation, route }: any) => {
-  const { setLogged, setProfile } = route.params;
+const SignIn = ({ navigation }: any) => {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [message, setMessage] = useState<string>('');
   const [loading, setLoading] = useState<boolean | null>(null);
+  const refreshProfile = useProfileStore(s => s.refreshProfile);
   const handleSubmit = async () => {
     setLoading(true);
     const {
@@ -24,18 +23,10 @@ const SignIn = ({ navigation, route }: any) => {
       password,
     });
     if (success === true) {
-      await getProfile({ access_token }).then(async res => {
-        if (res) {
-          await AsyncStorage.setItem('profile', JSON.stringify(res));
-          setProfile(res);
-        } else {
-          setMessage('System Error!');
-        }
-      });
+      await refreshProfile({ access_token, refresh_token, setMessage });
       console.log(access_token, refresh_token);
       setLoading(null);
       setMessage('Loading Profile...');
-      setLogged(true);
     } else {
       setMessage(server_message);
       setLoading(false);

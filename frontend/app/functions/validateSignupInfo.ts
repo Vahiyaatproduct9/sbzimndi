@@ -1,4 +1,4 @@
-export default async function({
+export default async function ({
     name,
     email,
     phone,
@@ -6,10 +6,10 @@ export default async function({
     repass,
     lctnEnbld,
     location: {
-        long,
-        lat, acc
+        longitude,
+        latitude, accuracy
     }
-} : {
+}: {
     name: string;
     email: string;
     phone: string;
@@ -17,9 +17,9 @@ export default async function({
     repass: string;
     lctnEnbld: boolean;
     location: {
-        long: number;
-        lat: number;
-        acc: number;
+        longitude: number;
+        latitude: number;
+        accuracy: number;
     };
 }) {
     if (name.length < 3) {
@@ -40,7 +40,7 @@ export default async function({
         return 'Passwords do not match';
     }
     if (lctnEnbld) {
-        if (long === 0 && lat === 0 && acc === 0) {
+        if (longitude === 0 && latitude === 0 && accuracy === 0) {
             return 'Location is enabled but not available';
         }
     }

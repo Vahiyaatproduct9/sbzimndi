@@ -2,11 +2,13 @@ import { Image, Pressable, ScrollView, Text, View } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import css from './productPage.css';
 import getItem from '../../../api/getItem';
-import { getAndSetLocation } from '../../../api/getLocation';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Message from '../../components/message/message';
 import calculateDistance from '../../functions/calculateDistance';
 import MtoKm from '../../functions/meterstokm';
 import timeline from '../../functions/timeline';
+import useLocationStore from '../../store/useLocationStore';
+import theme from '../../../colors/ColorScheme';
 
 const ProductPage = ({
   navigation,
@@ -15,14 +17,14 @@ const ProductPage = ({
   navigation: any;
   route: { params: { id: string } };
 }) => {
+  const { setLocation, latitude, longitude, accuracy } = useLocationStore();
   const { id } = route.params;
   const [pressed, setPressed] = useState<boolean>(false);
-  const [location, setLocation] = useState<number[] | null>(null);
   const [message, setMessage] = useState<string>('');
   const [item, setItem] = useState<any>(null);
   // Startup FUnction below!
   useEffect(() => {
-    (async () => await getAndSetLocation(setLocation, setMessage))();
+    (async () => await setLocation())();
   }, []);
   useEffect(() => {
     (async () =>
@@ -31,21 +33,21 @@ const ProductPage = ({
   useEffect(() => {
     (async () => {
       const distance_meters = calculateDistance(
-        location ? location[0] : 0,
-        location ? location[1] : 0,
+        latitude ?? 0,
+        longitude ?? 0,
         item ? item.latitude : 0,
         item ? item.longitude : 0,
       );
       setItem((prev: any) => ({ ...prev, distance_meters }));
     })();
     console.log('ran function');
-  }, []);
+  }, [latitude, longitude]);
   useEffect(() => {
     console.log('item updated', item);
   }, [item]);
   useEffect(() => {
-    console.log('location updated', location);
-  }, [location]);
+    console.log('location updated', latitude, longitude, accuracy);
+  }, [latitude, longitude, accuracy]);
   //Startup function ends !
   return (
     item && (
@@ -62,12 +64,17 @@ const ProductPage = ({
         </View>
         <View style={css.priceContainer}>
           <Text style={css.price}>${item.price}</Text>
-          <Text style={css.price}>expires {timeline(item.expiry_date)}</Text>
+          <Text style={css.price}>{`expires ${timeline(
+            item.expiry_date,
+          )}`}</Text>
         </View>
         <View style={css.ownerContainer}>
-          <Text style={css.owner}>
-            {item.users ? item.users.full_name : 'K'}
-          </Text>
+          <View style={css.ownerBox}>
+            <FontAwesome name="user-circle" size={28} color={theme.text} />
+            <Text style={css.owner}>
+              {item.users ? item.users.full_name : 'Name'}
+            </Text>
+          </View>
           <Text style={css.away}>
             {item.distance_meters > 1000
               ? MtoKm(item.distance_meters)

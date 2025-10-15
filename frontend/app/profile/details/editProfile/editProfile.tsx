@@ -172,10 +172,10 @@ const EditProfile = ({ navigation, route }: any) => {
   };
   useEffect(() => {
     if (
-      profile.items.profile_picture &&
-      profile.items.profile_picture.length > 0
+      profile?.data?.profile_picture &&
+      profile?.data?.profile_picture.length > 0
     ) {
-      setPhoto(profile.items.profile_picture);
+      setPhoto(profile?.data?.profile_picture);
     } else {
       (async () => {
         await RNFS.exists(`${RNFS.DocumentDirectoryPath}/profile.jpg`).then(
@@ -197,15 +197,15 @@ const EditProfile = ({ navigation, route }: any) => {
         );
       })();
     }
-  }, [profile.items.profile_picture]);
+  }, [profile?.data?.profile_picture]);
   useEffect(() => {
     (async () => {
-      if (profile.items) {
-        setName(profile.items.full_name);
-        setBio(profile.items.bio);
-        setSpiritAnimal(profile.items.spirit_animal);
-        setToggle(profile.items.user_type === 'seller' ? true : false);
-        console.log(profile.items.name);
+      if (profile?.data) {
+        setName(profile?.data?.full_name);
+        setBio(profile?.data?.bio);
+        setSpiritAnimal(profile?.data?.spirit_animal);
+        setToggle(profile?.data?.user_type === 'seller' ? true : false);
+        console.log(profile?.data?.name);
       } else {
         await getName().then(res => res && setName(res));
         await getBio().then(res => res && setBio(res));
@@ -264,8 +264,8 @@ const EditProfile = ({ navigation, route }: any) => {
             {toggle ? 'Seller' : 'Buyer'}
           </Text>
         </View>
-        {profile.items.upi_id.length > 0 &&
-          profile.items.upi_name.length > 0 && (
+        {profile?.data?.upi_id?.length > 0 &&
+          profile?.data?.upi_name?.length > 0 && (
             <View style={[css.TextBox, css.switch]}>
               <Text style={[css.text, css.label]}>Force Seller</Text>
               <Switch value={toggle} pressedState={setToggle} />

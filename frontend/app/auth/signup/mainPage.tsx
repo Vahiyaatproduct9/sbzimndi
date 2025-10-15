@@ -3,7 +3,7 @@ import React from 'react';
 import SignUp from './signup';
 import Kyc from '../kyc/kyc';
 import { signupPage } from '../../../types/types';
-import UploadDocuments from '../documents/uploadDocuments';
+// import UploadDocuments from '../documents/uploadDocuments';
 import Upi from '../upi/upi';
 
 const MainPage = () => {
@@ -18,8 +18,8 @@ const MainPage = () => {
         return <Kyc setActivePage={setActivePage} />;
       case 'UPI':
         return <Upi />;
-      default:
-        return <UploadDocuments />;
+      // default:
+      //   return <UploadDocuments />;
     }
   };
 

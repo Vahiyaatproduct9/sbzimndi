@@ -12,7 +12,6 @@ import {
   setIfsc as setifsc,
   setAccountNumber as setAN,
   setPassword,
-  setLocation,
 } from '../../functions/getLocalInfo';
 import { signupPage } from '../../../types/types';
 import { signup } from '../../../api/signUp';

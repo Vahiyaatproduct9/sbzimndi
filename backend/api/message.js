@@ -156,7 +156,7 @@ function M() {
               conversations_seller_id_fkey(*)
               `
             )
-            .or(`buyer_id.eq.${user_id},seller_id.eq.${user_id}`);
+            .or(`buyer_id.eq.${user_id}, seller_id.eq.${user_id}`);
           console.log("contact list : ", data, error);
           if (!error || data)
             return {
@@ -190,19 +190,21 @@ function M() {
           );
           if (success) {
             return await runFunction(id);
-          } else
+          } else {
+            console.log("error getting accesstoken:", error);
             return {
               success: false,
               data: null,
               error,
               message: "Access Token Invalid",
             };
+          }
         } else
           return {
             success: false,
             data: null,
             error: null,
-            message: "No user_id not Access Token provided.",
+            message: "No user_id nor Access Token provided.",
           };
       } catch (e) {
         console.log("Error: ", e);

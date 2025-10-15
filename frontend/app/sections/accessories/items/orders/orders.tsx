@@ -28,11 +28,12 @@ const Orders = () => {
       const res = await listOrders();
       if (res?.success) setOrders(res.data);
       else setMessage(`${res?.error || 'Some Error occured.'}`);
-      console.log('orders: ', orders, res);
+      console.log('res from orders: ', res);
     };
 
     fetch_orders();
   }, []);
+  useEffect(() => console.log('orders:', orders), [orders]);
   const startConversation = async ({
     iambuyer,
     reciever_id,
@@ -54,6 +55,7 @@ const Orders = () => {
   };
 
   function viewProfile({ user_id }: { user_id: string }) {
+    console.log('user_id from orders : ', user_id);
     navigation.goBack();
     navigation.navigate('Profile' as never, { user_id });
   }
@@ -84,7 +86,7 @@ const Orders = () => {
           <View style={css.options}>
             <Pressable
               onPress={() => {
-                viewProfile({ user_id: order.user_id });
+                viewProfile({ user_id: order.users.id });
               }}
             >
               <MaterialIcons

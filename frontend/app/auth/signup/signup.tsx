@@ -1,5 +1,5 @@
 import { View, Text, TextInput, Image, Pressable, Switch } from 'react-native';
-import { getAndSetLocation } from '../../../api/getLocation.ts';
+// import { getAndSetLocation } from '../../../api/getLocation.ts';
 import React, { useEffect } from 'react';
 import css from '../style/css.ts';
 import theme from '../../../colors/ColorScheme.ts';
@@ -9,6 +9,7 @@ const image = require('../../../assets/images/fruit.png');
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import validateSignupInfo from '../../functions/validateSignupInfo.ts';
+import useLocationStore from '../../store/useLocationStore.ts';
 
 const SignUp = ({ setActivePage }: any) => {
   const nv = useNavigation();
@@ -20,16 +21,16 @@ const SignUp = ({ setActivePage }: any) => {
   const [repass, setRepass] = useState<string>('');
   const [lctnEnbld, setLctnEnbld] = useState<boolean>(false);
   const [reS, setRes] = useState<string>('');
-  const [location, setLocation] = useState<Array<number>>([0, 0, 0]);
   const [pressed, setPressed] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean | null>(null);
+  const { setLocation, latitude, longitude, accuracy } = useLocationStore();
 
   useEffect(() => {
     const run = async () => {
-      await getAndSetLocation(setLocation, setRes);
+      setLocation();
     };
     if (lctnEnbld) run();
-  }, [lctnEnbld]);
+  }, [lctnEnbld, setLocation]);
   useEffect(() => {
     const run = async () => {
       const res = await AsyncStorage.getItem('signupInfo');
@@ -42,12 +43,11 @@ const SignUp = ({ setActivePage }: any) => {
         setRepass(response.repass);
         setPassword(response.password);
         setLctnEnbld(response.lctnEnbld);
-        const loc = [
-          response.location.lat,
-          response.location.long,
-          response.location.acc,
-        ];
-        setLocation(loc);
+        // const loc = [
+        //   response.location.latitude,
+        //   response.location.longitude,
+        //   response.location.accuracy,
+        // ];
       }
     };
     run();
@@ -62,9 +62,9 @@ const SignUp = ({ setActivePage }: any) => {
       repass,
       lctnEnbld,
       location: {
-        long: location[0],
-        lat: location[1],
-        acc: location[2],
+        latitude: latitude ?? 0,
+        longitude: longitude ?? 0,
+        accuracy: accuracy ?? 0,
       },
     };
     if ((await validateSignupInfo(info)) === null) {

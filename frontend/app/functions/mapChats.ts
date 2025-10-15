@@ -1,18 +1,26 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Conversation_Data, User } from "../../types/types";
 export default async (data: Conversation_Data[]) => {
+    console.log('origin data: ', data)
     const local_user_id = await AsyncStorage.getItem('profile')
         .then(res => {
-            const profile: User = JSON.parse(res || '')
-            return profile.id
+            const profile: { success: boolean, items: User } = JSON.parse(res || '')
+            return profile?.data?.id
         })
     let newData = [];
     for (const item of data) {
         if (item.buyer_id === local_user_id) {
-            newData.push({ ...item.seller, conversation_id: item.id, last_message: item.last_message, last_message_at: item.last_message_at, my_id: local_user_id })
+            newData.push({ ...item.seller })
         } else if (item.seller_id === local_user_id) {
-            newData.push({ ...item.buyer, conversation_id: item.id, last_message: item.last_message, last_message_at: item.last_message_at, my_id: local_user_id })
-        } else continue
+            newData.push({ ...item.buyer })
+        }
+        newData[newData.length - 1] = {
+            ...newData[newData.length - 1],
+            conversation_id: item.id,
+            last_message: item.last_message,
+            last_message_at: item.last_message_at,
+            my_id: local_user_id
+        }
     }
     console.log('newData :', newData)
     return newData

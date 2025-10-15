@@ -2,6 +2,7 @@ import { getAccessToken } from '../app/functions/getLocalInfo.ts'
 import messaging from '@react-native-firebase/messaging'
 import backendUrl from './path.ts'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import { Profile } from '../types/types'
 export default async function (props: {
   access_token?: string | null,
   user_id?: string | null
@@ -21,7 +22,7 @@ export default async function (props: {
       })
     }
   )
-  const d = await data.json()
+  const d: Profile = await data.json()
   if (!props.user_id) {
     try {
       await AsyncStorage.setItem('profile', JSON.stringify(d || []))

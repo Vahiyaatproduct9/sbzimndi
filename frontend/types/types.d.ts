@@ -4,7 +4,7 @@ export interface signUpInfo {
     email: string;
     password: string;
     phone: string;
-    location: number[] | { lat: number, long: number, acc: number },
+    location: number[] | { latitude: number, longitude: number, accuracy: number },
     ifsc?: string | null;
     fullName?: string | null;
     upiId?: string | null;
@@ -37,7 +37,7 @@ interface users_bought_by {
     id: string;
 }
 export interface orders_bought_by extends order {
-    users: users_bought_by
+    users: User
 }
 
 export interface notification {
@@ -98,6 +98,16 @@ export interface User {
     rzp_merchant_status: string | null;
     rzp_linked_account_id: string | null;
     rzp_stakeholder_account_id: string | null;
+}
+export interface Profile {
+    success: boolean | null;
+    error: {
+        code: string | null | undefined;
+        message: string | undefined;
+        status: number | string | undefined;
+    } | null;
+    message: string | null;
+    data: User | null
 }
 
 export interface Conversation_Data {

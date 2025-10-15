@@ -87,7 +87,7 @@ const PaymentButton = ({
       disabled={processing}
       onPress={handleSubmit}
     >
-      <Text style={textStyle}>{processing ? 'Please wait' : 'P ay'}</Text>
+      <Text style={textStyle}>{processing ? 'Please wait' : 'Pay'}</Text>
     </Pressable>
   );
 };

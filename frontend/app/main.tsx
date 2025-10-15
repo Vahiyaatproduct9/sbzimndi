@@ -13,10 +13,8 @@ const Stack = createNativeStackNavigator();
 
 export default function ({
   setActiveTab,
-  profile,
 }: {
   setActiveTab: React.Dispatch<React.SetStateAction<tabs>>;
-  profile: any;
 }) {
   return (
     <NavigationContainer independent>
@@ -25,7 +23,7 @@ export default function ({
           name="Home"
           component={Home as never}
           options={{ headerShown: false }}
-          initialParams={{ setActiveTab, profile }}
+          initialParams={{ setActiveTab }}
         />
         <Stack.Screen
           name="Notifications"
@@ -60,7 +58,7 @@ export default function ({
           name="Text"
           component={Text}
           options={{ headerShown: false }}
-          initialParams={{ profile }}
+          // initialParams={{ profile }}
         />
       </Stack.Navigator>
     </NavigationContainer>

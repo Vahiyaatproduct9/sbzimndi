@@ -20,8 +20,8 @@ export default StyleSheet.create({
         height: '100%',
         borderRadius: 10
     },
-    infoContainer:{
-        padding: 10,   
+    infoContainer: {
+        padding: 10,
     },
     heading: {
         fontSize: 24,
@@ -41,6 +41,12 @@ export default StyleSheet.create({
         padding: 10,
         flexDirection: 'row',
         justifyContent: 'space-between',
+    },
+    ownerBox: {
+        flexDirection: 'row',
+        gap: 10,
+        justifyContent: 'center',
+        alignItems: 'center'
     },
     owner: {
         fontSize: 18,

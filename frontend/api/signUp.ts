@@ -33,9 +33,9 @@ export async function signup({ name, email, password, phone,
             fullName,
             fcm_token,
             location: {
-                lat: Array.isArray(location) ? location[0] : location.lat,
-                long: Array.isArray(location) ? location[1] : location.long,
-                acc: Array.isArray(location) ? location[2] : location.acc
+                lat: Array.isArray(location) ? location[0] : location.latitude,
+                long: Array.isArray(location) ? location[1] : location.longitude,
+                acc: Array.isArray(location) ? location[2] : location.accuracy
             },
             ifsc: ifsc || null,
             accountNumber: accountNumber || null,

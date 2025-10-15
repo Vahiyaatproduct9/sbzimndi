@@ -14,7 +14,7 @@ export default StyleSheet.create({
     color: theme.text,
     marginBottom: 20,
   },
-  box:{
+  box: {
     width: '100%',
     padding: 10,
     boxShadow: '0 4px 10px 0 rgba(0,0,0,0.3)',
@@ -33,7 +33,8 @@ export default StyleSheet.create({
     fontSize: 18,
   },
   text: {
-    color: theme.text
+    color: theme.text,
+    fontSize: 16
   },
   imageContainer: {
     width: '30%',
@@ -46,6 +47,39 @@ export default StyleSheet.create({
     width: '100%',
     objectFit: 'cover',
     borderRadius: 5
+  },
+  contentContainer: {
+    width: '100%',
+    backgroundColor: theme.tint,
+    padding: 20,
+    borderRadius: 20,
+    marginTop: 20,
+    gap: 20
+  },
+  contentHeader: {
+    fontSize: 23,
+    fontWeight: '600',
+    color: theme.text,
+    textAlign: 'right'
+  },
+  distance: {
+    color: theme.text,
+    textAlign: 'right'
+  },
+  descriptionBox: {
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center'
+  },
+  description: {
+    color: theme.text,
+    flex: 1,
+    textAlign: 'right'
+  },
+  descriptionHead: {
+    color: theme.text,
+    fontWeight: '600',
   },
   paymentButton: {
     width: '70%',
@@ -64,7 +98,6 @@ export default StyleSheet.create({
     backgroundColor: 'rgba(255,255,0, 0.4)',
     marginTop: 20,
     borderRadius: 10,
-
   },
   noteText: {
     color: theme.text,

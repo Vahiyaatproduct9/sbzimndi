@@ -8,76 +8,34 @@ import Search from './app/search/search.tsx';
 import Profile from './app/profile/profile.tsx';
 import Animated, { useSharedValue, withSpring } from 'react-native-reanimated';
 import AddItem from './app/addItem/addItem.tsx';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-// import notifee, { AndroidImportance } from '@notifee/react-native';
-// import requestNotificationPermission from './app/functions/requestNotificationPermission';
-// import getNotification from './api/getNotification';
-// import messaging from '@react-native-firebase/messaging';
 
 type activeTab = 'home' | 'search' | 'add' | 'profile';
 
 function App() {
-  const [logged, setLogged] = useState<boolean | null>(null);
-  // const [isSeller, setSeller] = useState<boolean>(false);
   const animateProperty = {
     y: useSharedValue(80),
     opacity: useSharedValue(0),
   };
   const [active, setActive] = useState<activeTab>('home');
   const [loaded, setLoaded] = useState<boolean>(false);
-  const [profile, setProfile] = useState<any>(null);
+  // const [profile, setProfile] = useState<any>(null);
 
   useEffect(() => {
     setLoaded(true);
     animateProperty.y.value = withSpring(0);
     animateProperty.opacity.value = withSpring(1);
   }, [animateProperty.opacity, animateProperty.y]);
-  useEffect(() => {
-    (async () =>
-      await AsyncStorage.setItem('profile', JSON.stringify(profile)))();
-  }, [profile]);
   const activeBlock = () => {
     if (active === 'home') {
-      return <Main setActiveTab={setActive} profile={profile} />;
+      return <Main setActiveTab={setActive} />;
     } else if (active === 'search') {
       return <Search />;
     } else if (active === 'add') {
       return <AddItem setActiveTab={setActive} />;
     } else if (active === 'profile') {
-      return (
-        <Profile
-          logged={logged}
-          profile={profile}
-          setLogged={setLogged}
-          setProfile={setProfile}
-          setActiveTab={setActive}
-        />
-      );
+      return <Profile setActiveTab={setActive} />;
     }
   };
-  // (async () => {
-  //   try {
-  //     const token = await requestNotificationPermission();
-  //     console.log('FCM Token:', token);
-
-  //     if (token) {
-  //       messaging().onMessage(async remoteMessage => {
-  //         console.log('Foreground message received:', remoteMessage);
-  //         await notifee.displayNotification({
-  //           title: remoteMessage.notification?.title || 'New Update',
-  //           body: remoteMessage.notification?.body || 'Check your app!',
-  //           android: {
-  //             channelId: 'default',
-  //             importance: AndroidImportance.HIGH,
-  //           },
-  //         });
-  //       });
-  //     }
-  //   } catch (e) {
-  //     console.log('Error from Notification Tab: ', e);
-  //   }
-  // })();
-
   return (
     <View style={styles.container}>
       {loaded ? (
@@ -93,21 +51,7 @@ function App() {
           >
             {activeBlock()}
           </Animated.View>
-          <Tabs
-            setProfile={setProfile}
-            setLogged={setLogged}
-            logged={logged}
-            active={active}
-            setActive={setActive}
-            profile={profile}
-            isSeller={
-              profile
-                ? profile.items.user_type === 'seller'
-                  ? true
-                  : false
-                : false
-            }
-          />
+          <Tabs active={active} setActive={setActive} />
         </>
       ) : (
         <LoadingScreen />

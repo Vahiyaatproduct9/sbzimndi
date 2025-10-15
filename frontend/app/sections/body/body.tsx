@@ -6,10 +6,6 @@ import {
   FlatList,
   Pressable,
 } from 'react-native';
-import {
-  getLocation,
-  setLocation as sL,
-} from '../../functions/getLocalInfo.ts';
 import React, { useEffect, useState } from 'react';
 import Theme from '../../../colors/ColorScheme.ts';
 import Card from '../../components/Card/card.tsx';
@@ -23,7 +19,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Message from '../../components/message/message.tsx';
 import { useNavigation } from '@react-navigation/native';
 import getNearestItems from '../../../api/getNearestItems.ts';
-import { getAndSetLocation } from '../../../api/getLocation.ts';
+// import { getAndSetLocation } from '../../../api/getLocation.ts';
+import useLocationStore from '../../store/useLocationStore.ts';
 
 const Body = () => {
   const navigation = useNavigation();
@@ -34,22 +31,15 @@ const Body = () => {
   const [message, setMessage] = useState<string>('');
   const [items, setItems] = useState<any | null>(null);
   const [fetched, setFetched] = useState<boolean | null>(null);
-  const [location, setLocation] = useState<number[] | null>();
+  const { latitude, longitude, accuracy, setLocation } = useLocationStore();
   useEffect(() => {
     containerProperty.opacity.value = withDelay(0, withSpring(1));
     containerProperty.top.value = withDelay(0, withSpring(0));
     (async () => {
-      await getLocation()
-        .then(setLocation)
-        .catch(() => {
-          setLocation([0, 0, 0]);
-          setMessage(
-            'Please Enable Location Permission to view the nearby Items.',
-          );
-        });
+      await setLocation();
     })();
     setFetched(false);
-  }, []);
+  }, [containerProperty.opacity, containerProperty.top, setLocation]);
   useEffect(() => {
     (async () => {
       try {
@@ -62,13 +52,10 @@ const Body = () => {
             return; // cache still valid
           }
         }
-
-        const loc = await getAndSetLocation(setLocation, setMessage);
-        setLocation(loc);
         const response = await getNearestItems({
-          longitude: location ? location[0] : 0,
-          latitude: location ? location[1] : 0,
-          accuracy: location ? location[2] : 0,
+          longitude: longitude ?? 0,
+          latitude: latitude ?? 0,
+          accuracy: accuracy ?? 0,
         });
 
         if (response.status === 200) {
@@ -86,7 +73,7 @@ const Body = () => {
         console.log('Error in useEffect:', err);
       }
     })();
-  }, []);
+  }, [accuracy, latitude, longitude]);
 
   useEffect(() => {
     console.log(items);
@@ -133,20 +120,6 @@ const Body = () => {
                         <AntDesign name="star" size={32} color="gold" />
                       </View>
                     </View>
-                    <Pressable
-                      style={css.button}
-                      onPress={() => console.log('buy')}
-                    >
-                      <Text
-                        style={{
-                          fontSize: 18,
-                          fontWeight: 700,
-                          color: Theme.text,
-                        }}
-                      >
-                        Buy
-                      </Text>
-                    </Pressable>
                   </View>
                 </Card>
               </Pressable>
@@ -161,8 +134,10 @@ const Body = () => {
             }}
           />
         </View>
-      ) : (
+      ) : fetched === false ? (
         <Text>Please Connect to the Internet!</Text>
+      ) : (
+        <Text>Loading...</Text>
       )}
     </Animated.View>
   );

@@ -23,9 +23,9 @@ const Accessories = ({
         style={[css.box, css.profile]}
         onPress={() => setActiveTab('profile')}
       >
-        {profile?.items?.profile_picture ? (
+        {profile?.data?.profile_picture ? (
           <Image
-            source={{ uri: profile.items.profile_picture }}
+            source={{ uri: profile?.data?.profile_picture }}
             style={css.profilePicture}
           />
         ) : (
@@ -33,8 +33,8 @@ const Accessories = ({
         )}
         <View style={css.profile_box}>
           <Text style={css.text}>
-            {profile?.items?.full_name
-              ? String(profile.items.full_name).split(' ')[0]
+            {profile?.data?.full_name
+              ? String(profile?.data?.full_name).split(' ')[0]
               : 'User'}
           </Text>
         </View>

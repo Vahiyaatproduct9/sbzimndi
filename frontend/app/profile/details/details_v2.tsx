@@ -53,20 +53,21 @@ const Details = ({ route }: any) => {
   }, [setLogged]);
 
   useEffect(() => {
+    console.log('route params from details: ', setLogged, user_id);
     if (user_id) setIsMyProfile(false);
     else setIsMyProfile(true);
-  }, [user_id]);
+  }, [user_id, setLogged]);
 
   useEffect(() => {
     // getProfilee..
     (async () => {
-      if (!isMyProfile) {
+      if (user_id) {
+        console.log('user id detcted. runing this section. ');
         const userProfile = await getProfile({ user_id });
         console.log('userProfile: ', userProfile);
         if (userProfile.success) {
           setProfile(userProfile);
         }
-        return;
       } else {
         const localProfile = await AsyncStorage.getItem('profile').then(res =>
           JSON.parse(res || ''),
@@ -107,8 +108,8 @@ const Details = ({ route }: any) => {
         {profile && (
           <Animation.Image
             source={
-              profile?.items?.profile_picture
-                ? { uri: profile.items.profile_picture }
+              profile?.data?.profile_picture
+                ? { uri: profile?.data?.profile_picture }
                 : image
             }
             style={[css.image, imageProperty]}
@@ -129,7 +130,7 @@ const Details = ({ route }: any) => {
       <Animation.View style={[css.body, textProperty]}>
         {profile && (
           <Animation.Image
-            source={spirit(profile ? profile.items.spirit_animal : 'cheetah')}
+            source={spirit(profile ? profile?.data?.spirit_animal : 'cheetah')}
             style={[css.spirit, spiritProperty]}
           />
         )}
@@ -140,7 +141,7 @@ const Details = ({ route }: any) => {
             <Text style={[css.bodyTxt]}>Name</Text>
           </View>
           <Text style={css.bodySectionContent}>
-            {profile ? profile.items.full_name : getName() || 'Loading ...'}
+            {profile ? profile?.data?.full_name : getName() || 'Loading ...'}
           </Text>
         </View>
         <View style={css.bodySectionContainer}>
@@ -150,7 +151,7 @@ const Details = ({ route }: any) => {
           </View>
           <Text style={css.bodySectionContent}>
             {profile
-              ? profile.items.user_type === 'buyer'
+              ? profile?.data?.user_type === 'buyer'
                 ? 'Buyer'
                 : 'Seller'
               : 'Loading ...'}
@@ -162,7 +163,7 @@ const Details = ({ route }: any) => {
             <Text style={[css.bodyTxt]}>Items Sold</Text>
           </View>
           <Text style={css.bodySectionContent}>
-            {profile ? profile.items.items.length : 'Loading ...'}
+            {profile ? profile?.data?.items.length : 'Loading ...'}
           </Text>
         </View>
         <View style={css.bodySectionContainer}>
