@@ -8,29 +8,40 @@ import css from './orders.css';
 import { useNavigation } from '@react-navigation/native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import conversation from '../../../../../api/conversation';
-import { getAndSetLocation } from '../../../../../api/getLocation';
 import theme from '../../../../../colors/ColorScheme';
 import calculateDistance from '../../../../functions/calculateDistance';
 import getRelativeDistance from '../../../../functions/getRelativeDistance';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import useLocationStore from '../../../../store/useLocationStore';
 const Orders = () => {
   const navigation = useNavigation();
   const [orders, setOrders] = useState<null | undefined | orders_bought_by[]>();
   const [message, setMessage] = useState<string>('');
-  const [location, setLocation] = useState<number[] | null>(null);
-
+  const { setLocation, latitude, longitude, accuracy } = useLocationStore();
   useEffect(() => {
     (async () => {
-      await getAndSetLocation(setLocation);
+      if (!latitude || !longitude || !accuracy) {
+        await setLocation();
+        console.log('ran location.');
+      }
     })();
-  }, []);
+  }, [accuracy, latitude, setLocation, longitude]);
+
   useEffect(() => {
     const fetch_orders = async () => {
+      const local_orders = await AsyncStorage.getItem('orders')
+        .then(res => JSON.parse(res || ''))
+        .catch(e => {
+          console.log('error in orders: ', e);
+          return null;
+        });
+      console.log('local_orders', local_orders);
       const res = await listOrders();
+      if (local_orders?.length > 0) setOrders(local_orders);
       if (res?.success) setOrders(res.data);
       else setMessage(`${res?.error || 'Some Error occured.'}`);
       console.log('res from orders: ', res);
     };
-
     fetch_orders();
   }, []);
   useEffect(() => console.log('orders:', orders), [orders]);
@@ -71,13 +82,13 @@ const Orders = () => {
         </View>
         <View style={css.footer}>
           <Text style={css.distance}>
-            {location
+            {longitude && latitude && accuracy
               ? getRelativeDistance(
                   calculateDistance(
                     order.latitude,
                     order.longitude,
-                    location[0],
-                    location[1],
+                    latitude ?? 0,
+                    longitude ?? 0,
                   ),
                 )
               : 'Distance not available'}

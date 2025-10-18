@@ -67,9 +67,8 @@ const EditProfile = ({ navigation, route }: any) => {
             cleanPath(`${RNFS.DocumentDirectoryPath}/profile.jpg`),
           );
           console.log('Picked image uri:', res.assets[0].uri);
-          const newPath = `file://${
-            RNFS.DocumentDirectoryPath
-          }/profile.jpg?time=${Date.now()}`;
+          const newPath = `file://${RNFS.DocumentDirectoryPath
+            }/profile.jpg?time=${Date.now()}`;
           console.log('New profile path:', newPath);
           setPhoto(newPath);
         }
@@ -142,9 +141,11 @@ const EditProfile = ({ navigation, route }: any) => {
           await sn(name);
           await sb(bio);
 
+
           // Only save the new profile picture if we uploaded one
           if (shouldUpload && photo) {
-            await saveProfilePicture(cleanPath(photo), 'profile');
+            const local_image_uri = await saveProfilePicture(cleanPath(photo), 'profile');
+            await AsyncStorage.setItem('profile_picture', local_image_uri || '')
           }
 
           // setMess('Profile Updated Successfully!');
@@ -181,9 +182,8 @@ const EditProfile = ({ navigation, route }: any) => {
         await RNFS.exists(`${RNFS.DocumentDirectoryPath}/profile.jpg`).then(
           exists => {
             if (exists) {
-              const path = `file://${
-                RNFS.DocumentDirectoryPath
-              }/profile.jpg?time=${Date.now()}`;
+              const path = `file://${RNFS.DocumentDirectoryPath
+                }/profile.jpg?time=${Date.now()}`;
               console.log('Profile picture path:', path);
               setPhoto(path);
             } else {

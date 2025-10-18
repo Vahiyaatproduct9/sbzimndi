@@ -12,11 +12,12 @@ import {
   getPhone,
   getRefreshToken,
 } from '../../../../functions/getLocalInfo';
+import css from '../payment.css';
+import { tabs } from 'types/types';
 
 const PaymentButton = ({
-  style,
   setMessage,
-  textStyle,
+  pressed,
   setPressed,
   setActiveTab,
   item,
@@ -24,8 +25,9 @@ const PaymentButton = ({
   style?: StyleSheetProperties;
   textStyle?: StyleSheetProperties;
   setMessage: React.Dispatch<React.SetStateAction<string>>;
-  setActiveTab: React.Dispatch<React.SetStateAction<string>>;
+  setActiveTab: React.Dispatch<React.SetStateAction<tabs>>;
   setPressed: React.Dispatch<React.SetStateAction<boolean>>;
+  pressed: boolean;
   item: any;
 }) => {
   const [processing, setProcessing] = useState<boolean>(false);
@@ -51,7 +53,7 @@ const PaymentButton = ({
       const options = {
         key,
         order_id, // Razorpay order_id (from backend)
-        amount, // in paisa>
+        amount, // in paisa
         currency,
         name,
         description: 'SbziMndi',
@@ -71,7 +73,9 @@ const PaymentButton = ({
         access_token,
       });
       setMessage(message);
-      console.log(message);
+      if (success) {
+        setTimeout(() => setActiveTab('home'), 2000);
+      }
     } catch (err) {
       console.log(err);
     } finally {
@@ -83,11 +87,11 @@ const PaymentButton = ({
     <Pressable
       onPressIn={() => setPressed(true)}
       onPressOut={() => setPressed(false)}
-      style={style}
+      style={[css.paymentButton, pressed && css.pressed]}
       disabled={processing}
       onPress={handleSubmit}
     >
-      <Text style={textStyle}>{processing ? 'Please wait' : 'Pay'}</Text>
+      <Text style={css.buttonText}>{processing ? 'Please wait' : 'Pay'}</Text>
     </Pressable>
   );
 };

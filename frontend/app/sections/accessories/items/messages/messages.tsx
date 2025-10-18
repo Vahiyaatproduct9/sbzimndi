@@ -5,6 +5,7 @@ import Message from '../../../../components/message/message';
 import { User } from '../../../../../types/types';
 import { useNavigation } from '@react-navigation/native';
 import getContacts from '../../../../functions/getContacts';
+import { useProfileStore } from '../../../../store/useProfileStore';
 interface enhancedUser extends User {
   last_message: string | null;
   last_message_at: string | null;
@@ -12,6 +13,7 @@ interface enhancedUser extends User {
   my_id: string;
 }
 const Messages = ({ route }: any) => {
+  const profile = useProfileStore(s => s.profile);
   const navigation = useNavigation();
   const parameter = route.params;
   if (typeof parameter?.conversation_id === 'string') {
@@ -23,8 +25,11 @@ const Messages = ({ route }: any) => {
   const [message, setMessage] = useState<string>('');
   // fetching all Conversations
   useEffect(() => {
-    (async () => getContacts({ setList, setMessage }))();
-  }, []);
+    (async () => {
+      await getContacts({ setList, setMessage, profile });
+    })();
+  }, [profile]);
+  useEffect(() => console.log('Contact List: '), [list]);
   const block = () =>
     list?.map(listItem => {
       return (

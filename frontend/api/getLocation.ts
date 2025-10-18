@@ -1,6 +1,6 @@
-import { SetStateAction } from 'react';
+// import { SetStateAction } from 'react';
 import { PermissionsAndroid, Platform } from 'react-native';
-import Geolocation from 'react-native-geolocation-service';
+// import Geolocation from 'react-native-geolocation-service';
 
 export async function requestLocationPermission(): Promise<boolean> {
     try {
@@ -25,47 +25,47 @@ export async function requestLocationPermission(): Promise<boolean> {
         return false;
     }
 }
-export async function getandsetCoarseLocation(setLocation: (loc: [number, number, number]) => void, setMessage?: React.Dispatch<SetStateAction<string>>) {
-    Geolocation.getCurrentPosition(
-        (position) => {
-            const loc: [number, number, number] = [
-                position.coords.longitude,
-                position.coords.latitude,
-                position.coords.accuracy
-            ];
-            return setLocation(loc);
-        },
-        (error) => {
-            return setMessage && setMessage(error.message);
-        },
-        { enableHighAccuracy: false }
-    );
-}
+// export async function getandsetCoarseLocation(setLocation: (loc: [number, number, number]) => void, setMessage?: React.Dispatch<SetStateAction<string>>) {
+//     Geolocation.getCurrentPosition(
+//         (position) => {
+//             const loc: [number, number, number] = [
+//                 position.coords.longitude,
+//                 position.coords.latitude,
+//                 position.coords.accuracy
+//             ];
+//             return setLocation(loc);
+//         },
+//         (error) => {
+//             return setMessage && setMessage(error.message);
+//         },
+//         { enableHighAccuracy: false }
+//     );
+// }
 
-export async function getAndSetLocation(setLocation: (loc: [number, number, number]) => void, setMessage?: React.Dispatch<SetStateAction<string>>) {
-    const hasPermission = await requestLocationPermission();
-    let localloc: number[] | null = null;
-    if (!hasPermission) {
-        setMessage && setMessage('Using Approximate Location')
-        await getandsetCoarseLocation(setLocation, setMessage);
-        return;
-    }
-    Geolocation.getCurrentPosition(
+// export async function getAndSetLocation(setLocation: (loc: [number, number, number]) => void, setMessage?: React.Dispatch<SetStateAction<string>>) {
+//     const hasPermission = await requestLocationPermission();
+//     let localloc: number[] | null = null;
+//     if (!hasPermission) {
+//         setMessage && setMessage('Using Approximate Location')
+//         await getandsetCoarseLocation(setLocation, setMessage);
+//         return;
+//     }
+//     Geolocation.getCurrentPosition(
 
-        (position) => {
-            const loc: [number, number, number] = [
-                position.coords.longitude,
-                position.coords.latitude,
-                position.coords.accuracy
-            ];
-            setLocation(loc);
-            localloc = loc
-        },
-        (error) => {
-            console.log(error)
-            setMessage && setMessage(error.message);
-        },
-        { enableHighAccuracy: true, timeout: 10000, maximumAge: 10000 }
-    );
-    return localloc
-}
+//         (position) => {
+//             const loc: [number, number, number] = [
+//                 position.coords.longitude,
+//                 position.coords.latitude,
+//                 position.coords.accuracy
+//             ];
+//             setLocation(loc);
+//             localloc = loc
+//         },
+//         (error) => {
+//             console.log(error)
+//             setMessage && setMessage(error.message);
+//         },
+//         { enableHighAccuracy: true, timeout: 10000, maximumAge: 10000 }
+//     );
+//     return localloc
+// }

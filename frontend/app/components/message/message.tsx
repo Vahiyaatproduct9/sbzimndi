@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View } from 'react-native';
-import React, { SetStateAction } from 'react';
+import React, { ReactNode, SetStateAction } from 'react';
 import theme from '../../../colors/ColorScheme.ts';
 import { useEffect, useState } from 'react';
 // import Animated from 'react-native-reanimated';

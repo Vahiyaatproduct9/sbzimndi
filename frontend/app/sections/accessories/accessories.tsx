@@ -7,6 +7,7 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Octicons from 'react-native-vector-icons/Octicons';
 import theme from '../../../colors/ColorScheme';
 import { useNavigation } from '@react-navigation/native';
+import Feather from 'react-native-vector-icons/Feather';
 import { tabs } from '../../../types/types';
 const Accessories = ({
   profile,
@@ -43,19 +44,28 @@ const Accessories = ({
         style={css.box}
         onPress={() => navigation.navigate('Messages' as never)}
       >
-        <MaterialIcons name="message" size={28} color={theme.text} />
+        <MaterialIcons name="message" style={css.icons} />
       </Pressable>
       <Pressable
         style={css.box}
         onPress={() => navigation.navigate('Orders' as never)}
       >
-        <Octicons name="gift" size={28} color={theme.text} />
+        <Octicons name="gift" style={css.icons} />
+      </Pressable>
+      <Pressable
+        style={css.box}
+        onPress={() => {
+          navigation.navigate('Cart' as never);
+          console.log('Kishor')
+        }}
+      >
+        <Feather name="shopping-cart" style={css.icons} />
       </Pressable>
       <Pressable
         style={css.box}
         onPress={() => navigation.navigate('Notifications' as never)}
       >
-        <Ionicons name="notifications" size={28} color={theme.text} />
+        <Ionicons name="notifications" style={css.icons} />
       </Pressable>
     </View>
   );

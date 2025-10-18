@@ -47,11 +47,13 @@ export default StyleSheet.create({
         flexDirection: 'row',
         overflow: 'hidden',
         gap: 10,
-        marginBottom: 10
+        marginBottom: 10,
+        padding: 10
     },
     blockImage: {
-        height: 100, width: 100,
-        objectFit: 'cover',
+        height: 100,
+        width: 100,
+        borderRadius: 20
     },
     blockInfo: {
         padding: 10,

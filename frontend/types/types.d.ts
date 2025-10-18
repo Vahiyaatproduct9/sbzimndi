@@ -136,3 +136,27 @@ export interface Message {
     created_at: Date | string;
     read: boolean;
 }
+export type Item = {
+    id: string;
+    name: string;
+    description: string;
+    quantity: string;
+    price: number;
+    expiry_date: string;
+    latitude: number;
+    longitude: number;
+    user_id: string;
+    created_at: string;
+    image_url: string;
+    accuracy: number;
+    location: string;
+    bought_by: string | null;
+    bought_at: string | null;
+    distance_meters: number;
+};
+
+export type SearchResult = {
+    item: Item;
+    refIndex: number;
+    score: number;
+};

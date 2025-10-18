@@ -6,7 +6,7 @@ import {
   FlatList,
   Pressable,
 } from 'react-native';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import Theme from '../../../colors/ColorScheme.ts';
 import Card from '../../components/Card/card.tsx';
 import AntDesign from 'react-native-vector-icons/AntDesign';
@@ -14,13 +14,15 @@ import Animated, {
   withSpring,
   useSharedValue,
   withDelay,
+  useAnimatedStyle,
 } from 'react-native-reanimated';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Message from '../../components/message/message.tsx';
 import { useNavigation } from '@react-navigation/native';
 import getNearestItems from '../../../api/getNearestItems.ts';
-// import { getAndSetLocation } from '../../../api/getLocation.ts';
 import useLocationStore from '../../store/useLocationStore.ts';
+import theme from '../../../colors/ColorScheme.ts';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 const Body = () => {
   const navigation = useNavigation();
@@ -40,6 +42,24 @@ const Body = () => {
     })();
     setFetched(false);
   }, [containerProperty.opacity, containerProperty.top, setLocation]);
+
+  const fetchItems: () => Promise<boolean> = useCallback(async () => {
+    const response = await getNearestItems({
+      longitude: longitude ?? 0,
+      latitude: latitude ?? 0,
+      accuracy: accuracy ?? 0,
+    });
+    if (response.success === true) {
+      setItems(response);
+      await AsyncStorage.setItem(
+        'items',
+        JSON.stringify({ ...response, time: Date.now() }),
+      );
+    } else {
+      setMessage('Please check your Internet Connection before trying again.');
+    }
+    return response.success;
+  }, [accuracy, latitude, longitude]);
   useEffect(() => {
     (async () => {
       try {
@@ -52,40 +72,41 @@ const Body = () => {
             return; // cache still valid
           }
         }
-        const response = await getNearestItems({
-          longitude: longitude ?? 0,
-          latitude: latitude ?? 0,
-          accuracy: accuracy ?? 0,
-        });
-
-        if (response.status === 200) {
-          setItems(response);
-          await AsyncStorage.setItem(
-            'items',
-            JSON.stringify({ ...response, time: Date.now() }),
-          );
-        } else {
-          setMessage(
-            'Please check your Internet Connection before trying again.',
-          );
-        }
+        fetchItems();
       } catch (err) {
         console.log('Error in useEffect:', err);
       }
     })();
-  }, [accuracy, latitude, longitude]);
-
-  useEffect(() => {
-    console.log(items);
-  }, [items]);
+  }, [accuracy, fetchItems, latitude, longitude]);
 
   useEffect(() => {
     items === null ? setFetched(false) : setFetched(true);
+    console.log(items);
   }, [items]);
+  let round = useSharedValue(0);
+  const reload = async () => {
+    console.log('button pressed');
+    const success = await fetchItems();
+    if (success) {
+      round.value = withSpring(360, { stiffness: 100 }, () => {
+        round.value = 0;
+      });
+    }
+  };
+  const roundAnim = useAnimatedStyle(() => ({
+    transform: [{ rotateZ: `${round.value}deg` }],
+  }));
   return (
     <Animated.View style={[css.container, containerProperty]}>
       <Message time={3} content={message} state={setMessage} />
-      <Text style={css.head}>Nearby Picks</Text>
+      <View style={css.header}>
+        <Text style={css.head}>Nearby Picks</Text>
+        <Pressable onPress={() => reload()}>
+          <Animated.View style={roundAnim}>
+            <Ionicons name="reload" size={24} color={theme.text} />
+          </Animated.View>
+        </Pressable>
+      </View>
       {items && typeof items !== 'undefined' ? (
         <View style={css.slider}>
           <FlatList
@@ -156,6 +177,11 @@ const css = StyleSheet.create({
     height: '100%',
     width: 190,
     flexDirection: 'column',
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
   },
   head: {
     color: Theme.text,

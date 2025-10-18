@@ -14,42 +14,59 @@
     "noUnusedParameters": false,
     "noFallthroughCasesInSwitch": true,
     "forceConsistentCasingInFileNames": true,
-
     /* === Output Behavior === */
     "noEmit": true, // Metro handles emit
     "isolatedModules": true, // Ensures Babel compatibility
     "skipLibCheck": true, // Faster builds, safe in RN
-
     /* === Module Resolution === */
     "moduleResolution": "node",
     "module": "esnext",
     "target": "esnext",
-    "lib": ["esnext"],
+    "lib": [
+      "esnext"
+    ],
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "jsx": "react-native",
     "allowJs": false,
-
     /* === Imports & Aliases === */
-    "baseUrl": ".",
-    "paths": {
-      "@/*": ["src/*"],
-      "@assets/*": ["src/assets/*"],
-      "@components/*": ["src/components/*"],
-      "@screens/*": ["src/screens/*"],
-      "@hooks/*": ["src/hooks/*"],
-      "@store/*": ["src/store/*"],
-      "@utils/*": ["src/utils/*"],
-      "@api/*": ["src/api/*"],
-      "@types/*": ["src/types/*"]
-    },
-
+    // "baseUrl": ".",
+    // "paths": {
+    //   "@/*": [
+    //     "src/*"
+    //   ],
+    //   "@assets/*": [
+    //     "src/assets/*"
+    //   ],
+    //   "@components/*": [
+    //     "src/components/*"
+    //   ],
+    //   "@screens/*": [
+    //     "src/screens/*"
+    //   ],
+    //   "@hooks/*": [
+    //     "src/hooks/*"
+    //   ],
+    //   "@store/*": [
+    //     "src/store/*"
+    //   ],
+    //   "@utils/*": [
+    //     "src/utils/*"
+    //   ],
+    //   "@api/*": [
+    //     "src/api/*"
+    //   ],
+    //   "@types/*": [
+    //     "src/types/*"
+    //   ]
+    // },
     /* === Experimental Features === */
     "experimentalDecorators": true,
     "emitDecoratorMetadata": false,
-    "customConditions": ["react-native"],
-
+    "customConditions": [
+      "react-native"
+    ],
     /* === Type Checking Performance === */
     "incremental": true,
     "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo"

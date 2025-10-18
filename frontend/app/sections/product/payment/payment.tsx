@@ -6,7 +6,6 @@ import timeline from '../../../functions/timeline';
 import Message from '../../../components/message/message';
 import { order } from 'types/types';
 import getRelativeDistance from '../../../functions/getRelativeDistance';
-import theme from '../../../../colors/ColorScheme';
 type enhancedOrder = order & {
   distance_meters: number;
   users: {
@@ -46,9 +45,7 @@ const Payment = ({
           </View>
         </View>
         <View style={css.contentContainer}>
-          <Text style={css.contentHeader}>
-            Details
-          </Text>
+          <Text style={css.contentHeader}>Details</Text>
           <View style={css.descriptionBox}>
             <Text style={css.descriptionHead}>Distance: </Text>
             <Text style={css.text}>
@@ -57,15 +54,11 @@ const Payment = ({
           </View>
           <View style={css.descriptionBox}>
             <Text style={css.descriptionHead}>Quantity: </Text>
-            <Text style={css.text}>
-              {item.quantity}
-            </Text>
+            <Text style={css.text}>{item.quantity}</Text>
           </View>
           <View style={css.descriptionBox}>
             <Text style={css.descriptionHead}>Description: </Text>
-            <Text style={css.description}>
-              {item.description}
-            </Text>
+            <Text style={css.description}>{item.description}</Text>
           </View>
         </View>
         <View style={css.note}>
@@ -83,10 +76,9 @@ const Payment = ({
       <PaymentButton
         item={item}
         setMessage={setMessage}
-        textStyle={css.buttonText}
         setPressed={setPressed}
         setActiveTab={setActiveTab}
-        style={[css.paymentButton, pressed && css.pressed]}
+        pressed={pressed}
       />
     </View>
   );

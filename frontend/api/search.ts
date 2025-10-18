@@ -1,3 +1,4 @@
+import { SearchResult } from "../types/types";
 import path from "./path";
 interface prop {
     latitude: number,
@@ -16,6 +17,10 @@ export default async ({ latitude, longitude, query }: prop) => {
             query
         })
     })
-    const data = res.json()
+    const data: Promise<{
+        result: SearchResult[] | null;
+        status: number
+    } | null> = await res.json()
+    console.log('rsuit: ', data)
     return data
 }

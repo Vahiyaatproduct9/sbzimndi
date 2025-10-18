@@ -10,6 +10,7 @@ import Notifications from './options/notifications/notifications';
 import EarnWithSbziMndi from './options/earnWithSbziMndi/earnWithSbziMndi';
 import PrivacyPolicy from './options/privacyPolicy/privacyPolicy';
 import DonateToSbziMndi from './options/donateToSbziMndi/donateToSbziMndi';
+import Feedback from './options/feedback/feedback';
 const Stack = createNativeStackNavigator();
 const Settings = ({ route }: { route: any }) => {
   const { setActiveTab } = route.params;
@@ -59,6 +60,11 @@ const Settings = ({ route }: { route: any }) => {
           name="donate"
           component={DonateToSbziMndi}
           options={{ title: 'Donate Us' }}
+        />
+        <Stack.Screen
+          name="feedback"
+          component={Feedback}
+          options={{ title: 'Feedback' }}
         />
       </Stack.Navigator>
     </NavigationContainer>

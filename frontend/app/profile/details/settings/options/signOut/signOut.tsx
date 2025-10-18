@@ -1,10 +1,14 @@
 import { View, Text, Pressable } from 'react-native';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import css from './signOut.css';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+// import AsyncStorage from '@react-native-async-storage/async-storage';
 import Message from '../../../../../components/message/message';
+
 import { useNavigation } from '@react-navigation/native';
+import { useProfileStore } from '../../../../../store/useProfileStore';
 const SignOut = ({ route }: { route: any }) => {
+
+  const deleteProfilefile = useProfileStore(s => s.deleteProfile)
   const { setActiveTab } = route.params;
   const navigation = useNavigation();
   const sign_out = async () => {
@@ -13,7 +17,7 @@ const SignOut = ({ route }: { route: any }) => {
       setTimeout(() => {
         setActiveTab('home');
       }, 800);
-      await AsyncStorage.clear();
+      await deleteProfilefile()
     } catch (e) {
       setMessage(`${e}`);
     }

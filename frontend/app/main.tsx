@@ -9,6 +9,8 @@ import Messages from './sections/accessories/items/messages/messages';
 import Orders from './sections/accessories/items/orders/orders';
 import Text from './sections/accessories/items/messages/text/text';
 import Details from './profile/details/details_v2';
+import Cart from './sections/accessories/items/cart/cart';
+import theme from '../colors/ColorScheme';
 const Stack = createNativeStackNavigator();
 
 export default function ({
@@ -18,7 +20,9 @@ export default function ({
 }) {
   return (
     <NavigationContainer independent>
-      <Stack.Navigator>
+      <Stack.Navigator
+        screenOptions={{ headerStyle: { backgroundColor: theme.tint } }}
+      >
         <Stack.Screen
           name="Home"
           component={Home as never}
@@ -34,6 +38,11 @@ export default function ({
         <Stack.Screen
           name="Orders"
           component={Orders}
+          options={{ headerShown: true }}
+        />
+        <Stack.Screen
+          name="Cart"
+          component={Cart}
           options={{ headerShown: true }}
         />
         <Stack.Screen
@@ -58,7 +67,7 @@ export default function ({
           name="Text"
           component={Text}
           options={{ headerShown: false }}
-          // initialParams={{ profile }}
+        // initialParams={{ profile }}
         />
       </Stack.Navigator>
     </NavigationContainer>

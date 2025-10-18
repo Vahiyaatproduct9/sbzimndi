@@ -32,7 +32,7 @@ export default async ({ access_token, user_id, fcm_token }) => {
     return {
       success: false,
       message: "No Access Token Provided.",
-      items: null,
+      data: null,
       error: null,
     };
 };

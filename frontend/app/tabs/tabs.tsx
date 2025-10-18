@@ -5,6 +5,8 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import Animation, { useSharedValue, withSpring } from 'react-native-reanimated';
 import { useProfileStore } from '../store/useProfileStore.ts';
 type ActiveTab = 'home' | 'search' | 'add' | 'profile';
+import useLocationStore from '../store/useLocationStore.ts';
+import { requestLocationPermission } from '../../api/getLocation.ts';
 
 interface props {
   active: ActiveTab;
@@ -12,10 +14,17 @@ interface props {
 }
 const Tabs = (props: props) => {
   const refreshProfile = useProfileStore(s => s.refreshProfile);
+  const setLocation = useLocationStore(s => s.setLocation);
   const profile = useProfileStore(s => s.profile);
   useEffect(() => {
+    (async () => {
+      await requestLocationPermission();
+      await setLocation();
+    })();
+  }, [setLocation]);
+  useEffect(() => {
     try {
-      refreshProfile({});
+      (async () => await refreshProfile({}))()
     } catch (error) {
       console.log("Can't refresh profile.");
     }
@@ -25,7 +34,7 @@ const Tabs = (props: props) => {
     const timer = setInterval(async () => {
       await refreshProfile({});
     }, 600000);
-    return clearInterval(timer);
+    return () => { clearInterval(timer) };
   }, [refreshProfile]);
   const animateProperty = {
     width: useSharedValue(20),
@@ -70,7 +79,7 @@ const Tabs = (props: props) => {
             color="#353535ff"
           />
         </Pressable>
-        {profile?.data?.upi_id && (
+        {profile?.data?.upi_id && profile?.data?.user_type === 'seller' && (
           <Pressable onPress={() => props.setActive('add')} style={css.button}>
             <Ionicons
               name={

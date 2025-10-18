@@ -19,13 +19,10 @@ const Profile = ({ setActiveTab }: prop) => {
   useEffect(() => {
     console.log('logged in? ->', profile ? true : false);
   }, [profile]);
-  // const getLocalProfile = async () =>
-  //   await AsyncStorage.getItem('profile').then(res => JSON.parse(res || ''));
   return (
-    // <Details />
     <NavigationContainer>
       <Stack.Navigator>
-        {!profile ? (
+        {!profile?.data ? (
           <>
             <Stack.Screen
               name="Options"
@@ -50,8 +47,6 @@ const Profile = ({ setActiveTab }: prop) => {
             />
           </>
         ) : profile ? (
-          // (async () => await getLocalProfile())() !== null &&
-          // (async () => await getLocalProfile())().length !== 0
           <Stack.Screen
             name="Profile"
             component={ProfileScreen}

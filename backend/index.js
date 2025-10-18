@@ -15,6 +15,7 @@ import getItem from "./api/getItem.js";
 import payment from "./api/payment.js";
 import verifyPayment from "./api/verifyPayment.js";
 import { Readable } from "stream";
+import feedback from './api/feedback.js'
 import signOut from "./api/signOut.js";
 import updateFcn from "./api/updateFcn.js";
 import { WebSocketServer } from "ws";
@@ -24,6 +25,7 @@ import {
   getNotification,
 } from "./api/manageNotification.js";
 import listOrders from "./api/listOrders.js";
+import cart from "./api/listCartItems.js";
 import you_have_a_new_message_notification from "./api/you_have_a_new_message_notification.js";
 // import conversations from "./endponts/conversations.js";
 const port = 8080;
@@ -203,18 +205,9 @@ app.post("/search", async (req, res) => {
 
 app.post("/getItems", async (req, res) => {
   const { latitude, longitude } = req.body;
-  const { data, error } = await read_items({ latitude, longitude });
+  const response = await read_items({ latitude, longitude });
   console.log("Provided location goes", latitude, longitude);
-  if (error || !data)
-    res.status(error.code).json({
-      data: error,
-      status: error.code,
-    });
-  else
-    res.status(200).json({
-      data: data,
-      status: 200,
-    });
+  res.json(response);
 });
 
 app.post("/addpost", upload.single("photo"), async (req, res) => {
@@ -282,6 +275,13 @@ app.post("/get-orders", async (req, res) => {
 });
 
 // ENDS...
+//list cart items
+app.post("/cart/list", async (req, res) => {
+  const { user_id, access_token } = req.body;
+  const response = await cart({ access_token, user_id }).list();
+  res.json(response);
+});
+// Conversations section...
 
 app.post("/conversation/create", async (req, res) => {
   const { access_token, user_id: id_1, reciever_id: id_2, iambuyer } = req.body;
@@ -322,6 +322,12 @@ app.post("/conversation/get", async (req, res) => {
   });
   res.json(response);
 });
+// Feedback section
+app.post('/feedback', async (req, res) => {
+  const { access_token, body, stars } = req.body;
+  const response = await feedback({ access_token, body, stars })
+  res.json(response)
+})
 app.post("/signOut", async (req, res) => {
   const { access_token } = req.body;
   const response = await signOut(access_token);
