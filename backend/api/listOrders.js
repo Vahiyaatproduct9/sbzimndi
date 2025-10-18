@@ -1,6 +1,7 @@
 import getUserfromAccessToken from "../functions/getUserfromAccessToken.js";
 import sbs from "../libs/createAuth.js";
 export default async (access_token) => {
+  console.log("listing Orders ... ");
   if (!access_token)
     return { success: false, data: null, error: "No Access Token Provided" };
   try {

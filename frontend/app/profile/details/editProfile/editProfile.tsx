@@ -26,6 +26,7 @@ import {
   setBio as sb,
 } from '../../../functions/getLocalInfo.ts';
 import updateProfile from '../../../../api/updateProfile.ts';
+import { useProfileStore } from '../../../store/useProfileStore.ts';
 // import Message from '../../../components/message/message.tsx';
 import saveProfilePicture from '../../../functions/saveProfilePicture.ts';
 import saveRole, { getRole } from '../../../functions/toggleRole.ts';
@@ -35,6 +36,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const EditProfile = ({ navigation, route }: any) => {
   const { profile } = route.params;
+  const refreshProfile = useProfileStore(s => s.refreshProfile);
   // const [mess, setMess] = useState<string>('');
   const [uploading, setUploading] = useState<boolean>(false);
   const [spiritAnimal, setSpiritAnimal] = useState<string>('');
@@ -67,8 +69,9 @@ const EditProfile = ({ navigation, route }: any) => {
             cleanPath(`${RNFS.DocumentDirectoryPath}/profile.jpg`),
           );
           console.log('Picked image uri:', res.assets[0].uri);
-          const newPath = `file://${RNFS.DocumentDirectoryPath
-            }/profile.jpg?time=${Date.now()}`;
+          const newPath = `file://${
+            RNFS.DocumentDirectoryPath
+          }/profile.jpg?time=${Date.now()}`;
           console.log('New profile path:', newPath);
           setPhoto(newPath);
         }
@@ -140,12 +143,18 @@ const EditProfile = ({ navigation, route }: any) => {
           await saveRole(toggle ? 'seller' : 'buyer');
           await sn(name);
           await sb(bio);
-
+          await refreshProfile({});
 
           // Only save the new profile picture if we uploaded one
           if (shouldUpload && photo) {
-            const local_image_uri = await saveProfilePicture(cleanPath(photo), 'profile');
-            await AsyncStorage.setItem('profile_picture', local_image_uri || '')
+            const local_image_uri = await saveProfilePicture(
+              cleanPath(photo),
+              'profile',
+            );
+            await AsyncStorage.setItem(
+              'profile_picture',
+              local_image_uri || '',
+            );
           }
 
           // setMess('Profile Updated Successfully!');
@@ -182,8 +191,9 @@ const EditProfile = ({ navigation, route }: any) => {
         await RNFS.exists(`${RNFS.DocumentDirectoryPath}/profile.jpg`).then(
           exists => {
             if (exists) {
-              const path = `file://${RNFS.DocumentDirectoryPath
-                }/profile.jpg?time=${Date.now()}`;
+              const path = `file://${
+                RNFS.DocumentDirectoryPath
+              }/profile.jpg?time=${Date.now()}`;
               console.log('Profile picture path:', path);
               setPhoto(path);
             } else {

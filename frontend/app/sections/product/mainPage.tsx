@@ -22,7 +22,7 @@ const MainPage = ({
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         <Stack.Screen
           name="productPage"
-          component={ProductPage as never}
+          component={ProductPage}
           initialParams={{ id }}
         />
         <Stack.Screen

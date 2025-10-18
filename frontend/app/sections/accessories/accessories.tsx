@@ -8,12 +8,12 @@ import Octicons from 'react-native-vector-icons/Octicons';
 import theme from '../../../colors/ColorScheme';
 import { useNavigation } from '@react-navigation/native';
 import Feather from 'react-native-vector-icons/Feather';
-import { tabs } from '../../../types/types';
+import { Profile, tabs } from '../../../types/types';
 const Accessories = ({
   profile,
   setActiveTab,
 }: {
-  profile: any;
+  profile: Profile;
   setActiveTab: React.Dispatch<React.SetStateAction<tabs>>;
 }) => {
   const navigation = useNavigation();
@@ -46,17 +46,19 @@ const Accessories = ({
       >
         <MaterialIcons name="message" style={css.icons} />
       </Pressable>
-      <Pressable
-        style={css.box}
-        onPress={() => navigation.navigate('Orders' as never)}
-      >
-        <Octicons name="gift" style={css.icons} />
-      </Pressable>
+      {profile.data?.user_type === 'seller' && (
+        <Pressable
+          style={css.box}
+          onPress={() => navigation.navigate('Orders' as never)}
+        >
+          <Octicons name="gift" style={css.icons} />
+        </Pressable>
+      )}
       <Pressable
         style={css.box}
         onPress={() => {
           navigation.navigate('Cart' as never);
-          console.log('Kishor')
+          console.log('Kishor');
         }}
       >
         <Feather name="shopping-cart" style={css.icons} />

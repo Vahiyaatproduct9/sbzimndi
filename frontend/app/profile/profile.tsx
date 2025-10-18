@@ -9,7 +9,7 @@ import ProfileScreen from './profileScreen';
 import MainPage from '../auth/signup/mainPage';
 const Stack = createNativeStackNavigator();
 import { useProfileStore } from '../store/useProfileStore';
-import { tabs } from 'types/types';
+import { tabs } from '../../types/types';
 
 interface prop {
   setActiveTab: React.Dispatch<React.SetStateAction<tabs>>;
@@ -20,7 +20,7 @@ const Profile = ({ setActiveTab }: prop) => {
     console.log('logged in? ->', profile ? true : false);
   }, [profile]);
   return (
-    <NavigationContainer>
+    <NavigationContainer independent>
       <Stack.Navigator>
         {!profile?.data ? (
           <>

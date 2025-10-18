@@ -17,6 +17,7 @@ const Orders = () => {
   const navigation = useNavigation();
   const [orders, setOrders] = useState<null | undefined | orders_bought_by[]>();
   const [message, setMessage] = useState<string>('');
+  const [loading, setLoading] = useState<boolean | null>(null);
   const { setLocation, latitude, longitude, accuracy } = useLocationStore();
   useEffect(() => {
     (async () => {
@@ -28,21 +29,34 @@ const Orders = () => {
   }, [accuracy, latitude, setLocation, longitude]);
 
   useEffect(() => {
+    setLoading(true);
     const fetch_orders = async () => {
-      const local_orders = await AsyncStorage.getItem('orders')
-        .then(res => JSON.parse(res || ''))
-        .catch(e => {
-          console.log('error in orders: ', e);
-          return null;
-        });
-      console.log('local_orders', local_orders);
-      const res = await listOrders();
+      let local_orders;
+      try {
+        local_orders = await AsyncStorage.getItem('orders')
+          .then(res => (res ? JSON.parse(res) : null))
+          .catch(async e => {
+            console.log('error in orders: ', e);
+            await AsyncStorage.removeItem('orders');
+          });
+      } catch (e) {
+        local_orders = null;
+      }
       if (local_orders?.length > 0) setOrders(local_orders);
-      if (res?.success) setOrders(res.data);
-      else setMessage(`${res?.error || 'Some Error occured.'}`);
-      console.log('res from orders: ', res);
+      console.log('local_orders', local_orders);
+      console.log('Running orders ....');
     };
-    fetch_orders();
+    fetch_orders().then(async () => {
+      const res = await listOrders();
+      if (res?.success) {
+        setOrders(res.data);
+        setLoading(null);
+      } else {
+        setMessage(`${res?.error || 'Some Error occured.'}`);
+        setLoading(false);
+      }
+      console.log('res from orders: ', res);
+    });
   }, []);
   useEffect(() => console.log('orders:', orders), [orders]);
   const startConversation = async ({
@@ -132,10 +146,12 @@ const Orders = () => {
       <Message state={setMessage} content={message} time={3} />
       {orders && orders.length > 0 ? (
         blocks()
-      ) : orders?.length === 0 ? (
-        <Text style={css.bold}>No Orders Yet.</Text>
-      ) : (
+      ) : loading === false ? (
+        <Text style={css.bold}>Something went Wrong! X{'('}</Text>
+      ) : loading === true ? (
         <Text style={css.bold}>Loading...</Text>
+      ) : (
+        <Text style={css.bold}>Hang on.. No Orders Yet...</Text>
       )}
     </ScrollView>
   );

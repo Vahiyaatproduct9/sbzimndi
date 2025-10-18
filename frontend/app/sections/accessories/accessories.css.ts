@@ -25,7 +25,7 @@ export default StyleSheet.create({
     backgroundColor: theme.extra
   },
   profile: {
-    flex: 6
+    flex: 4
   },
   profile_box: {
     justifyContent: 'center',

@@ -15,7 +15,7 @@ import getItem from "./api/getItem.js";
 import payment from "./api/payment.js";
 import verifyPayment from "./api/verifyPayment.js";
 import { Readable } from "stream";
-import feedback from './api/feedback.js'
+import feedback from "./api/feedback.js";
 import signOut from "./api/signOut.js";
 import updateFcn from "./api/updateFcn.js";
 import { WebSocketServer } from "ws";
@@ -265,13 +265,12 @@ app.post("/update-fcm", async (req, res) => {
 
 // LIST ORDERS HERE ...
 
-app.post("/get-orders", async (req, res) => {
+app.post("/getOrders", async (req, res) => {
   const { access_token } = req.body;
-  if (access_token && access_token.length > 0)
-    console.log("access token recieved.");
-  else console.log("no access token");
   const response = await listOrders(access_token);
   res.json(response);
+  // console.log("running");
+  // res.json({ success: false });
 });
 
 // ENDS...
@@ -323,11 +322,11 @@ app.post("/conversation/get", async (req, res) => {
   res.json(response);
 });
 // Feedback section
-app.post('/feedback', async (req, res) => {
+app.post("/feedback", async (req, res) => {
   const { access_token, body, stars } = req.body;
-  const response = await feedback({ access_token, body, stars })
-  res.json(response)
-})
+  const response = await feedback({ access_token, body, stars });
+  res.json(response);
+});
 app.post("/signOut", async (req, res) => {
   const { access_token } = req.body;
   const response = await signOut(access_token);

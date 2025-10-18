@@ -4,7 +4,7 @@ import css from './payment.css';
 import PaymentButton from './paymentButton/paymentButton';
 import timeline from '../../../functions/timeline';
 import Message from '../../../components/message/message';
-import { order } from 'types/types';
+import { order } from '../../../../types/types';
 import getRelativeDistance from '../../../functions/getRelativeDistance';
 type enhancedOrder = order & {
   distance_meters: number;
