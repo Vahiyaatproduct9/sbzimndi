@@ -19,6 +19,7 @@ import getRelativeDay from '../functions/timeline.ts';
 import getRelativeDistance from '../functions/getRelativeDistance.ts';
 import Message from '../components/message/message.tsx';
 import { SearchResult } from '../../types/types';
+import distanceColor from '../functions/distanceColor.ts';
 const Search = () => {
   const { setLocation, latitude, longitude } = useLocationStore();
   const [searchContent, setSearchContent] = useState<string>('');
@@ -90,14 +91,26 @@ const Search = () => {
             />
             <View style={css.blockInfo}>
               <View style={css.blockInfoHead}>
-                <Text style={css.blockText}>{item.item.name}</Text>
+                <View>
+                  <Text style={css.itemName}>{item.item.name}</Text>
+                  <Text style={css.expiryDate}>
+                    Expires {getRelativeDay(item.item.expiry_date)}
+                  </Text>
+                </View>
+                <Text style={css.price}>₹{item.item.price}</Text>
               </View>
               <View style={css.blockInfoInfo}>
-                <Text style={css.blockText}>${item.item.price}</Text>
-                <Text style={css.blockText}>
-                  Expires {getRelativeDay(item.item.expiry_date)}
+                <Text style={css.dateUploaded}>
+                  {getRelativeDay(item.item.created_at)}
                 </Text>
-                <Text style={css.blockText}>
+                <Text
+                  style={[
+                    css.blockText,
+                    {
+                      color: distanceColor(item.item.distance_meters),
+                    },
+                  ]}
+                >
                   {getRelativeDistance(item.item.distance_meters)}
                 </Text>
               </View>

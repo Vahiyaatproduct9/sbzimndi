@@ -56,25 +56,40 @@ export default StyleSheet.create({
         borderRadius: 20
     },
     blockInfo: {
-        padding: 10,
         height: '100%',
         flex: 1,
+        flexDirection: 'row',
         boxSizing: 'border-box'
     },
     blockInfoHead: {
-        width: '100%',
         // backgroundColor: 'red',
+        padding: 10,
         flex: 1,
-        justifyContent: 'center',
+        justifyContent: 'space-between'
     },
     blockInfoInfo: {
         flex: 1,
-        flexDirection: 'row',
         justifyContent: 'space-between',
-        paddingTop: 25
+        alignItems: 'flex-end'
     },
     blockText: {
         fontWeight: 600,
         color: dark ? `rgba(255,255,255,0.6)` : `rgba(0,0,0,0.6)`
+    },
+    itemName: {
+        color: theme.text,
+        fontWeight: '600',
+        fontSize: 19
+    }, expiryDate: {
+        color: dark ? `rgba(255,255,255,0.6)` : `rgba(0,0,0,0.6)`,
+        fontSize: 12
+    },
+    price: {
+        color: theme.text,
+        fontSize: 18,
+        fontWeight: '500'
+    }, dateUploaded: {
+        color: dark ? `rgba(255,255,255,0.6)` : `rgba(0,0,0,0.6)`,
+        fontSize: 12
     }
 })
