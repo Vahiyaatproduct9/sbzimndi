@@ -8,6 +8,8 @@ frontend/.env*
 backend/.env*
 backend/test.js
 backend/api/test.js
+backend/**/serviceAccountKey.json
+**/serviceAccountKey.json
 **/dist/
 **/build/
 **/out/
@@ -39,7 +41,7 @@ backend/api/test.js
 
 # Node dependencies
 backend/libs/serviceAccountKey.json
-
+frontend/android/app/sbzimndi.keystore
 frontend/node_modules/
 frontend/android/app/google-services.json
 frontend/dist/

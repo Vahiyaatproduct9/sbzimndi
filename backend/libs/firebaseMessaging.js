@@ -8,6 +8,7 @@ const __dirname = path.dirname(__filename);
 
 const serviceAccountPath = path.join(__dirname, "serviceAccountKey.json");
 const serviceAccount = JSON.parse(fs.readFileSync(serviceAccountPath, "utf8"));
+if (!serviceAccount) serviceAccount = JSON.parse(process.env.FIREBASE_SECRET_KEY)
 if (!admin.apps.length) {
   admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
