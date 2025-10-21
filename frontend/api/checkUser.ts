@@ -13,7 +13,7 @@ export default async function ({ access_token, refresh_token }: { access_token?:
         }
     }
     const value = isAccessTokenExpired(access_token ?? local_access_token)
-    if (!value) return {
+    if (value > 10) return {
         access_token,
         refresh_token
     }
@@ -26,23 +26,20 @@ export default async function ({ access_token, refresh_token }: { access_token?:
         console.log('Getting new access_token!')
         const response = await res.json()
         console.log('response form  checkUser: ', response)
-        if (response.access_token && response.refresh_token) {
+        if (response.session.access_token && response.session.refresh_token) {
 
             await setAccessToken(response.access_token)
             await setRefreshToken(response.refresh_token)
         }
         console.log(response)
-        if (response.status === 200) return {
-            access_token: response.access_token,
-            refresh_token: response.refresh_token,
-            message: 'Session Renewed!',
-            success: true
-        }
-        else return {
-            access_token: null,
-            refresh_token: null,
-            message: 'Some Error Occured ',
-            success: false
+        if (response.success) {
+            return {
+                access_token: response.session.access_token,
+                refresh_token: response.session.refresh_token,
+                ...response
+            }
+        } else {
+            return { access_token, refresh_token, ...response }
         }
     }
 }

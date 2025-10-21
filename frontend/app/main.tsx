@@ -11,6 +11,8 @@ import Text from './sections/accessories/items/messages/text/text';
 import Details from './profile/details/details_v2';
 import Cart from './sections/accessories/items/cart/cart';
 import theme from '../colors/ColorScheme';
+import OrderConfirmed from './sections/accessories/items/orders/confirmed/OrderConfirmed';
+import OTP from './sections/accessories/items/orders/orderOTP/otp.tsx';
 const Stack = createNativeStackNavigator();
 
 export default function ({
@@ -21,7 +23,13 @@ export default function ({
   return (
     <NavigationContainer independent>
       <Stack.Navigator
-        screenOptions={{ headerStyle: { backgroundColor: theme.tint } }}
+        screenOptions={{
+          headerStyle: { backgroundColor: theme.tint },
+
+          headerTitleStyle: {
+            color: theme.text,
+          },
+        }}
       >
         <Stack.Screen
           name="Home"
@@ -51,6 +59,22 @@ export default function ({
           options={{ headerShown: true }}
         />
         <Stack.Screen
+          name="OrderOTP"
+          component={OTP}
+          options={{
+            headerShown: true,
+            title: 'Order Confirmation',
+          }}
+        />
+        <Stack.Screen
+          name="Confirmed"
+          component={OrderConfirmed}
+          options={{
+            headerShown: false,
+            title: 'Confirmed',
+          }}
+        />
+        <Stack.Screen
           name="Product"
           options={{
             title: 'Details',
@@ -67,7 +91,7 @@ export default function ({
           name="Text"
           component={Text}
           options={{ headerShown: false }}
-        // initialParams={{ profile }}
+          // initialParams={{ profile }}
         />
       </Stack.Navigator>
     </NavigationContainer>

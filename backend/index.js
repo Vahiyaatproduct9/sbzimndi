@@ -27,6 +27,9 @@ import {
 import listOrders from "./api/listOrders.js";
 import cart from "./api/listCartItems.js";
 import you_have_a_new_message_notification from "./api/you_have_a_new_message_notification.js";
+import orderOTP from "./mailTemplates/orderOTP.js";
+import sendOrderOTP from "./api/sendOrderOTP.js";
+import checkOrderOTP from "./api/checkOrderOTP.js";
 // import conversations from "./endponts/conversations.js";
 const port = 8080;
 const app = express();
@@ -180,20 +183,8 @@ app.post("/verify", async (req, res) => {
 
 app.post("/extendToken", async (req, res) => {
   const { refresh_token } = req.body;
-  const { data, error } = await extendToken(refresh_token);
-  if (data.session) {
-    return res.json({
-      status: 200,
-      access_token: data.session.access_token,
-      refresh_token: data.session.refresh_token,
-      success: true,
-    });
-  } else
-    return res.json({
-      status: error ? error.status : 400,
-      ...error,
-      success: false,
-    });
+  const response = await extendToken(refresh_token);
+  res.json(response);
 });
 
 app.post("/search", async (req, res) => {
@@ -269,8 +260,6 @@ app.post("/getOrders", async (req, res) => {
   const { access_token } = req.body;
   const response = await listOrders(access_token);
   res.json(response);
-  // console.log("running");
-  // res.json({ success: false });
 });
 
 // ENDS...
@@ -321,6 +310,22 @@ app.post("/conversation/get", async (req, res) => {
   });
   res.json(response);
 });
+// Order OTP
+
+app.post("/orderOtp", async (req, res) => {
+  console.log("RUnning otp");
+  const { item_id } = req.body;
+  const response = await sendOrderOTP({ item_id });
+  res.json(response);
+});
+
+app.post("/checkOtp", async (req, res) => {
+  console.log("checking otp");
+  const body = req.body;
+  const response = await checkOrderOTP(body);
+  res.json(response);
+});
+
 // Feedback section
 app.post("/feedback", async (req, res) => {
   const { access_token, body, stars } = req.body;

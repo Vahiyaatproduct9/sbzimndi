@@ -54,7 +54,7 @@ export default ({ setActiveTab }: prop) => {
   };
   useEffect(() => {
     const checkandValidateUser = async () => {
-      const res = await checkUser();
+      const res = await checkUser({});
       await AsyncStorage.setItem('access_token', res.access_token);
       await AsyncStorage.setItem('refresh_token', res.refresh_token);
       if (

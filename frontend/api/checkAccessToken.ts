@@ -8,9 +8,9 @@ export default function isAccessTokenExpired(token: string) {
         // `exp` is in seconds, Date.now() is in ms
         const expiryTime = payload.exp * 1000;
         console.log('Mins left =>', (expiryTime - Date.now()) / 60000)
-        return Date.now() >= expiryTime;
+        return (expiryTime - Date.now()) / 60000;
     } catch (e) {
         console.error('Invalid token format', e);
-        return true; // treat as expired if can't decode
+        return 0; // treat as expired if can't decode
     }
 }

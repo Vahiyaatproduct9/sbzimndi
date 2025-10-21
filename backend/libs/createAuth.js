@@ -1,5 +1,7 @@
 import { configDotenv } from "dotenv";
-configDotenv();
+configDotenv({
+  quiet: true,
+});
 import { createClient } from "@supabase/supabase-js";
 
-export default createClient(process.env.supabaseUrl, process.env.supabaseSso)
+export default createClient(process.env.supabaseUrl, process.env.supabaseSso);

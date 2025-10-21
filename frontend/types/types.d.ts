@@ -29,6 +29,7 @@ export interface order {
     price: number;
     quantity: string;
     user_id: string;
+    order_otp: string;
 }
 interface users_bought_by {
     full_name: string;

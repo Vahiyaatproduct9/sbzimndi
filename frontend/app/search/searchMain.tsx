@@ -27,6 +27,7 @@ const Search = () => {
   const [searchContent, setSearchContent] = useState<string>('');
   const [searchResult, setSearchResult] = useState<SearchResult[] | null>(null);
   const [mess, setMess] = useState<string>('');
+  const [loading, setLoading] = useState<boolean | null>(null);
   const searchBarProperty = {
     width: useSharedValue(0),
     opacity: useSharedValue(0),
@@ -65,15 +66,24 @@ const Search = () => {
     // the real search function
     const timer = setTimeout(() => {
       if (searchContent.length > 2) {
-        const res = async () =>
-          await search({
+        const res = async () => {
+          setLoading(true);
+          const result: {
+            result: SearchResult[] | null;
+            status: number;
+          } | null = await search({
             longitude: longitude ?? 0,
             latitude: latitude ?? 0,
             query: searchContent,
-          }).then(result => {
-            setSearchResult(result?.status === 200 ? result?.result : null);
-            console.log('searchResult -> ', result);
           });
+          if (result?.status === 200) {
+            setSearchResult(result.result);
+            setLoading(null);
+          } else {
+            setSearchResult([]);
+            setLoading(false);
+          }
+        };
         res();
       }
       console.log(searchResult);
@@ -128,8 +138,14 @@ const Search = () => {
           </Pressable>
         );
       })
+    ) : loading === true ? (
+      <Text style={css.notice}>Loading..</Text>
+    ) : loading === false ? (
+      <Text style={css.notice}>Something went wrong X(</Text>
+    ) : loading === null && searchContent.length === 0 ? (
+      <Text style={css.notice}>Search to get Started</Text>
     ) : (
-      <Text>Nothing to show here {':('}</Text>
+      <Text style={css.notice}>No Results :(</Text>
     );
   };
 

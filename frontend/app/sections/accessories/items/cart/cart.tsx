@@ -81,7 +81,7 @@ const Cart = () => {
           <View key={i} style={css.block}>
             <View style={css.imageContainer}>
               <Image
-                source={require('../../../../../assets/images/sky.png')}
+                source={{ uri: cartItem.image_url }}
                 style={css.image}
               />
             </View>

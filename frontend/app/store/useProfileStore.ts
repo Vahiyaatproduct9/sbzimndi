@@ -2,8 +2,7 @@ import { createJSONStorage, persist } from "zustand/middleware";
 import { create } from "zustand";
 import { Profile } from "../../types/types";
 import getProfile from "../../api/getProfile";
-// import AsyncStorage from "@react-native-async-storage/async-storage";
-import checkUser from "../../api/checkUser";
+import extendToken from '../../api/extendToken'
 import {
   getAccessToken,
   getRefreshToken,
@@ -57,7 +56,7 @@ export const useProfileStore = create<useProfileStore>()(
         let new_refresh_token: string | null = null;
 
         try {
-          const { access_token: nat, refresh_token: nrt, success } = await checkUser({
+          const { data, error, success } = await extendToken({
             access_token:
               access_token ??
               (oldAccessToken && oldAccessToken.length > 0 ? oldAccessToken : null),
@@ -65,15 +64,17 @@ export const useProfileStore = create<useProfileStore>()(
               refresh_token ??
               (oldRefreshToken && oldRefreshToken.length > 0 ? oldRefreshToken : null),
           });
-
-          new_access_token = nat;
-          new_refresh_token = nrt;
-          await setAccessToken(nat || oldAccessToken)
-          await setRefreshToken(nrt || oldRefreshToken)
+          if (error) {
+            console.log('Error while refreshing token:', error)
+          }
+          new_access_token = data.session.access_token;
+          new_refresh_token = data.session.refresh_token;
+          await setAccessToken((success ? new_access_token : oldAccessToken) || oldAccessToken)
+          await setRefreshToken((success ? new_refresh_token : oldRefreshToken) || oldRefreshToken)
           const res = await getProfile({
-            access_token: success ? nat : access_token,
+            access_token: success ? new_access_token : access_token,
           });
-          if (res?.success) await AsyncStorage.setItem('profile', JSON.stringify(res || ''))
+          if (res?.success && res?.data) await AsyncStorage.setItem('profile', JSON.stringify(res ?? ''))
           set({ profile: res });
         } catch (err) {
           console.log('Error in useProfileStore:', err);
