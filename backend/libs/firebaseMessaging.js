@@ -1,14 +1,15 @@
-import path from "path";
-import { fileURLToPath } from "url";
-import fs from "fs";
+// import path from "path";
+// import { fileURLToPath } from "url";
+// import fs from "fs";
 import admin from "firebase-admin";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// const __filename = fileURLToPath(import.meta.url);
+// const __dirname = path.dirname(__filename);
 
-const serviceAccountPath = path.join(__dirname, "serviceAccountKey.json");
-const serviceAccount = JSON.parse(fs.readFileSync(serviceAccountPath, "utf8"));
-if (!serviceAccount) serviceAccount = JSON.parse(process.env.FIREBASE_SECRET_KEY)
+// const serviceAccountPath = path.join(__dirname, "serviceAccountKey.json");
+// const serviceAccount = JSON.parse(fs.readFileSync(serviceAccountPath, "utf8"));
+const serviceAccount = JSON.parse(process.env.FIREBASE_SECRET_KEY);
+// if (!serviceAccount) serviceAccount = JSON.parse(process.env.FIREBASE_SECRET_KEY)
 if (!admin.apps.length) {
   admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
