@@ -5,8 +5,8 @@ export default class {
   public openConnection;
   public closeConnection;
   constructor(props: { conversation_id: string; state: React.Dispatch<React.SetStateAction<Message[] | null | undefined>> }) {
-    // const wss = new WebSocket(`ws://localhost:9000?conversation_id=${props.conversation_id}`);
-    const wss = new WebSocket(`wss://sbzimndi.onrender.com?conversation_id=${props.conversation_id}`);
+    // const wss = new WebSocket(`ws://localhost:9000/?conversation_id=${props.conversation_id}`);
+    const wss = new WebSocket(`wss://sbzimndi.onrender.com/?conversation_id=${props.conversation_id}`);
     this.openConnection = async function () {
 
       wss.onopen = () => {

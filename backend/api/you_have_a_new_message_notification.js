@@ -53,7 +53,7 @@ export default (clients) => {
               data: { conversation_id: payload.new.conversation_id },
             };
 
-            if (receiver[0].notification_on)
+            if (receiver.notification_on)
               await postNotification({
                 fcm_token: receiver.fcm_token,
                 notification,
