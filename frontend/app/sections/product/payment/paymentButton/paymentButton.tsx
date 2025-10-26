@@ -7,13 +7,11 @@ import rzpCheckout from 'react-native-razorpay';
 import verifyPayment from '../../../../../api/verifyPayment';
 import {
   getAccessToken,
-  getEmail,
-  getName,
-  getPhone,
   getRefreshToken,
 } from '../../../../functions/getLocalInfo';
 import css from '../payment.css';
-import { tabs } from 'types/types';
+import { tabs } from '../../../../../types/types';
+import { useProfileStore } from '../../../../store/useProfileStore';
 
 const PaymentButton = ({
   setMessage,
@@ -30,14 +28,13 @@ const PaymentButton = ({
   pressed: boolean;
   item: any;
 }) => {
+  const profile = useProfileStore(s => s.profile);
+  const access_token = useProfileStore(s => s.access_token);
   const [processing, setProcessing] = useState<boolean>(false);
   const handleSubmit = async () => {
-    const access_token = await getAccessToken().then(res =>
-      res !== null ? res : '',
-    );
-    const Pname = await getName();
-    const email = await getEmail();
-    const contact = await getPhone();
+    const Pname = profile?.data?.full_name;
+    const email = profile?.data?.email;
+    const contact = profile?.data?.phone_number;
     if ((await getRefreshToken()) === '' || (await getAccessToken()) === '') {
       setMessage('Please Login to buy a product.');
       setTimeout(() => setActiveTab('profile'), 1800);
@@ -69,8 +66,8 @@ const PaymentButton = ({
       const result = await rzpCheckout.open(options);
       console.log({ result, access_token });
       const { success, message } = await verifyPayment({
-        result,
-        access_token,
+        result: result as any,
+        access_token: access_token ?? '',
       });
       setMessage(message);
       if (success) {

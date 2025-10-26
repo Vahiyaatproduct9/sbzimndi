@@ -34,8 +34,8 @@ export default (clients) => {
             .from("conversations")
             .select(
               `id, buyer_id, seller_id,
-              conversations_buyer_id_fkey(id, full_name, fcm_token),
-              conversations_seller_id_fkey(id, full_name, fcm_token)`
+              conversations_buyer_id_fkey(id, full_name, fcm_token, notification_on),
+              conversations_seller_id_fkey(id, full_name, fcm_token, notification_on)`
             )
             .eq("id", payload.new.conversation_id)
             .single();
@@ -53,10 +53,11 @@ export default (clients) => {
               data: { conversation_id: payload.new.conversation_id },
             };
 
-            await postNotification({
-              fcm_token: receiver.fcm_token,
-              notification,
-            });
+            if (receiver[0].notification_on)
+              await postNotification({
+                fcm_token: receiver.fcm_token,
+                notification,
+              });
             await addInNotificationTable({
               user_id: receiver.id,
               notification,

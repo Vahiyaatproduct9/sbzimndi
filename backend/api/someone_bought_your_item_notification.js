@@ -28,20 +28,26 @@ export default async () => {
               newRow,
             },
           };
+          const { data } = await sbs
+            .from("users")
+            .select("fcm_token, notfication_on")
+            .eq("id", newRow.user_id)
+            .single();
           const { success, id } = await addInNotificationTable({
             user_id: newRow.user_id,
             notification,
           });
-          await postNotification({
-            user_id: newRow.user_id,
-            notification: {
-              ...notification,
-              data: {
-                ...notification.data,
-                notification_id: success === true ? id : "NA",
+          if (data?.notfication_on)
+            await postNotification({
+              fcm_token: data?.fcm_token,
+              notification: {
+                ...notification,
+                data: {
+                  ...notification.data,
+                  notification_id: success === true ? id : "NA",
+                },
               },
-            },
-          });
+            });
         }
       }
     )

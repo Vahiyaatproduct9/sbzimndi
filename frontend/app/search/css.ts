@@ -1,4 +1,4 @@
-import { StyleSheet } from 'react-native'
+import { StyleSheet, useWindowDimensions } from 'react-native'
 import theme, { dark } from '../../colors/ColorScheme.ts'
 export default StyleSheet.create({
   container: {
@@ -12,13 +12,6 @@ export default StyleSheet.create({
     flexDirection: 'row',
     padding: 10,
     gap: 10
-  },
-  notice: {
-    textAlign: 'center',
-    color: theme.text,
-    fontSize: 20,
-    paddingVertical: 30,
-    fontWeight: '600'
   },
   textInput: {
     flex: 1,
@@ -39,6 +32,25 @@ export default StyleSheet.create({
     borderRadius: 400,
     borderWidth: 1,
     borderColor: theme.text
+  },
+  noticeContainer: {
+    width: '100%',
+    position: 'absolute',
+    padding: 10,
+    gap: 20
+  },
+  notice: {
+    textAlign: 'center',
+    color: theme.text,
+    fontSize: 20,
+    textAlignVertical: 'center',
+    fontWeight: '600',
+  },
+  icon: {
+    color: theme.text,
+    fontSize: 40,
+    textAlignVertical: 'center',
+    textAlign: 'center'
   },
   body: {
     padding: 10,

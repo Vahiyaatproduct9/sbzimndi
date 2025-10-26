@@ -1,6 +1,6 @@
 import { createJSONStorage, persist } from "zustand/middleware";
 import { create } from "zustand";
-import { Profile } from "../../types/types";
+import { Profile, User } from "../../types/types";
 import getProfile from "../../api/getProfile";
 import extendToken from '../../api/extendToken'
 import {
@@ -22,6 +22,7 @@ interface useProfileStore {
     setMessage?: React.Dispatch<React.SetStateAction<string>> | null
   }
   ) => Promise<void>;
+  changeProfile: (obj: Partial<User> | null) => void;
   deleteProfile: () => Promise<void>;
 }
 const localStorage = () => {
@@ -86,6 +87,17 @@ export const useProfileStore = create<useProfileStore>()(
         }
         console.log('profile from useProfileStore:', get().profile);
       },
+      changeProfile: (obj) => {
+        const prev = get().profile;
+        set({
+          profile: {
+            ...prev,
+            data: { ...(prev?.data ?? {}), ...obj } as User,
+          },
+        });
+      },
+
+
       deleteProfile: async () => {
         await AsyncStorage.removeItem("profile");
         set({ profile: null });

@@ -4,6 +4,7 @@ import css from './css.ts';
 import Message from '../../../../../components/message/message.tsx';
 import checkOrderOTP from '../../../../../../api/checkOrderOTP';
 import { useNavigation } from '@react-navigation/native';
+import sendOrderOTP from '../../../../../../api/sendOrderOTP.ts';
 
 const Otp = ({ route }: any) => {
   const navigation = useNavigation();
@@ -12,6 +13,7 @@ const Otp = ({ route }: any) => {
   const [otp, setOtp] = useState<string>('');
   const [message, setMessage] = useState<string>('');
   const [loading, setLoading] = useState<boolean | null>(null);
+  const [isResend, setResend] = useState<boolean | null>(null);
   const handleSubmit = async () => {
     setLoading(true);
     if (otp.length !== 6) {
@@ -33,6 +35,14 @@ const Otp = ({ route }: any) => {
     verifyOtp();
     // setLoading(false);
   };
+  const resend = async () => {
+    setResend(true);
+    const res = await sendOrderOTP(item_id);
+    if (res.success) {
+      setResend(null);
+    } else setResend(false);
+    setMessage(res.message);
+  };
   return (
     <View style={css.container}>
       <Message content={message} time={3} state={setMessage} />
@@ -46,6 +56,15 @@ const Otp = ({ route }: any) => {
           keyboardType="number-pad"
           placeholder="Enter OTP"
         />
+        <Pressable style={css.resend} onPress={resend}>
+          <Text style={css.resendTxt}>
+            {isResend === null
+              ? 'Resend OTP?'
+              : isResend === false
+              ? 'Try again!'
+              : 'Sending...'}
+          </Text>
+        </Pressable>
         <View style={css.buttonView}>
           <Pressable
             style={[

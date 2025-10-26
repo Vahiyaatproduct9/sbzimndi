@@ -1,5 +1,4 @@
 // utils/handleSubmit.ts
-import { getAndSetLocation } from "../../api/getLocation";
 import addItem from "../../api/addItem";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -9,10 +8,11 @@ type Props = {
     name: string;
     date: Date;
     quantity: string;
-    location: number[] | null;
+    latitude: number | null;
+    longitude: number | null;
+    accuracy: number | null;
     price: string;
     desc: string;
-    setLocation: React.Dispatch<React.SetStateAction<number[] | null>>;
     setMess: React.Dispatch<React.SetStateAction<string>>;
     setActiveTab: React.Dispatch<
         React.SetStateAction<"home" | "search" | "add" | "profile">
@@ -25,10 +25,11 @@ export default async function handleSubmit({
     name,
     date,
     quantity,
-    location,
+    latitude,
+    longitude,
+    accuracy,
     price,
     desc,
-    setLocation,
     setMess,
     setActiveTab,
 }: Props) {
@@ -44,12 +45,6 @@ export default async function handleSubmit({
         setTimeout(() => setActiveTab("profile"), 1500);
         return;
     }
-
-    if (!location) {
-        await getAndSetLocation(setLocation, setMess);
-        return; // wait for location update first
-    }
-
     let data = new FormData();
     data.append("photo", {
         uri: photo,
@@ -65,12 +60,19 @@ export default async function handleSubmit({
             expiryDate: date,
             quantity,
             desc,
-            location, // [long, lat, accuracy]
+            longitude,
+            latitude,
+            accuracy,
             access_token,
         })
     );
 
     setPosted(null); // disable button during submission
-    const res = await addItem(data);
-    setPosted(res);
+    const res: {
+        success: boolean;
+        message: string | null;
+        error: any
+    } = await addItem(data);
+    setPosted(res.success);
+    setMess(res.message || '')
 }

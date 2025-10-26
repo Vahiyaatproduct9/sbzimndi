@@ -1,3 +1,5 @@
+import { spiritType } from "../../types/types"
+
 const sparrow = require(`../../assets/images/sparrow.png`)
 const orca = require(`../../assets/images/orca.png`)
 const cheetah = require(`../../assets/images/cheetah.png`)
@@ -9,7 +11,6 @@ const owl = require(`../../assets/images/owl.png`)
 const polar_bear = require(`../../assets/images/polar_bear.png`)
 const snow_leopard = require(`../../assets/images/snow_leopard.png`)
 
-type spirit = 'sparrow' | 'orca' | 'cheetah' | 'elephant' | 'brown_bear' | 'sparrow2' | 'kingfisher' | 'owl' | 'polar_bear' | 'snow_leopard' | null
 export default [
     { id: 1, label: "Brown Bear", value: "brown_bear", },
     { id: 2, label: "Cheetah", value: "cheetah", },
@@ -22,7 +23,7 @@ export default [
     { id: 9, label: "Snow Leopard", value: "snow_leopard", },
     { id: 10, label: "Sparrow 2", value: "sparrow2", },
 ]
-export const spirit = (spirit_animal: spirit | null) => {
+export const spirit = (spirit_animal: spiritType | null) => {
     switch (spirit_animal) {
         case null:
             return cheetah

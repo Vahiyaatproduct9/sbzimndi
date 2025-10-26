@@ -14,7 +14,8 @@ export default async (access_token) => {
           users!items_bought_by_fkey(*)`
         )
         .eq("user_id", id)
-        .not("bought_by", "is", null);
+        .not("bought_by", "is", null)
+        .eq("complete", false);
       if (!orderError) {
         console.log("orderData: ", orderData);
         return {

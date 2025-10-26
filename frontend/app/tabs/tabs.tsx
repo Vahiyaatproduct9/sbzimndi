@@ -33,10 +33,7 @@ const Tabs = (props: props) => {
   useEffect(() => {
     const timer = setInterval(async () => {
       await refreshProfile({});
-    }, 60000 * 25);
-    // 1 min -> 60000
-    // 25 -> mins
-    // 60000 x 25 = 30 mins
+    }, 60000 * 30);
     return () => { clearInterval(timer) };
   }, [refreshProfile]);
   const animateProperty = {

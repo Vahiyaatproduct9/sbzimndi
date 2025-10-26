@@ -1,6 +1,6 @@
 import path from './path'
-export default async ({result, access_token}: {result: any[], access_token: string} ) => {
-    console.log({result, access_token})
+export default async ({ result, access_token }: { result: any[], access_token: string }) => {
+    console.log({ result, access_token })
     const res = await fetch(`${path}/verify-payment`, {
         method: 'POST',
         headers: {
@@ -11,5 +11,6 @@ export default async ({result, access_token}: {result: any[], access_token: stri
         })
     })
     const response = await res.json()
+    console.log('response from verifyPayment: ', response)
     return response
 }

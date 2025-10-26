@@ -7,6 +7,9 @@ export default async (item_id: string) => {
         },
         body: JSON.stringify({ item_id })
     })
-    const response = await res.json()
+    const response: {
+        success: boolean;
+        message: string;
+    } = await res.json()
     return response
 }

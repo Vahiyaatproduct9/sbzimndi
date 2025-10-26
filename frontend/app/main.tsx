@@ -1,9 +1,10 @@
 import React from 'react';
 import Home from './home';
-import ProductPage from './sections/product/mainPage';
+import ProductPage from './sections/product/productPage';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { tabs } from '../types/types';
+import Payment from './sections/product/payment/payment.tsx';
 import Notifications from './sections/accessories/items/notifications/notification';
 import Messages from './sections/accessories/items/messages/messages';
 import Orders from './sections/accessories/items/orders/orders';
@@ -12,7 +13,7 @@ import Details from './profile/details/details_v2';
 import Cart from './sections/accessories/items/cart/cart';
 import theme from '../colors/ColorScheme';
 import OrderConfirmed from './sections/accessories/items/orders/confirmed/OrderConfirmed';
-import OTP from './sections/accessories/items/orders/orderOTP/otp.tsx';
+import OTP from './sections/accessories/items/orders/orderOTP/otp';
 const Stack = createNativeStackNavigator();
 
 export default function ({
@@ -76,22 +77,24 @@ export default function ({
         />
         <Stack.Screen
           name="Product"
-          options={{
-            title: 'Details',
-          }}
+          options={{ title: 'Details' }}
           component={ProductPage as never}
+        />
+
+        <Stack.Screen
+          name="Text"
+          component={Text}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="RzpCheckout"
+          component={Payment as never}
           initialParams={{ setActiveTab }}
         />
         <Stack.Screen
           name="Profile"
           component={Details}
           options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name="Text"
-          component={Text}
-          options={{ headerShown: false }}
-          // initialParams={{ profile }}
         />
       </Stack.Navigator>
     </NavigationContainer>

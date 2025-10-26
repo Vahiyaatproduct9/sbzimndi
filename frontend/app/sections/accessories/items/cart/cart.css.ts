@@ -85,5 +85,12 @@ export default StyleSheet.create({
         // flex: 1,
         flexDirection: 'row',
         width: 'auto',
+    },
+    Notice: {
+        textAlign: 'center',
+        fontSize: 24,
+        color: theme.text,
+        fontWeight: '600',
+        paddingVertical: 120
     }
 })

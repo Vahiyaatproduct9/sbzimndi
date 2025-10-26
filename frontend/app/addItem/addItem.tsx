@@ -13,14 +13,13 @@ import {
   ScrollView,
 } from 'react-native';
 import handleSubmit from '../functions/handleAddItem.ts';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import css from './css.ts';
 import Message from '../components/message/message.tsx';
-import checkUser from '../../api/checkUser.ts';
 import imagePicker from '../functions/imagePicker.ts';
 import filterPrice from '../functions/filterPrice.ts';
 import compareDate from '../functions/compareDate.ts';
+import useLocationStore from '../store/useLocationStore.ts';
 type activeTab = 'home' | 'search' | 'add' | 'profile';
 interface prop {
   setActiveTab: React.Dispatch<React.SetStateAction<activeTab>>;
@@ -45,33 +44,21 @@ export default ({ setActiveTab }: prop) => {
   const [name, setName] = useState<string>('');
   const [quantity, setQuantity] = useState<string>('');
   const [desc, setDesc] = useState<string>('');
-  const [location, setLocation] = useState<number[] | null>(null);
+  const { latitude, longitude, accuracy, setLocation, requestPermission } =
+    useLocationStore();
   const [posted, setPosted] = useState<boolean | null | ''>('');
   // const [loading, setLoading] = useState<boolean | null | 'uploading'>(null)
   const changeDate = (e: any, date?: Date) => {
     setShow(Platform.OS === 'ios');
     if (date) setDate(date);
   };
-  useEffect(() => {
-    const checkandValidateUser = async () => {
-      const res = await checkUser({});
-      await AsyncStorage.setItem('access_token', res.access_token);
-      await AsyncStorage.setItem('refresh_token', res.refresh_token);
-      if (
-        !res.access_token ||
-        !res.refresh_token ||
-        res.access_token.length === 0 ||
-        res.refresh_token.length === 0
-      ) {
-        setMess('Please Login to upload post!');
-        setTimeout(() => setActiveTab('home'), 800);
-      }
-    };
-    checkandValidateUser();
-  }, []);
   const pickImage = () => {
     return imagePicker({ setPhoto, setMess });
   };
+  useEffect(() => {
+    requestPermission();
+    setLocation();
+  }, [requestPermission, setLocation]);
   useEffect(() => {
     if (posted) {
       setMess('Posted!');
@@ -79,7 +66,7 @@ export default ({ setActiveTab }: prop) => {
         setActiveTab('home');
       }, 2000);
     }
-  }, [posted]);
+  }, [posted, setActiveTab]);
 
   useEffect(() => {
     compareDate({ date, setShowNote });
@@ -213,10 +200,11 @@ export default ({ setActiveTab }: prop) => {
                     name,
                     date,
                     quantity,
-                    location,
+                    latitude,
+                    longitude,
+                    accuracy,
                     price,
                     desc,
-                    setLocation,
                     setMess,
                     setActiveTab,
                   });

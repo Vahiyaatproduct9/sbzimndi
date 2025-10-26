@@ -23,6 +23,7 @@ import getNearestItems from '../../../api/getNearestItems.ts';
 import useLocationStore from '../../store/useLocationStore.ts';
 import theme from '../../../colors/ColorScheme.ts';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import listOrders from '../../../api/listOrders.ts';
 
 const Body = () => {
   const navigation = useNavigation();
@@ -51,20 +52,22 @@ const Body = () => {
     });
     if (response.success === true) {
       setItems(response);
+      setFetched(true);
       await AsyncStorage.setItem(
         'items',
-        JSON.stringify({ ...response, time: Date.now() }),
+        JSON.stringify({ ...response, time: Date.now() } || []),
       );
     } else {
+      setFetched(false);
       setMessage('Please check your Internet Connection before trying again.');
     }
     return response.success;
   }, [accuracy, latitude, longitude]);
-  useEffect(() => {
+  useEffect((): void => {
     (async () => {
       try {
         const res = await AsyncStorage.getItem('items');
-        const parsedRes = res ? JSON.parse(res) : null;
+        const parsedRes = res ? JSON.parse(res) : [];
         console.log(parsedRes);
         if (parsedRes) {
           setItems(parsedRes);
@@ -79,10 +82,6 @@ const Body = () => {
     })();
   }, [accuracy, fetchItems, latitude, longitude]);
 
-  useEffect(() => {
-    items === null ? setFetched(false) : setFetched(true);
-    console.log(items);
-  }, [items]);
   let round = useSharedValue(0);
   const reload = async () => {
     console.log('button pressed');
@@ -107,7 +106,7 @@ const Body = () => {
           </Animated.View>
         </Pressable>
       </View>
-      {items && typeof items !== 'undefined' ? (
+      {items?.success && items?.data?.length > 0 ? (
         <View style={css.slider}>
           <FlatList
             data={items.data}
@@ -129,7 +128,6 @@ const Body = () => {
                         <Text style={{ color: Theme.text }}>
                           {item.expiry_date}
                         </Text>
-                        <Text style={{ color: Theme.text }}>₹{item.price}</Text>
                       </View>
                       <View
                         style={{
@@ -137,8 +135,7 @@ const Body = () => {
                           justifyContent: 'center',
                         }}
                       >
-                        <Text style={{ color: Theme.text }}>4.7</Text>
-                        <AntDesign name="star" size={32} color="gold" />
+                        <Text style={{ color: Theme.text }}>₹{item.price}</Text>
                       </View>
                     </View>
                   </View>
@@ -155,10 +152,15 @@ const Body = () => {
             }}
           />
         </View>
-      ) : fetched === false ? (
-        <Text>Please Connect to the Internet!</Text>
+      ) : items?.data?.length === 0 ? (
+        <>
+          <Text style={css.text}>No Products yet.</Text>
+          <Text style={css.text}>We're trying our best! Please Hang On.</Text>
+        </>
+      ) : items?.success ? (
+        <Text style={css.text}>Some Error Occured X{'('}</Text>
       ) : (
-        <Text>Loading...</Text>
+        <Text style={css.text}>Loading ...</Text>
       )}
     </Animated.View>
   );
@@ -194,7 +196,9 @@ const css = StyleSheet.create({
     height: 150,
     aspectRatio: '1',
   },
-  info: {},
+  info: {
+    marginTop: 10,
+  },
   infoinfo: {
     flexDirection: 'row',
   },
@@ -204,6 +208,13 @@ const css = StyleSheet.create({
     alignItems: 'center',
     padding: 10,
     borderRadius: 10,
+  },
+  text: {
+    marginTop: 30,
+    color: theme.text,
+    fontSize: 20,
+    textAlign: 'center',
+    fontWeight: '600',
   },
 });
 

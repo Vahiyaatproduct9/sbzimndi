@@ -1,5 +1,6 @@
 import express, { json } from "express";
 import cors from "cors";
+import notification from "./functions/notifications.js";
 import message from "./api/message.js";
 import verifyWithOTP from "./api/verifyWithOTP.js";
 import signup from "./api/signup.js";
@@ -204,11 +205,8 @@ app.post("/getItems", async (req, res) => {
 app.post("/addpost", upload.single("photo"), async (req, res) => {
   const info = JSON.parse(req.body.info);
   const photo = req.file;
-  if (!photo) return res.status(400).json({ error: "No file uploaded" });
-  const { itemError, imgError } = await addPost({ photo, info });
-  if (!imgError && !itemError) {
-    res.json({ status: 200 });
-  } else res.json({ status: imgError.status || 400 });
+  const response = await addPost({ photo, info });
+  res.json(response);
 });
 
 app.post("/updateprofile", upload.single("photo"), async (req, res) => {
@@ -246,7 +244,12 @@ app.post("/delete-notification", async (req, res) => {
   const response = await deleteNotification({ access_token, notification_id });
   res.json(response);
 });
-
+app.post("/toggle-notification", async (req, res) => {
+  const request = req.body;
+  const response = await notification(request);
+  res.json(response);
+});
+///jj
 app.post("/update-fcm", async (req, res) => {
   const { access_token, fcm_token } = req.body;
   console.log("rumning update-fcm from index");

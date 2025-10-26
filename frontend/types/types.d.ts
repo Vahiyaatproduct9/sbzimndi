@@ -69,7 +69,7 @@ export interface Address {
 }
 
 export interface User {
-    id: string;
+    id: string | null;
     bio: string | null;
     ifsc: string | null;
     email: string;
@@ -84,7 +84,7 @@ export interface User {
     upi_name: string | null;
     fcm_token: string | null;
     full_name: string;
-    user_type: "buyer" | "seller" | string;
+    user_type: "buyer" | "seller" | undefined | null;
     bank_proof: string | null;
     created_at: string;
     updated_at: string;
@@ -93,15 +93,17 @@ export interface User {
     aadhar_front: string | null;
     personal_pan: string | null;
     phone_number: string;
-    spirit_animal: string | null;
+    spirit_animal: spiritType | null;
     account_number: string | null;
     profile_picture: string | null;
     rzp_merchant_status: string | null;
     rzp_linked_account_id: string | null;
     rzp_stakeholder_account_id: string | null;
+    notification_on: boolean | null;
+    items: Item[] | null;
 }
 export interface Profile {
-    success: boolean | null;
+    success: boolean | null | undefined;
     error: {
         code: string | null | undefined;
         message: string | undefined;
@@ -161,3 +163,5 @@ export type SearchResult = {
     refIndex: number;
     score: number;
 };
+
+export type spiritType = 'sparrow' | 'orca' | 'cheetah' | 'elephant' | 'brown_bear' | 'sparrow2' | 'kingfisher' | 'owl' | 'polar_bear' | 'snow_leopard' | null

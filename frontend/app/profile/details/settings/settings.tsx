@@ -51,11 +51,11 @@ const Settings = ({ route }: { route: any }) => {
           component={EarnWithSbziMndi}
           options={{ title: 'Earn With SbziMndi' }}
         />
-        <Stack.Screen
+        {/* <Stack.Screen
           name="privacyPolicy"
           component={PrivacyPolicy}
           options={{ title: 'Privacy Policy' }}
-        />
+        /> */}
         <Stack.Screen
           name="donate"
           component={DonateToSbziMndi}

@@ -72,6 +72,12 @@ export default StyleSheet.create({
         fontSize: 25,
         fontWeight: 700
     },
+    table: {
+        flexDirection: 'row',
+        gap: 20,
+        justifyContent: 'space-between',
+        paddingHorizontal: 20
+    },
     spirit: {
         height: 200,
         width: 200,
@@ -98,5 +104,14 @@ export default StyleSheet.create({
     },
     buttonText: {
         color: theme.text
+    },
+    message: {
+        flexDirection: 'row',
+        gap: 10,
+        alignItems: 'center'
+    },
+    messageIcon: {
+        fontSize: 32,
+        color: theme.text,
     }
 })

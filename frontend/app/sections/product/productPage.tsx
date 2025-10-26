@@ -9,39 +9,38 @@ import MtoKm from '../../functions/meterstokm';
 import timeline from '../../functions/timeline';
 import useLocationStore from '../../store/useLocationStore';
 import theme from '../../../colors/ColorScheme';
-
-const ProductPage = ({
-  navigation,
-  route,
-}: {
-  navigation: any;
-  route: { params: { id: string } };
-}) => {
+import { order, User } from '../../../types/types';
+import { useNavigation } from '@react-navigation/native';
+import { useProfileStore } from '../../store/useProfileStore';
+type enhancedOrder = order & {
+  distance_meters: number;
+  users: User;
+};
+const ProductPage = ({ route }: { route: { params: { id: string } } }) => {
+  const navigation = useNavigation();
+  const profile = useProfileStore(s => s.profile);
   const { setLocation, latitude, longitude, accuracy } = useLocationStore();
   const { id } = route.params;
   const [pressed, setPressed] = useState<boolean>(false);
   const [message, setMessage] = useState<string>('');
-  const [item, setItem] = useState<any>(null);
+  const [item, setItem] = useState<enhancedOrder | null>(null);
   // Startup FUnction below!
   useEffect(() => {
     (async () => await setLocation())();
-  }, []);
+  }, [setLocation]);
   useEffect(() => {
     (async () =>
       await getItem(id).then(res => setItem(prev => ({ ...prev, ...res }))))();
   }, [id]);
   useEffect(() => {
-    (async () => {
-      const distance_meters = calculateDistance(
-        latitude ?? 0,
-        longitude ?? 0,
-        item ? item.latitude : 0,
-        item ? item.longitude : 0,
-      );
-      setItem((prev: any) => ({ ...prev, distance_meters }));
-    })();
-    console.log('ran function');
-  }, [latitude, longitude]);
+    const distance_meters = calculateDistance(
+      latitude ?? 0,
+      longitude ?? 0,
+      item?.latitude ?? 0,
+      item?.longitude ?? 0,
+    );
+    setItem((prev: any) => ({ ...prev, distance_meters }));
+  }, [latitude, longitude, item?.latitude, item?.longitude]);
   useEffect(() => {
     console.log('item updated', item);
   }, [item]);
@@ -49,6 +48,13 @@ const ProductPage = ({
     console.log('location updated', latitude, longitude, accuracy);
   }, [latitude, longitude, accuracy]);
   //Startup function ends !
+  const paymentPage = () => {
+    if (!profile) {
+      setMessage('Please Login to place Order.');
+      return;
+    }
+    navigation.navigate('RzpCheckout', { item });
+  };
   return (
     item && (
       <ScrollView
@@ -65,16 +71,24 @@ const ProductPage = ({
         <View style={css.priceContainer}>
           <Text style={css.price}>${item.price}</Text>
           <Text style={css.price}>{`expires ${timeline(
-            item.expiry_date,
+            String(item.expiry_date),
           )}`}</Text>
         </View>
         <View style={css.ownerContainer}>
-          <View style={css.ownerBox}>
+          <Pressable
+            style={css.ownerBox}
+            onPress={() =>
+              navigation.navigate('Profile' as never, {
+                user_id: item.user_id,
+                iambuyer: true,
+              })
+            }
+          >
             <FontAwesome name="user-circle" size={28} color={theme.text} />
             <Text style={css.owner}>
               {item.users ? item.users.full_name : 'Name'}
             </Text>
-          </View>
+          </Pressable>
           <Text style={css.away}>
             {item.distance_meters > 1000
               ? MtoKm(item.distance_meters)
@@ -91,7 +105,7 @@ const ProductPage = ({
             style={[css.order, pressed && css.pressed]}
             onPressIn={() => setPressed(true)}
             onPressOut={() => setPressed(false)}
-            onPress={() => navigation.navigate('RzpCheckout', { item })}
+            onPress={paymentPage}
           >
             <Text style={css.orderText}>Buy</Text>
           </Pressable>

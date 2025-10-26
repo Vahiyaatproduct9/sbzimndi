@@ -80,10 +80,7 @@ const Cart = () => {
         return (
           <View key={i} style={css.block}>
             <View style={css.imageContainer}>
-              <Image
-                source={{ uri: cartItem.image_url }}
-                style={css.image}
-              />
+              <Image source={{ uri: cartItem.image_url }} style={css.image} />
             </View>
             <View style={css.contentContainer}>
               <View style={css.content1}>
@@ -103,8 +100,10 @@ const Cart = () => {
                   <Text style={css.text4}>₹ {cartItem.price}</Text>
                 </View>
                 <View style={css.iconBox}>
-                  <Pressable style={{ bottom: 20 }}
-                    onPress={() => viewProfile({ user_id: cartItem.user_id })}>
+                  <Pressable
+                    style={{ bottom: 20 }}
+                    onPress={() => viewProfile({ user_id: cartItem.user_id })}
+                  >
                     <MaterialIcons style={css.icon1} name="account-circle" />
                   </Pressable>
 
@@ -125,7 +124,7 @@ const Cart = () => {
         );
       })
     ) : (
-      <Text>You bought Nothing.</Text>
+      <Text style={css.Notice}>You bought Nothing.</Text>
     );
   // Fix the async function. Remove the async thingy and do whatever the fuck you want.
   return (
@@ -136,7 +135,6 @@ const Cart = () => {
     >
       <Message state={setMessage} content={message} time={3} />
       {blocks()}
-      <Text>Hey</Text>
     </ScrollView>
   );
 };

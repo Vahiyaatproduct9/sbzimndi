@@ -1,8 +1,8 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import message, { requestPermission } from "@react-native-firebase/messaging";
+import message from "@react-native-firebase/messaging";
 export default async () => {
   const messaging = message()
-  const authStatus = await requestPermission(messaging);
+  const authStatus = await messaging.requestPermission();
   if (
     authStatus === message.AuthorizationStatus.AUTHORIZED ||
     authStatus === message.AuthorizationStatus.PROVISIONAL

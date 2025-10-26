@@ -1,3 +1,5 @@
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
+import Ionicons from 'react-native-vector-icons/Ionicons'
 import {
   View,
   Text,
@@ -68,15 +70,12 @@ const Search = () => {
       if (searchContent.length > 2) {
         const res = async () => {
           setLoading(true);
-          const result: {
-            result: SearchResult[] | null;
-            status: number;
-          } | null = await search({
+          const result = await search({
             longitude: longitude ?? 0,
             latitude: latitude ?? 0,
             query: searchContent,
           });
-          if (result?.status === 200) {
+          if (result?.success === true) {
             setSearchResult(result.result);
             setLoading(null);
           } else {
@@ -97,7 +96,7 @@ const Search = () => {
   }
   // NEED REDESIGN ASAP. DO IT NOWW.
   const blocks = () => {
-    return searchResult && Array.isArray(searchResult) ? (
+    return searchResult && Array.isArray(searchResult) && searchResult.length > 0 ? (
       searchResult.map(item => {
         return (
           <Pressable
@@ -141,11 +140,20 @@ const Search = () => {
     ) : loading === true ? (
       <Text style={css.notice}>Loading..</Text>
     ) : loading === false ? (
-      <Text style={css.notice}>Something went wrong X(</Text>
+      <View style={css.noticeContainer}>
+        <MaterialIcons name='running-with-errors' style={css.icon} />
+        <Text style={css.notice}>Something went wrong!</Text>
+      </View>
     ) : loading === null && searchContent.length === 0 ? (
-      <Text style={css.notice}>Search to get Started</Text>
+      <View style={css.noticeContainer}>
+        <Ionicons name='search' style={css.icon} />
+        <Text style={css.notice}>Search to get Started</Text>
+      </ View>
     ) : (
-      <Text style={css.notice}>No Results :(</Text>
+      <View style={css.noticeContainer}>
+        <Text style={css.notice}>{':('}</Text>
+        <Text style={css.notice}>No Results</Text>
+      </View>
     );
   };
 

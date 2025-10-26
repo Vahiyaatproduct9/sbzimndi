@@ -59,6 +59,19 @@ export default StyleSheet.create({
     btntxt: {
         color: theme.text,
         fontSize: 20,
+    },
+    resend: {
+        backgroundColor: theme.tint,
+        padding: 10,
+        paddingHorizontal: 30,
+        alignSelf: 'flex-end',
+        margin: 20,
+        borderRadius: 20
+    },
+    resendTxt: {
+        color: theme.text,
+        fontSize: 15,
+
     }
 
 })
