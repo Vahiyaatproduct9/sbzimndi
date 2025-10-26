@@ -41,7 +41,7 @@ export default async function addPost({ photo, info }) {
       accuracy: info.accuracy,
       image_url: `${process.env.supabaseUrl}/storage/v1/object/public/uploads/${fileName}`,
       user_id: id,
-      location: `POINT(${info.latitude} ${info.longitude})`,
+      location: `POINT(${info.longitude} ${info.latitude})`,
     });
     if (itemError) {
       console.log("item error:", itemError);
